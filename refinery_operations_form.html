@@ -1,0 +1,349 @@
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <title>Refinery Operations | نموذج عمليات التكرير</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #111111;
+      --card-bg: #f5f5f5;
+      --border: #dddddd;
+      --accent: #0066cc;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #101010;
+        --fg: #f5f5f5;
+        --card-bg: #1c1c1c;
+        --border: #333333;
+        --accent: #4ea3ff;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      display: flex;
+      justify-content: center;
+    }
+
+    main {
+      width: 100%;
+      max-width: 800px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 20px 18px;
+      box-shadow: 0 8px 26px rgba(0,0,0,0.12);
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin: 0 0 18px;
+      text-align: center;
+    }
+
+    h1 span {
+      display: block;
+      font-size: 0.9rem;
+      opacity: 0.75;
+      margin-top: 4px;
+    }
+
+    form {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    select {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent);
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      opacity: 0.7;
+    }
+
+    #placeholder {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px dashed var(--border);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .footer-notes {
+      margin-top: 22px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      font-size: 0.7rem;
+      line-height: 1.6;
+      opacity: 0.85;
+    }
+
+    .footer-notes h2 {
+      font-size: 0.8rem;
+      margin: 0 0 6px;
+    }
+
+    .footer-notes ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .footer-notes li {
+      margin-bottom: 3px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 12px;
+      }
+      main {
+        padding: 18px 14px 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>
+      Refinery Operations Selector
+      <span>نموذج اختيار بيانات تشغيل وحدة التقطير</span>
+    </h1>
+
+    <form id="refineryForm">
+      <!-- 1) نوع الخام -->
+      <div class="field">
+        <label for="crudeType">Crude Type / نوع الخام</label>
+        <select id="crudeType" required>
+          <option value="">— اختر نوع الخام / Select crude —</option>
+          <option value="KEC">KEC</option>
+          <option value="KSRC">KSRC</option>
+          <option value="KMHC">KMHC</option>
+        </select>
+      </div>
+
+      <!-- 2) نوع التشغيل (KEC فقط) -->
+      <div class="field" id="operationField">
+        <label for="operationType">KEC Operating Mode / وضع تشغيل KEC</label>
+        <select id="operationType">
+          <!-- تعبئة تلقائية حسب نوع الخام -->
+        </select>
+        <span class="hint">Only for KEC / يظهر فقط مع خام KEC</span>
+      </div>
+
+      <!-- 3) كمية KBPD -->
+      <div class="field">
+        <label for="kbpd">Feed Rate (KBPD) / كمية التغذية (ألف برميل/يوم)</label>
+        <select id="kbpd" required>
+          <!-- تعبئة تلقائية حسب نوع الخام ووضع التشغيل -->
+        </select>
+      </div>
+
+      <!-- 4) نوع النتيجة المطلوبة -->
+      <div class="field">
+        <label for="resultType">Result Type / نوع النتيجة المطلوبة</label>
+        <select id="resultType" required>
+          <option value="">— اختر / Select —</option>
+          <option value="operating">
+            Operating Parameters / معايير التشغيل
+          </option>
+          <option value="yields">
+            Product Yields / كمية الإنتاج
+          </option>
+          <option value="quality">
+            Product Quality / جودة المنتجات
+          </option>
+        </select>
+      </div>
+    </form>
+
+    <!-- Placeholder مستقبلي لعرض النتائج -->
+    <section id="placeholder">
+      <p>اختر نوع الخام، ووضع التشغيل (إن وجد)، وكمية الـ KBPD، ونوع النتيجة المطلوبة من القوائم أعلاه.</p>
+      <p>Choose the crude type, operating mode (if applicable), KBPD, and desired result type from the lists above.</p>
+    </section>
+
+    <!-- الملاحظات بذيل الصفحة -->
+    <section class="footer-notes">
+      <h2>Notes / ملاحظات</h2>
+      <ul>
+        <li>
+          The above parameters are based on previous performance with maximum yields and stable operation. A variation is acceptable if the column profile is maintained. Minor adjustments may be done as needed. Any major deviation should be discussed in advance with PE.
+        </li>
+        <li>
+          The above are general guidelines. Desalter process parameters &amp; chemical dosage shared through the NALCO group shall be followed.
+        </li>
+        <li>
+          Cut points and operating conditions to be optimized depending on Diesel Cloud Point (on-spec −7&nbsp;°C in winter and 4&nbsp;°C in summer).
+        </li>
+        <li>
+          If SSW pH goes below 8, switch over to LP condensate processing.
+        </li>
+        <li>
+          If desalter effluent pH goes below 4.5, U35 shall be contacted to optimize caustic injection.
+        </li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      // ضبط لغة واتجاه الصفحة حسب لغة المتصفح
+      const htmlEl = document.documentElement;
+      const userLang = (navigator.language || navigator.userLanguage || "en").toLowerCase();
+
+      if (userLang.startsWith("ar")) {
+        htmlEl.lang = "ar";
+        htmlEl.dir = "rtl";
+      } else {
+        htmlEl.lang = "en";
+        htmlEl.dir = "ltr";
+      }
+
+      const crudeSelect = document.getElementById("crudeType");
+      const opField = document.getElementById("operationField");
+      const opSelect = document.getElementById("operationType");
+      const kbpdSelect = document.getElementById("kbpd");
+
+      // القيم مأخوذة من جداول الملف:
+      const config = {
+        KEC: {
+          operations: {
+            withHeavy: {
+              value: "withHeavy",
+              label: "With Heavy Diesel / مع ديزل ثقيل",
+              // KEC Max. with Heavy Diesel (KBPD)
+              kbpd: [205000, 200000, 175000, 155000],
+            },
+            withoutHeavy: {
+              value: "withoutHeavy",
+              label: "Without Heavy Diesel / بدون ديزل ثقيل",
+              // KEC Max. without Heavy Diesel (KBPD)
+              kbpd: [150000, 120000, 105000],
+            },
+            naphtha: {
+              value: "naphtha",
+              label: "Naphtha Mode / وضع النفثا",
+              // KEC Max. Naphtha Mode (KBPD)
+              kbpd: [205000],
+            },
+          },
+        },
+        KSRC: {
+          // KSRC table (KBPD)
+          kbpd: [120000],
+        },
+        KMHC: {
+          // KMHC table (KBPD)
+          kbpd: [200000, 120000],
+        },
+      };
+
+      function resetSelect(selectEl, placeholderText) {
+        selectEl.innerHTML = "";
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = placeholderText;
+        selectEl.appendChild(opt);
+      }
+
+      function fillKbpdOptions(list) {
+        list.forEach((v) => {
+          const o = document.createElement("option");
+          o.value = String(v);
+          o.textContent = v.toLocaleString();
+          kbpdSelect.appendChild(o);
+        });
+      }
+
+      function updateOperationAndKbpd() {
+        const crude = crudeSelect.value;
+        resetSelect(kbpdSelect, "— اختر / Select —");
+
+        if (crude === "KEC") {
+          // إظهار حقل وضع التشغيل
+          opField.style.display = "";
+          resetSelect(opSelect, "— اختر وضع التشغيل / Select operating mode —");
+
+          const ops = config.KEC.operations;
+          Object.keys(ops).forEach((key) => {
+            const item = ops[key];
+            const o = document.createElement("option");
+            o.value = item.value;
+            o.textContent = item.label;
+            opSelect.appendChild(o);
+          });
+        } else if (crude === "KSRC" || crude === "KMHC") {
+          // إخفاء حقل وضع التشغيل
+          opField.style.display = "none";
+          opSelect.innerHTML = "";
+
+          const kbpdList = (config[crude] && config[crude].kbpd) || [];
+          fillKbpdOptions(kbpdList);
+        } else {
+          opField.style.display = "none";
+          opSelect.innerHTML = "";
+        }
+      }
+
+      function updateKbpdForOperation() {
+        const crude = crudeSelect.value;
+        const op = opSelect.value;
+        resetSelect(kbpdSelect, "— اختر / Select —");
+
+        if (crude === "KEC") {
+          const ops = config.KEC.operations;
+          const selected = Object.values(ops).find((o) => o.value === op) || null;
+          if (selected) {
+            fillKbpdOptions(selected.kbpd);
+          }
+        }
+      }
+
+      crudeSelect.addEventListener("change", updateOperationAndKbpd);
+      opSelect.addEventListener("change", updateKbpdForOperation);
+
+      // تعبئة أولية
+      updateOperationAndKbpd();
+    })();
+  </script>
+</body>
+</html>
