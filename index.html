@@ -56,7 +56,7 @@
     header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       gap: 10px;
       margin-bottom: 16px;
     }
@@ -76,33 +76,26 @@
       opacity: 0.8;
     }
 
-    .lang-switch {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      align-items: flex-end;
-      font-size: 0.8rem;
-      white-space: nowrap;
-    }
-
-    .lang-switch label {
-      font-weight: 600;
-      font-size: 0.8rem;
-    }
-
-    .lang-switch select {
-      padding: 4px 8px;
+    .lang-toggle {
+      display: inline-flex;
       border-radius: 999px;
       border: 1px solid var(--border);
+      overflow: hidden;
       background: var(--bg);
-      color: var(--fg);
-      font-size: 0.8rem;
-      outline: none;
     }
 
-    .lang-switch select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px var(--accent-soft);
+    .lang-btn {
+      border: none;
+      background: transparent;
+      padding: 4px 12px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      min-width: 40px;
+    }
+
+    .lang-btn.active {
+      background: var(--accent);
+      color: #ffffff;
     }
 
     form {
@@ -148,7 +141,7 @@
       margin-top: 4px;
     }
 
-    button {
+    button.primary {
       border: none;
       border-radius: 999px;
       padding: 8px 18px;
@@ -164,14 +157,14 @@
       transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.08s ease;
     }
 
-    button:disabled {
+    button.primary:disabled {
       opacity: 0.55;
       cursor: default;
       box-shadow: none;
       transform: none;
     }
 
-    button:not(:disabled):active {
+    button.primary:not(:disabled):active {
       transform: translateY(1px);
       box-shadow: 0 3px 8px rgba(0,0,0,0.35);
     }
@@ -202,13 +195,21 @@
       font-size: 0.98rem;
     }
 
-    #resultsDetails {
+    #resultsSummary,
+    #resultsParams {
       margin: 0;
-      padding-left: 16px;
+      padding-left: 18px;
     }
 
-    #resultsDetails li {
+    #resultsSummary li,
+    #resultsParams li {
       margin-bottom: 2px;
+    }
+
+    .results-section-title {
+      margin: 8px 0 2px;
+      font-weight: 600;
+      font-size: 0.9rem;
     }
 
     .results-note {
@@ -255,11 +256,8 @@
         padding: 18px 14px 14px;
       }
       header {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .lang-switch {
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
       }
     }
   </style>
@@ -273,13 +271,9 @@
           Crude / feed case selector for KEC, KSRC, KMHC
         </div>
       </div>
-      <div class="lang-switch">
-        <label for="uiLang" id="lang-label">Language</label>
-        <select id="uiLang">
-          <option value="auto">Auto</option>
-          <option value="ar">العربية</option>
-          <option value="en">English</option>
-        </select>
+      <div class="lang-toggle" aria-label="Language">
+        <button type="button" class="lang-btn" data-lang="ar">ع</button>
+        <button type="button" class="lang-btn" data-lang="en">E</button>
       </div>
     </header>
 
@@ -287,7 +281,7 @@
       <div class="field">
         <span class="field-label" id="label-crude">Crude type</span>
         <select id="crudeType" required>
-          <option value="">{{placeholder_crude}}</option>
+          <option value=""></option>
           <option value="KEC">KEC</option>
           <option value="KSRC">KSRC</option>
           <option value="KMHC">KMHC</option>
@@ -312,7 +306,7 @@
       <div class="field">
         <span class="field-label" id="label-result">Result type</span>
         <select id="resultType" required>
-          <option value="">{{placeholder_result}}</option>
+          <option value=""></option>
           <option value="operating">operating</option>
           <option value="yields">yields</option>
           <option value="quality">quality</option>
@@ -321,7 +315,7 @@
     </form>
 
     <div class="actions">
-      <button id="showBtn" type="button" disabled>
+      <button id="showBtn" class="primary" type="button" disabled>
         <span id="btn-text">Show results</span>
       </button>
     </div>
@@ -336,10 +330,13 @@
 
     <section id="resultsCard">
       <h2 id="results-title">Selection summary</h2>
-      <ul id="resultsDetails"></ul>
+      <ul id="resultsSummary"></ul>
+
+      <div class="results-section-title" id="params-title"></div>
+      <ul id="resultsParams"></ul>
+
       <div class="results-note" id="results-note">
-        This selection corresponds to one of the cases in "Unit parameters at various feeds".
-        Use the case name and KBPD to locate the exact row in the tables.
+        Only the first KEC case (with Heavy Diesel, 205,000 KBPD) is fully mapped here.
       </div>
     </section>
 
@@ -373,12 +370,11 @@
 
   <script>
     (function () {
-      // --- i18n strings ---
+      // --- i18n ---
       const i18n = {
         en: {
           titleMain: "Refinery Operations Selector",
           titleSub: "Crude / feed case selector for KEC, KSRC, KMHC",
-          langLabel: "Language",
           crudeLabel: "Crude type",
           crudePlaceholder: "Select crude type…",
           opLabel: "KEC operating mode",
@@ -395,8 +391,10 @@
           placeholder1:
             "Select crude, operating mode (if KEC), KBPD and result type, then press \"Show results\".",
           resultsTitle: "Selection summary",
+          paramsTitleOperating: "Operating parameters for this case",
+          paramsTitleOther: "Detailed values are not mapped yet for this result type.",
           resultsNote:
-            "This selection corresponds to one of the cases in \"Unit parameters at various feeds\". Use the case name and KBPD to locate the exact row in the tables.",
+            "Only the first KEC case (with Heavy Diesel, 205,000 KBPD) is fully mapped here.",
           validationIncomplete:
             "Please complete all selections (crude, KBPD, and result type — and operating mode for KEC).",
           resCrude: "Crude type",
@@ -419,11 +417,12 @@
             yields: "Product yields",
             quality: "Product quality",
           },
+          notMapped:
+            "This combination is not mapped yet. For now only KEC with Heavy Diesel at 205,000 KBPD has full operating parameters.",
         },
         ar: {
           titleMain: "نموذج تشغيل وحدة التكرير",
           titleSub: "اختيار حالة التشغيل للخام KEC و KSRC و KMHC",
-          langLabel: "اللغة",
           crudeLabel: "نوع الخام",
           crudePlaceholder: "اختر نوع الخام…",
           opLabel: "وضع التشغيل (KEC فقط)",
@@ -440,8 +439,10 @@
           placeholder1:
             "اختر نوع الخام ووضع التشغيل (إذا كان KEC) وقيمة الـ KBPD ونوع النتيجة المطلوبة، ثم اضغط \"عرض النتائج\".",
           resultsTitle: "تفاصيل الاختيار",
+          paramsTitleOperating: "معايير التشغيل لهذي الحالة",
+          paramsTitleOther: "تفاصيل القيم لهذي النتيجة مو مضافة للحين.",
           resultsNote:
-            "هذا الاختيار يطابق حالة من جدول \"Unit parameters at various feeds\". استخدم اسم الحالة وقيمة KBPD للوصول إلى الصف الصحيح في الجداول.",
+            "حالياً فقط أول حالة KEC (مع ديزل ثقيل ٢٠٥٬٠٠٠ KBPD) مضافة بالكامل بمعايير التشغيل.",
           validationIncomplete:
             "رجاءً أكمل كل القوائم (نوع الخام، كمية KBPD، ونوع النتيجة، مع وضع التشغيل في حالة KEC).",
           resCrude: "نوع الخام",
@@ -464,24 +465,104 @@
             yields: "كميات الإنتاج",
             quality: "جودة المنتجات",
           },
+          notMapped:
+            "هذي التركيبة مو مضافة للحين. حالياً بس KEC مع ديزل ثقيل على ٢٠٥٬٠٠٠ KBPD فيها كل معايير التشغيل.",
         },
       };
 
-      // --- data from tables (complete KBPD lists) ---
+      // Data: only first KEC case (with Heavy Diesel, 205000 KBPD)
+      const operatingData = {
+        KEC: {
+          withHeavy: {
+            205000: [
+              ["Crude Feed (Tank)", "sm3/hr", 1342],
+              ["Slops", "sm3/hr", 36],
+              ["Wild Naphtha", "sm3/hr", 10],
+              ["Heater Feed Rate", "sm3/hr", 1230],
+              ["Washwater flow to Desalter V02 (75% of total) (2)", "%", 50],
+              ["Washwater flow to Desalter E01 crude side (25% of total) (2)", "%", 17],
+              ["V-0001 inlet temperature (2)", "°C", 149],
+              ["V-0002 inlet temperature (2)", "°C", 148],
+              ["E-10 Exchanger Outlet Temp to Preflash Drum (3)", "°C", 200],
+              ["Heater Outlet Temperature", "°C", 371],
+              ["Column Top Temperature", "°C", 112],
+              ["Top Column Pressure", "barg", 1],
+              ["Top Pump Around Flow", "sm3/hr", 1621],
+              ["Top Pump Around Draw Temperature", "°C", 127],
+              ["Top Pump Around Return Temperature", "°C", 165],
+              ["Middle Pump Around Flow", "sm3/hr", 1186],
+              ["Middle Pump Around Draw Temperature", "°C", 219],
+              ["Middle Pump Around Return Temperature", "°C", 165],
+              ["Bottom Pump Around Flow", "sm3/hr", 900],
+              ["Bottom Pump Around Draw Temperature", "°C", 291],
+              ["Bottom Pump Around Return Temperature", "°C", 244],
+              ["Column Bottom Temperature", "°C", 348],
+              ["Kerosene Draw Temperature", "°C", 178],
+              ["Kerosene Reboiler Temperature", "°C", 216],
+              ["Light Diesel Draw Temperature", "°C", 264],
+              ["Heavy Diesel Draw Temperature", "°C", 318],
+              ["Overflow flash flow", "sm3/hr", 113],
+              ["Stripping Steam Temperature", "°C", 275],
+              ["Stripping steam to crude column", "kg/hr", 22500],
+              ["Stripping Steam to Light Diesel Stripper (3)", "kg/hr", 1200],
+              ["Stripping Steam to Heavy Diesel Stripper (3)", "kg/hr", 350],
+              ["Stabilizer feed temperature", "°C", 102],
+              ["Stabilizer reboiler inlet temperature", "°C", 147],
+              ["Stabilizer Reboiler outlet temperature", "°C", 160],
+              ["Stabilizer reflux flow", "sm3/hr", 35],
+              ["BPA to reboiler inlet temperature", "°C", 235],
+              ["BPA to reboiler flow", "sm3/hr", 900],
+            ],
+          },
+        },
+      };
+
+      const htmlEl = document.documentElement;
+      const titleMainEl = document.getElementById("title-main");
+      const titleSubEl = document.getElementById("title-sub");
+
+      const langButtons = Array.from(document.querySelectorAll(".lang-btn"));
+
+      const labelCrude = document.getElementById("label-crude");
+      const labelOp = document.getElementById("label-operation");
+      const hintOp = document.getElementById("hint-operation");
+      const labelKbpd = document.getElementById("label-kbpd");
+      const labelResult = document.getElementById("label-result");
+
+      const crudeSelect = document.getElementById("crudeType");
+      const opField = document.getElementById("operationField");
+      const opSelect = document.getElementById("operationType");
+      const kbpdSelect = document.getElementById("kbpd");
+      const resultSelect = document.getElementById("resultType");
+
+      const placeholderText1 = document.getElementById("placeholder-text-1");
+      const btn = document.getElementById("showBtn");
+      const btnText = document.getElementById("btn-text");
+      const validationMsg = document.getElementById("validationMsg");
+
+      const resultsCard = document.getElementById("resultsCard");
+      const resultsTitle = document.getElementById("results-title");
+      const resultsSummary = document.getElementById("resultsSummary");
+      const paramsTitleEl = document.getElementById("params-title");
+      const resultsParams = document.getElementById("resultsParams");
+      const resultsNote = document.getElementById("results-note");
+
+      let currentLang = "en";
+
       const config = {
         KEC: {
           operations: {
             withHeavy: {
               value: "withHeavy",
-              kbpd: [205000, 200000, 175000, 155000, 130000, 105000], // KEC Max. with Heavy Diesel
+              kbpd: [205000, 200000, 175000, 155000, 130000, 105000],
             },
             withoutHeavy: {
               value: "withoutHeavy",
-              kbpd: [200000, 195000, 180000, 160000, 150000, 120000, 105000], // KEC Max. without Heavy Diesel
+              kbpd: [200000, 195000, 180000, 160000, 150000, 120000, 105000],
             },
             naphtha: {
               value: "naphtha",
-              kbpd: [205000], // KEC Max. Naphtha Mode
+              kbpd: [205000],
             },
           },
         },
@@ -492,34 +573,6 @@
           kbpd: [200000, 120000],
         },
       };
-
-      // --- DOM refs ---
-      const htmlEl = document.documentElement;
-      const titleMainEl = document.getElementById("title-main");
-      const titleSubEl = document.getElementById("title-sub");
-      const langLabelEl = document.getElementById("lang-label");
-      const uiLangSelect = document.getElementById("uiLang");
-
-      const labelCrude = document.getElementById("label-crude");
-      const labelOp = document.getElementById("label-operation");
-      const hintOp = document.getElementById("hint-operation");
-      const labelKbpd = document.getElementById("label-kbpd");
-      const labelResult = document.getElementById("label-result");
-      const crudeSelect = document.getElementById("crudeType");
-      const opField = document.getElementById("operationField");
-      const opSelect = document.getElementById("operationType");
-      const kbpdSelect = document.getElementById("kbpd");
-      const resultSelect = document.getElementById("resultType");
-      const placeholderText1 = document.getElementById("placeholder-text-1");
-      const btn = document.getElementById("showBtn");
-      const btnText = document.getElementById("btn-text");
-      const validationMsg = document.getElementById("validationMsg");
-      const resultsCard = document.getElementById("resultsCard");
-      const resultsTitle = document.getElementById("results-title");
-      const resultsDetails = document.getElementById("resultsDetails");
-      const resultsNote = document.getElementById("results-note");
-
-      let currentLang = "en";
 
       function detectDefaultLang() {
         const navLang =
@@ -550,7 +603,6 @@
         list.forEach((v) => {
           const o = document.createElement("option");
           o.value = String(v);
-          // thousands separator depends on locale
           const formatted =
             lang === "ar"
               ? v.toLocaleString("ar-EG")
@@ -564,13 +616,10 @@
         currentLang = lang in i18n ? lang : "en";
         const t = i18n[currentLang];
 
-        // direction + lang attribute
         setDirForLang(currentLang);
 
-        // texts
         titleMainEl.textContent = t.titleMain;
         titleSubEl.textContent = t.titleSub;
-        langLabelEl.textContent = t.langLabel;
 
         labelCrude.textContent = t.crudeLabel;
         labelOp.textContent = t.opLabel;
@@ -583,25 +632,17 @@
         resultsNote.textContent = t.resultsNote;
 
         // placeholders
-        // crude
-        const crudePlaceholder =
-          crudeSelect.options[0] && crudeSelect.options[0].value === ""
-            ? crudeSelect.options[0]
-            : null;
-        if (crudePlaceholder) {
-          crudePlaceholder.textContent = t.crudePlaceholder;
+        if (crudeSelect.options[0]) {
+          crudeSelect.options[0].textContent = t.crudePlaceholder;
+        }
+        if (kbpdSelect.options[0]) {
+          kbpdSelect.options[0].textContent = t.kbpdPlaceholder;
+        }
+        if (resultSelect.options[0]) {
+          resultSelect.options[0].textContent = t.resultPlaceholder;
         }
 
-        // result
-        const resultPlaceholder =
-          resultSelect.options[0] && resultSelect.options[0].value === ""
-            ? resultSelect.options[0]
-            : null;
-        if (resultPlaceholder) {
-          resultPlaceholder.textContent = t.resultPlaceholder;
-        }
-
-        // result labels inside options
+        // result labels
         for (let i = 0; i < resultSelect.options.length; i++) {
           const opt = resultSelect.options[i];
           if (opt.value === "operating") opt.textContent = t.resultOperating;
@@ -609,7 +650,6 @@
           else if (opt.value === "quality") opt.textContent = t.resultQuality;
         }
 
-        // repopulate operation + kbpd lists so labels/formatting match language
         updateOperationAndKbpd(true);
       }
 
@@ -617,28 +657,22 @@
         const crude = crudeSelect.value;
         const t = i18n[currentLang];
 
-        // reset KBPD
         resetSelect(kbpdSelect, t.kbpdPlaceholder);
 
         if (crude === "KEC") {
           opField.style.display = "";
           if (forceResetOp) {
             resetSelect(opSelect, t.opPlaceholder);
+          } else if (!opSelect.options.length) {
+            resetSelect(opSelect, t.opPlaceholder);
           }
 
-          // clear existing, keep placeholder
-          const existingPlaceholder = opSelect.options[0];
+          // clear ops except placeholder
+          const ph = opSelect.options[0];
           opSelect.innerHTML = "";
-          if (existingPlaceholder) {
-            existingPlaceholder.value = "";
-            existingPlaceholder.textContent = t.opPlaceholder;
-            opSelect.appendChild(existingPlaceholder);
-          } else {
-            const ph = document.createElement("option");
-            ph.value = "";
-            ph.textContent = t.opPlaceholder;
-            opSelect.appendChild(ph);
-          }
+          ph.value = "";
+          ph.textContent = t.opPlaceholder;
+          opSelect.appendChild(ph);
 
           const ops = config.KEC.operations;
           Object.keys(ops).forEach((key) => {
@@ -721,23 +755,58 @@
           : "—";
         const resName = t.resultTypeNames[resVal] || "—";
 
-        resultsDetails.innerHTML = "";
+        resultsSummary.innerHTML = "";
+        resultsParams.innerHTML = "";
 
-        function addRow(label, value) {
+        function addSummaryRow(label, value) {
           const li = document.createElement("li");
           li.textContent = label + ": " + value;
-          resultsDetails.appendChild(li);
+          resultsSummary.appendChild(li);
         }
 
-        addRow(t.resCrude, crudeName);
-        addRow(t.resOperation, opName);
-        addRow(t.resKbpd, kbpdText);
-        addRow(t.resType, resName);
+        addSummaryRow(t.resCrude, crudeName);
+        addSummaryRow(t.resOperation, opName);
+        addSummaryRow(t.resKbpd, kbpdText);
+        addSummaryRow(t.resType, resName);
+
+        // operating params
+        if (
+          resVal === "operating" &&
+          crudeVal === "KEC" &&
+          opVal === "withHeavy" &&
+          kbpdVal === "205000" &&
+          operatingData.KEC &&
+          operatingData.KEC.withHeavy &&
+          operatingData.KEC.withHeavy[205000]
+        ) {
+          paramsTitleEl.textContent = t.paramsTitleOperating;
+          operatingData.KEC.withHeavy[205000].forEach((row) => {
+            const [name, unit, value] = row;
+            const li = document.createElement("li");
+            li.textContent = name + ": " + value + " " + unit;
+            resultsParams.appendChild(li);
+          });
+        } else {
+          paramsTitleEl.textContent = t.paramsTitleOther;
+          const li = document.createElement("li");
+          li.textContent = t.notMapped;
+          resultsParams.appendChild(li);
+        }
 
         resultsCard.style.display = "block";
       }
 
-      // --- events ---
+      function setLangButtonsActive(lang) {
+        langButtons.forEach((btn) => {
+          if (btn.getAttribute("data-lang") === lang) {
+            btn.classList.add("active");
+          } else {
+            btn.classList.remove("active");
+          }
+        });
+      }
+
+      // Events
       crudeSelect.addEventListener("change", function () {
         updateOperationAndKbpd(true);
       });
@@ -751,18 +820,17 @@
 
       btn.addEventListener("click", showResults);
 
-      uiLangSelect.addEventListener("change", function () {
-        const val = uiLangSelect.value;
-        if (val === "auto") {
-          applyLanguage(detectDefaultLang());
-        } else {
-          applyLanguage(val);
-        }
+      langButtons.forEach((btnEl) => {
+        btnEl.addEventListener("click", function () {
+          const lang = btnEl.getAttribute("data-lang");
+          setLangButtonsActive(lang);
+          applyLanguage(lang);
+        });
       });
 
-      // --- initial ---
+      // Initial
       const defaultLang = detectDefaultLang();
-      uiLangSelect.value = "auto";
+      setLangButtonsActive(defaultLang);
       applyLanguage(defaultLang);
     })();
   </script>
