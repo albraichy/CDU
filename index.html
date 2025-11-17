@@ -59,6 +59,7 @@
       align-items: center;
       gap: 10px;
       margin-bottom: 16px;
+      direction: ltr; /* ثابت: العنوان يسار والسويتش يمين بأي لغة */
     }
 
     .title-block {
@@ -191,31 +192,47 @@
     }
 
     #resultsCard h2 {
-      margin: 0 0 4px;
+      margin: 0 0 8px;
       font-size: 0.98rem;
     }
 
-    #resultsSummary,
-    #resultsParams {
-      margin: 0;
-      padding-left: 18px;
+    .results-message {
+      font-size: 0.8rem;
+      opacity: 0.9;
+      margin-bottom: 4px;
     }
 
-    #resultsSummary li,
-    #resultsParams li {
-      margin-bottom: 2px;
+    .table-wrapper {
+      margin-top: 4px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--bg);
     }
 
-    .results-section-title {
-      margin: 8px 0 2px;
-      font-weight: 600;
-      font-size: 0.9rem;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
     }
 
-    .results-note {
-      margin-top: 6px;
-      font-size: 0.78rem;
-      opacity: 0.8;
+    thead {
+      background: color-mix(in srgb, var(--accent-soft) 60%, transparent);
+    }
+
+    th, td {
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    tr:nth-child(even) td {
+      background: color-mix(in srgb, var(--card-bg) 70%, transparent);
+    }
+
+    th:first-child,
+    td:first-child {
+      width: 55%;
     }
 
     .validation-msg {
@@ -255,10 +272,6 @@
       main {
         padding: 18px 14px 14px;
       }
-      header {
-        flex-direction: row;
-        align-items: center;
-      }
     }
   </style>
 </head>
@@ -290,17 +303,13 @@
 
       <div class="field" id="operationField">
         <span class="field-label" id="label-operation">KEC operating mode</span>
-        <select id="operationType">
-          <!-- options via JS -->
-        </select>
+        <select id="operationType"></select>
         <span class="hint" id="hint-operation">Only applicable when KEC is selected</span>
       </div>
 
       <div class="field">
         <span class="field-label" id="label-kbpd">Feed rate (KBPD)</span>
-        <select id="kbpd" required>
-          <!-- options via JS -->
-        </select>
+        <select id="kbpd" required></select>
       </div>
 
       <div class="field">
@@ -329,48 +338,29 @@
     <div class="validation-msg" id="validationMsg"></div>
 
     <section id="resultsCard">
-      <h2 id="results-title">Selection summary</h2>
-      <ul id="resultsSummary"></ul>
-
-      <div class="results-section-title" id="params-title"></div>
-      <ul id="resultsParams"></ul>
-
-      <div class="results-note" id="results-note">
-        Only the first KEC case (with Heavy Diesel, 205,000 KBPD) is fully mapped here.
+      <h2 id="results-title">Operating parameters</h2>
+      <div id="resultsMessage" class="results-message"></div>
+      <div id="tableWrapper" class="table-wrapper">
+        <table id="resultsTable">
+          <thead>
+            <tr>
+              <th id="th-param">Parameter</th>
+              <th id="th-value">Value</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
       </div>
     </section>
 
     <section class="footer-notes">
-      <h2>Notes</h2>
-      <ul>
-        <li>
-          The parameters in the referenced tables are based on previous performance
-          with maximum yields and stable operation. A variation is acceptable if the
-          column profile is maintained. For any major deviation, prior discussion with
-          PE is recommended.
-        </li>
-        <li>
-          Values are general guidelines. Desalter process parameters and chemical
-          dosage as shared through the NALCO group shall be followed.
-        </li>
-        <li>
-          Cut points and operating conditions shall be optimized depending on Diesel
-          Cloud Point (on-spec −7&nbsp;°C in winter and 4&nbsp;°C in summer).
-        </li>
-        <li>
-          If SSW pH goes below 8, switch over to LP condensate processing.
-        </li>
-        <li>
-          If desalter effluent pH goes below 4.5, U35 shall be contacted to optimize
-          caustic injection.
-        </li>
-      </ul>
+      <h2 id="footer-title">Notes</h2>
+      <ul id="footer-list"></ul>
     </section>
   </main>
 
   <script>
     (function () {
-      // --- i18n ---
       const i18n = {
         en: {
           titleMain: "Refinery Operations Selector",
@@ -390,35 +380,22 @@
           btnShow: "Show results",
           placeholder1:
             "Select crude, operating mode (if KEC), KBPD and result type, then press \"Show results\".",
-          resultsTitle: "Selection summary",
-          paramsTitleOperating: "Operating parameters for this case",
-          paramsTitleOther: "Detailed values are not mapped yet for this result type.",
-          resultsNote:
-            "Only the first KEC case (with Heavy Diesel, 205,000 KBPD) is fully mapped here.",
+          cardTitleOperating: "Operating parameters",
+          cardTitleOther: "Result",
+          tableParam: "Parameter",
+          tableValue: "Value",
           validationIncomplete:
             "Please complete all selections (crude, KBPD, and result type — and operating mode for KEC).",
-          resCrude: "Crude type",
-          resOperation: "Operating mode",
-          resKbpd: "Feed rate (KBPD)",
-          resType: "Result type",
-          resNotApplicable: "Not applicable (non-KEC case)",
-          crudeNames: {
-            KEC: "KEC",
-            KSRC: "KSRC",
-            KMHC: "KMHC",
-          },
-          opNames: {
-            withHeavy: "KEC – Max with Heavy Diesel",
-            withoutHeavy: "KEC – Max without Heavy Diesel",
-            naphtha: "KEC – Max Naphtha Mode",
-          },
-          resultTypeNames: {
-            operating: "Operating parameters",
-            yields: "Product yields",
-            quality: "Product quality",
-          },
           notMapped:
             "This combination is not mapped yet. For now only KEC with Heavy Diesel at 205,000 KBPD has full operating parameters.",
+          footerTitle: "Notes",
+          footerNotes: [
+            "The parameters in the referenced tables are based on previous performance with maximum yields and stable operation. A variation is acceptable if the column profile is maintained. For any major deviation, prior discussion with PE is recommended.",
+            "Values are general guidelines. Desalter process parameters and chemical dosage as shared through the NALCO group shall be followed.",
+            "Cut points and operating conditions shall be optimized depending on Diesel Cloud Point (on-spec −7 °C in winter and 4 °C in summer).",
+            "If SSW pH goes below 8, switch over to LP condensate processing.",
+            "If desalter effluent pH goes below 4.5, U35 shall be contacted to optimize caustic injection."
+          ]
         },
         ar: {
           titleMain: "نموذج تشغيل وحدة التكرير",
@@ -437,40 +414,27 @@
           resultQuality: "جودة المنتجات",
           btnShow: "عرض النتائج",
           placeholder1:
-            "اختر نوع الخام ووضع التشغيل (إذا كان KEC) وقيمة الـ KBPD ونوع النتيجة المطلوبة، ثم اضغط \"عرض النتائج\".",
-          resultsTitle: "تفاصيل الاختيار",
-          paramsTitleOperating: "معايير التشغيل لهذي الحالة",
-          paramsTitleOther: "تفاصيل القيم لهذي النتيجة مو مضافة للحين.",
-          resultsNote:
-            "حالياً فقط أول حالة KEC (مع ديزل ثقيل ٢٠٥٬٠٠٠ KBPD) مضافة بالكامل بمعايير التشغيل.",
+            "اختر نوع الخام ووضع التشغيل (إذا كان KEC) وقيمة الـ KBPD ونوع النتيجة المطلوبة، ثم اضغط «عرض النتائج».",
+          cardTitleOperating: "معايير التشغيل",
+          cardTitleOther: "النتيجة",
+          tableParam: "المعيار",
+          tableValue: "القيمة",
           validationIncomplete:
             "رجاءً أكمل كل القوائم (نوع الخام، كمية KBPD، ونوع النتيجة، مع وضع التشغيل في حالة KEC).",
-          resCrude: "نوع الخام",
-          resOperation: "وضع التشغيل",
-          resKbpd: "كمية التغذية (KBPD)",
-          resType: "نوع النتيجة",
-          resNotApplicable: "غير مطبق (ليس خام KEC)",
-          crudeNames: {
-            KEC: "KEC",
-            KSRC: "KSRC",
-            KMHC: "KMHC",
-          },
-          opNames: {
-            withHeavy: "KEC – أقصى تشغيل مع ديزل ثقيل",
-            withoutHeavy: "KEC – أقصى تشغيل بدون ديزل ثقيل",
-            naphtha: "KEC – وضع النفثا (Naphtha Mode)",
-          },
-          resultTypeNames: {
-            operating: "معايير التشغيل",
-            yields: "كميات الإنتاج",
-            quality: "جودة المنتجات",
-          },
           notMapped:
             "هذي التركيبة مو مضافة للحين. حالياً بس KEC مع ديزل ثقيل على ٢٠٥٬٠٠٠ KBPD فيها كل معايير التشغيل.",
-        },
+          footerTitle: "ملاحظات",
+          footerNotes: [
+            "المعايير في الجداول مبنية على أداء سابق عند أعلى مردود وتشغيل مستقر، ويسمح بهامش بسيط من التغيّر إذا ظل بروفايل العمود ثابتاً. أي تغيير كبير يفضّل مناقشته مسبقاً مع قسم PE.",
+            "القيم تعتبر خطوطاً إرشادية عامة، ويجب اتباع شروط تشغيل الديسالتر وجرعات الكيماويات كما هي معتمدة في مجموعة NALCO.",
+            "يتم تحسين نقاط القطع وظروف التشغيل بناءً على نقطة تعكر الديزل (المواصفة −٧ °م شتاءً و ٤ °م صيفاً).",
+            "إذا نزلت قيمة pH لمياه SSW عن ٨، يتم التحويل إلى معالجة LP condensate.",
+            "إذا نزلت قيمة pH لمياه مخرج الديسالتر عن ٤٫٥ يجب التنسيق مع U35 لضبط حقن الكاوية."
+          ]
+        }
       };
 
-      // Data: only first KEC case (with Heavy Diesel, 205000 KBPD)
+      // Only first KEC case mapped
       const operatingData = {
         KEC: {
           withHeavy: {
@@ -511,43 +475,11 @@
               ["Stabilizer Reboiler outlet temperature", "°C", 160],
               ["Stabilizer reflux flow", "sm3/hr", 35],
               ["BPA to reboiler inlet temperature", "°C", 235],
-              ["BPA to reboiler flow", "sm3/hr", 900],
-            ],
-          },
-        },
+              ["BPA to reboiler flow", "sm3/hr", 900]
+            ]
+          }
+        }
       };
-
-      const htmlEl = document.documentElement;
-      const titleMainEl = document.getElementById("title-main");
-      const titleSubEl = document.getElementById("title-sub");
-
-      const langButtons = Array.from(document.querySelectorAll(".lang-btn"));
-
-      const labelCrude = document.getElementById("label-crude");
-      const labelOp = document.getElementById("label-operation");
-      const hintOp = document.getElementById("hint-operation");
-      const labelKbpd = document.getElementById("label-kbpd");
-      const labelResult = document.getElementById("label-result");
-
-      const crudeSelect = document.getElementById("crudeType");
-      const opField = document.getElementById("operationField");
-      const opSelect = document.getElementById("operationType");
-      const kbpdSelect = document.getElementById("kbpd");
-      const resultSelect = document.getElementById("resultType");
-
-      const placeholderText1 = document.getElementById("placeholder-text-1");
-      const btn = document.getElementById("showBtn");
-      const btnText = document.getElementById("btn-text");
-      const validationMsg = document.getElementById("validationMsg");
-
-      const resultsCard = document.getElementById("resultsCard");
-      const resultsTitle = document.getElementById("results-title");
-      const resultsSummary = document.getElementById("resultsSummary");
-      const paramsTitleEl = document.getElementById("params-title");
-      const resultsParams = document.getElementById("resultsParams");
-      const resultsNote = document.getElementById("results-note");
-
-      let currentLang = "en";
 
       const config = {
         KEC: {
@@ -573,6 +505,41 @@
           kbpd: [200000, 120000],
         },
       };
+
+      const htmlEl = document.documentElement;
+      const titleMainEl = document.getElementById("title-main");
+      const titleSubEl = document.getElementById("title-sub");
+      const langButtons = Array.from(document.querySelectorAll(".lang-btn"));
+
+      const labelCrude = document.getElementById("label-crude");
+      const labelOp = document.getElementById("label-operation");
+      const hintOp = document.getElementById("hint-operation");
+      const labelKbpd = document.getElementById("label-kbpd");
+      const labelResult = document.getElementById("label-result");
+
+      const crudeSelect = document.getElementById("crudeType");
+      const opField = document.getElementById("operationField");
+      const opSelect = document.getElementById("operationType");
+      const kbpdSelect = document.getElementById("kbpd");
+      const resultSelect = document.getElementById("resultType");
+
+      const placeholderText1 = document.getElementById("placeholder-text-1");
+      const btn = document.getElementById("showBtn");
+      const btnText = document.getElementById("btn-text");
+      const validationMsg = document.getElementById("validationMsg");
+
+      const resultsCard = document.getElementById("resultsCard");
+      const resultsTitle = document.getElementById("results-title");
+      const resultsMessage = document.getElementById("resultsMessage");
+      const tableWrapper = document.getElementById("tableWrapper");
+      const resultsBody = document.getElementById("resultsBody");
+      const thParam = document.getElementById("th-param");
+      const thValue = document.getElementById("th-value");
+
+      const footerTitle = document.getElementById("footer-title");
+      const footerList = document.getElementById("footer-list");
+
+      let currentLang = "en";
 
       function detectDefaultLang() {
         const navLang =
@@ -628,10 +595,11 @@
         labelResult.textContent = t.resultLabel;
         btnText.textContent = t.btnShow;
         placeholderText1.textContent = t.placeholder1;
-        resultsTitle.textContent = t.resultsTitle;
-        resultsNote.textContent = t.resultsNote;
 
-        // placeholders
+        resultsTitle.textContent = t.cardTitleOperating;
+        thParam.textContent = t.tableParam;
+        thValue.textContent = t.tableValue;
+
         if (crudeSelect.options[0]) {
           crudeSelect.options[0].textContent = t.crudePlaceholder;
         }
@@ -642,13 +610,21 @@
           resultSelect.options[0].textContent = t.resultPlaceholder;
         }
 
-        // result labels
         for (let i = 0; i < resultSelect.options.length; i++) {
           const opt = resultSelect.options[i];
           if (opt.value === "operating") opt.textContent = t.resultOperating;
           else if (opt.value === "yields") opt.textContent = t.resultYields;
           else if (opt.value === "quality") opt.textContent = t.resultQuality;
         }
+
+        // footer
+        footerTitle.textContent = t.footerTitle;
+        footerList.innerHTML = "";
+        t.footerNotes.forEach((txt) => {
+          const li = document.createElement("li");
+          li.textContent = txt;
+          footerList.appendChild(li);
+        });
 
         updateOperationAndKbpd(true);
       }
@@ -661,13 +637,10 @@
 
         if (crude === "KEC") {
           opField.style.display = "";
-          if (forceResetOp) {
-            resetSelect(opSelect, t.opPlaceholder);
-          } else if (!opSelect.options.length) {
+          if (forceResetOp || !opSelect.options.length) {
             resetSelect(opSelect, t.opPlaceholder);
           }
 
-          // clear ops except placeholder
           const ph = opSelect.options[0];
           opSelect.innerHTML = "";
           ph.value = "";
@@ -679,7 +652,11 @@
             const conf = ops[key];
             const o = document.createElement("option");
             o.value = conf.value;
-            o.textContent = i18n[currentLang].opNames[conf.value];
+            o.textContent = conf.value === "withHeavy"
+              ? (currentLang === "ar" ? "أقصى تشغيل مع ديزل ثقيل" : "Max with Heavy Diesel")
+              : conf.value === "withoutHeavy"
+              ? (currentLang === "ar" ? "أقصى تشغيل بدون ديزل ثقيل" : "Max without Heavy Diesel")
+              : (currentLang === "ar" ? "وضع النفثا (Naphtha Mode)" : "Naphtha Mode");
             opSelect.appendChild(o);
           });
         } else if (crude === "KSRC" || crude === "KMHC") {
@@ -742,34 +719,10 @@
           return;
         }
 
-        const crudeName = t.crudeNames[crudeVal] || crudeVal || "—";
-        const opName =
-          crudeVal === "KEC"
-            ? t.opNames[opVal] || "—"
-            : t.resNotApplicable;
-        const kbpdNum = kbpdVal ? Number(kbpdVal) : null;
-        const kbpdText = kbpdNum
-          ? (currentLang === "ar"
-              ? kbpdNum.toLocaleString("ar-EG")
-              : kbpdNum.toLocaleString("en-US")) + " KBPD"
-          : "—";
-        const resName = t.resultTypeNames[resVal] || "—";
+        resultsBody.innerHTML = "";
+        resultsMessage.textContent = "";
+        tableWrapper.style.display = "none";
 
-        resultsSummary.innerHTML = "";
-        resultsParams.innerHTML = "";
-
-        function addSummaryRow(label, value) {
-          const li = document.createElement("li");
-          li.textContent = label + ": " + value;
-          resultsSummary.appendChild(li);
-        }
-
-        addSummaryRow(t.resCrude, crudeName);
-        addSummaryRow(t.resOperation, opName);
-        addSummaryRow(t.resKbpd, kbpdText);
-        addSummaryRow(t.resType, resName);
-
-        // operating params
         if (
           resVal === "operating" &&
           crudeVal === "KEC" &&
@@ -779,18 +732,22 @@
           operatingData.KEC.withHeavy &&
           operatingData.KEC.withHeavy[205000]
         ) {
-          paramsTitleEl.textContent = t.paramsTitleOperating;
-          operatingData.KEC.withHeavy[205000].forEach((row) => {
-            const [name, unit, value] = row;
-            const li = document.createElement("li");
-            li.textContent = name + ": " + value + " " + unit;
-            resultsParams.appendChild(li);
+          resultsTitle.textContent = t.cardTitleOperating;
+          const rows = operatingData.KEC.withHeavy[205000];
+          rows.forEach(([name, unit, value]) => {
+            const tr = document.createElement("tr");
+            const tdParam = document.createElement("td");
+            const tdValue = document.createElement("td");
+            tdParam.textContent = name;
+            tdValue.textContent = value + " " + unit;
+            tr.appendChild(tdParam);
+            tr.appendChild(tdValue);
+            resultsBody.appendChild(tr);
           });
+          tableWrapper.style.display = "block";
         } else {
-          paramsTitleEl.textContent = t.paramsTitleOther;
-          const li = document.createElement("li");
-          li.textContent = t.notMapped;
-          resultsParams.appendChild(li);
+          resultsTitle.textContent = t.cardTitleOther;
+          resultsMessage.textContent = t.notMapped;
         }
 
         resultsCard.style.display = "block";
@@ -806,7 +763,6 @@
         });
       }
 
-      // Events
       crudeSelect.addEventListener("change", function () {
         updateOperationAndKbpd(true);
       });
@@ -828,7 +784,6 @@
         });
       });
 
-      // Initial
       const defaultLang = detectDefaultLang();
       setLangButtonsActive(defaultLang);
       applyLanguage(defaultLang);
