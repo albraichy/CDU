@@ -29,7 +29,9 @@
             --table-stripe: #f8f9fa;
             --table-row-bg: #ffffff;     
             --input-bg: #ffffff;
+            --input-text: #2c3e50;
             --footer-bg: #e9ecef;
+            --placeholder-color: #6c757d;
             
             /* Badge Colors (Solid Blue in Light) */
             --badge-bg: var(--kipic-navy);
@@ -44,7 +46,7 @@
             --bg-body: #121212;
             --bg-card: #1e1e24;
             --text-main: #e0e0e0;
-            --text-muted: #a0a0a0;
+            --text-muted: #b0b0b0;
             --border-color: #343a40;
             --header-text: #e0e0e0;
             
@@ -55,9 +57,11 @@
             --table-stripe: #1c232b;     
             
             --input-bg: #2b2b36;
+            --input-text: #e0e0e0;
             --footer-bg: #1a1a1a;
             --kipic-navy: #0d1b2a; 
             --kipic-green: #7bc938;
+            --placeholder-color: #adb5bd; /* Lighter placeholder for dark mode */
             
             /* Badge Colors (Solid Green in Dark) */
             --badge-bg: var(--kipic-green);
@@ -103,21 +107,17 @@
             color: #d1e7dd; 
         }
 
-        /* FIXED LTR: Prevents swapping positions when language changes */
+        /* Fixed LTR for Controls */
         .header-controls {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            right: 25px; /* Fixed to right side visually */
+            inset-inline-end: 25px;
             display: flex;
             gap: 12px;
             align-items: center;
             direction: ltr !important; 
         }
-        /* In RTL mode, we still want it visually on the left? Or keep it right?
-           Usually Header controls stay in place. If you want them to flip sides, remove 'right: 25px' 
-           and use 'inset-inline-end'. But to fix the "Switch flipping logic", the internal container must be LTR. 
-        */
 
         .icon-btn {
             background: rgba(255,255,255,0.15);
@@ -134,7 +134,7 @@
         }
         .icon-btn:hover { background: var(--kipic-green); border-color: var(--kipic-green); }
 
-        /* Language Switch - Fixed LTR Internals */
+        /* Language Switch */
         .lang-switch-container {
             background: rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.3);
@@ -145,7 +145,6 @@
             cursor: pointer;
             width: 76px;
             height: 34px;
-            direction: ltr !important; /* Internal elements never flip */
         }
         
         .lang-option {
@@ -165,7 +164,7 @@
             position: absolute;
             top: 2px;
             bottom: 2px;
-            left: 2px; /* Start Left (EN) */
+            left: 2px;
             width: 50%;
             background: var(--kipic-green);
             border-radius: 16px;
@@ -173,12 +172,11 @@
             z-index: 1;
         }
         
-        /* Simple Logic: If AR active, move slider right. No RTL confusion. */
         .lang-switch-container.ar-active .lang-slider {
             transform: translateX(92%);
         }
 
-        /* --- CARDS --- */
+        /* --- CARDS & COLLAPSE --- */
         .card {
             background-color: var(--bg-card);
             border: none;
@@ -209,48 +207,111 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            white-space: nowrap; /* Prevent wrapping of title */
         }
         [data-theme="dark"] .card-title-text { color: var(--kipic-green); }
 
-        /* --- FEED BADGE (Solid Colors) --- */
+        /* --- FEED BADGE --- */
         .feed-badge {
             background-color: var(--badge-bg);
             border: 1px solid var(--badge-border);
             color: var(--badge-text);
-            padding: 4px 12px;
+            padding: 5px 16px;
             border-radius: 6px;
             font-family: 'Roboto Mono', monospace;
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             direction: ltr;
             white-space: nowrap;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            flex-shrink: 0; /* Prevent shrinking on small screens */
-            margin-inline-start: 10px; /* Space from title */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* --- INPUTS --- */
+        /* --- DESKTOP VIEW --- */
+        @media (min-width: 769px) {
+            .collapse-icon { display: none !important; }
+            .card-header-custom { cursor: default !important; pointer-events: none; }
+            .collapse { display: block !important; height: auto !important; visibility: visible !important; }
+            /* Enable pointer events for header badge/controls */
+            .card-header-custom .header-actions { pointer-events: auto; } 
+        }
+
+        /* --- MOBILE VIEW (Optimized) --- */
+        @media (max-width: 768px) {
+            .main-header { padding: 1rem 1.2rem; }
+            .header-title-main { font-size: 1.3rem; }
+            .header-subtitle { font-size: 0.9rem; }
+            
+            /* Hide Theme Toggle on Mobile */
+            #theme-toggle-btn { display: none !important; }
+            .header-controls { position: static; transform: none; margin-top: 10px; justify-content: center; }
+            
+            .card { margin-bottom: 12px; }
+            .card-body { padding: 0; }
+            
+            /* Reduce fonts for mobile */
+            .table td, .table th { padding: 8px 10px; font-size: 0.8rem; }
+            .val-display { font-size: 0.85rem; }
+            
+            /* Collapse Logic */
+            .card-header-custom { cursor: pointer; padding: 10px 15px; }
+            
+            /* Stack badge and title on mobile if crowded */
+            .card-header-custom {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .card-title-text { font-size: 0.95rem; }
+            
+            .feed-badge { 
+                font-size: 0.75rem; 
+                padding: 3px 8px; 
+                margin-top: 2px;
+            }
+            
+            .header-actions {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                margin-top: 5px;
+            }
+            
+            .collapse-icon {
+                transition: transform 0.3s ease;
+                color: var(--arrow-color);
+                font-size: 1rem;
+                font-weight: bold;
+                display: block;
+            }
+            [dir="ltr"] .collapse-icon { transform: rotate(-90deg); }
+            [dir="rtl"] .collapse-icon { transform: rotate(90deg); }
+            .card-header-custom[aria-expanded="true"] .collapse-icon { transform: rotate(0deg) !important; }
+        }
+
+        /* --- INPUTS & PLACEHOLDER FIX --- */
         .form-label { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
         
         .form-control, .form-select {
             background-color: var(--input-bg);
-            color: var(--text-main);
+            color: var(--input-text);
             border: 1px solid var(--border-color);
             padding: 8px 12px;
             border-radius: 8px;
             font-size: 0.9rem;
         }
+        
+        /* Fix Placeholder Visibility */
+        .form-control::placeholder { 
+            color: var(--placeholder-color) !important; 
+            opacity: 1 !important; /* Force visibility */
+        }
+
         .form-control:focus, .form-select:focus {
             border-color: var(--kipic-green);
             box-shadow: 0 0 0 3px rgba(111, 174, 39, 0.15);
         }
         
-        [dir="rtl"] .form-select {
-            background-position: left 0.75rem center;
-            padding-right: 0.75rem;
-            padding-left: 2.25rem;
-        }
+        [dir="rtl"] .form-select { background-position: left 0.75rem center; padding-right: 0.75rem; padding-left: 2.25rem; }
 
         .btn-calc-custom {
             background-color: var(--operator-blue);
@@ -259,11 +320,7 @@
             transition: all 0.3s ease;
             padding-top: 8px; padding-bottom: 8px;
         }
-        .btn-calc-custom:hover {
-            background-color: #003d73; 
-            border-color: #003d73;
-            color: #ffffff;
-        }
+        .btn-calc-custom:hover { background-color: #003d73; border-color: #003d73; color: #ffffff; }
 
         /* --- TABLES --- */
         .table { margin-bottom: 0; border-color: var(--border-color); color: var(--text-main); }
@@ -277,9 +334,8 @@
             border-bottom: 2px solid #dee2e6;
         }
         [data-theme="dark"] .table thead th { border-bottom-color: #495057; }
-
         .table td {
-            background-color: var(--table-row-bg); 
+            background-color: var(--table-row-bg);
             padding: 8px 15px;
             vertical-align: middle;
             border-color: var(--border-color);
@@ -287,7 +343,6 @@
             font-size: 0.9rem;
         }
         .table-hover tbody tr:hover td { background-color: var(--table-stripe); }
-
         .group-cell {
             background-color: var(--table-head-bg) !important;
             color: var(--kipic-navy);
@@ -295,7 +350,6 @@
             border-inline-end: 2px solid var(--border-color);
         }
         [data-theme="dark"] .group-cell { color: var(--kipic-green); }
-
         .val-display { font-family: 'Roboto Mono', monospace; font-weight: 600; }
         .unit-small { font-size: 0.8em; color: var(--text-muted); margin-inline-start: 6px; font-weight: 400; }
 
@@ -303,11 +357,14 @@
         .quality-alert {
             background-color: rgba(255, 193, 7, 0.1);
             border-inline-start: 4px solid #ffc107;
-            padding: 12px 20px;
-            font-size: 0.85rem;
+            padding: 10px 15px;
+            font-size: 0.8rem;
             color: var(--text-main);
             border-top: 1px solid var(--border-color);
         }
+        /* Removed default bullets */
+        .quality-alert ul, .footer-notes ul { list-style: none; padding-left: 0; margin: 0; }
+        
         .site-footer {
             margin-top: auto;
             background-color: var(--footer-bg);
@@ -317,58 +374,8 @@
             color: var(--text-muted);
         }
         .footer-notes li { margin-bottom: 8px; padding-inline-start: 15px; position: relative; line-height: 1.5; }
+        /* Colored bullets */
         .footer-notes li::before { content: "•"; color: var(--kipic-green); font-weight: bold; position: absolute; inset-inline-start: 0; }
-
-        /* --- RESPONSIVE BEHAVIOR (DESKTOP VS MOBILE) --- */
-
-        /* DESKTOP (>768px) */
-        @media (min-width: 769px) {
-            /* Disable Collapse logic on Desktop */
-            .collapse { display: block !important; height: auto !important; visibility: visible !important; }
-            .card-header-custom { cursor: default !important; pointer-events: none; }
-            /* Hide Chevron */
-            .collapse-icon { display: none !important; }
-            /* Enable pointer events for badge specifically if needed */
-            .card-header-custom .d-flex { pointer-events: auto; }
-        }
-
-        /* MOBILE (<=768px) */
-        @media (max-width: 768px) {
-            .main-header { padding: 1rem 1.2rem; }
-            .header-title-main { font-size: 1.3rem; }
-            .header-subtitle { font-size: 0.9rem; }
-            
-            /* Hide Theme Toggle on Mobile */
-            #theme-toggle-btn { display: none !important; }
-            
-            /* Controls stack below title */
-            .header-controls { 
-                position: static; 
-                transform: none; 
-                margin-top: 10px; 
-                justify-content: center; 
-                width: 100%;
-                right: auto;
-            }
-            
-            .card { margin-bottom: 15px; }
-            .table td, .table th { padding: 8px 10px; font-size: 0.8rem; }
-            .val-display { font-size: 0.9rem; }
-            
-            /* Enable Collapse Pointer & Icon */
-            .card-header-custom { cursor: pointer; }
-            .collapse-icon {
-                transition: transform 0.3s ease;
-                color: var(--arrow-color);
-                font-size: 1.1rem;
-                font-weight: bold;
-                display: block;
-            }
-            /* Chevron Rotation Logic */
-            [dir="ltr"] .collapse-icon { transform: rotate(-90deg); } /* Point Right */
-            [dir="rtl"] .collapse-icon { transform: rotate(90deg); }  /* Point Left */
-            .card-header-custom[aria-expanded="true"] .collapse-icon { transform: rotate(0deg) !important; } /* Point Down */
-        }
     </style>
 </head>
 <body>
@@ -435,12 +442,13 @@
                         <i class="bi bi-speedometer2"></i>
                         <span data-i18n="opParams">Operational Parameters</span>
                     </h5>
-                    <div class="d-flex align-items-center gap-2">
+                    
+                    <div class="header-actions d-flex align-items-center gap-2">
                         <div id="feed-display-badge" class="feed-badge">--</div>
                         <i class="bi bi-chevron-down collapse-icon"></i>
                     </div>
                 </div>
-                <div id="collapseParams" class="collapse">
+                <div id="collapseParams" class="collapse show">
                     <div class="card-body p-0 table-responsive">
                         <table class="table table-hover table-sm">
                             <thead>
@@ -460,13 +468,15 @@
             
             <div class="card mb-3 mb-md-4">
                 <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseYields" aria-expanded="false">
-                    <h5 class="card-title-text">
-                        <i class="bi bi-graph-up-arrow"></i>
-                        <span data-i18n="prodYields">Production Yields</span>
-                    </h5>
-                    <i class="bi bi-chevron-down collapse-icon"></i>
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                         <h5 class="card-title-text">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            <span data-i18n="prodYields">Production Yields</span>
+                        </h5>
+                        <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
                 </div>
-                <div id="collapseYields" class="collapse">
+                <div id="collapseYields" class="collapse show">
                     <div class="card-body p-0">
                         <table class="table table-sm mb-0">
                             <thead>
@@ -483,11 +493,13 @@
 
             <div class="card mb-0">
                 <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseQuality" aria-expanded="false">
-                    <h5 class="card-title-text">
-                        <i class="bi bi-clipboard-check"></i>
-                        <span data-i18n="prodQuality">Quality Specifications</span>
-                    </h5>
-                    <i class="bi bi-chevron-down collapse-icon"></i>
+                    <div class="d-flex w-100 justify-content-between align-items-center">
+                        <h5 class="card-title-text">
+                            <i class="bi bi-clipboard-check"></i>
+                            <span data-i18n="prodQuality">Quality Specifications</span>
+                        </h5>
+                        <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
                 </div>
                 <div id="collapseQuality" class="collapse">
                     <div class="card-body p-0 table-responsive">
@@ -566,7 +578,7 @@
                     "Overflash Flow": {u: "sm3/h", v: [112.5, 84.3, 108.4, 83.5, 75.2, 72.7]},
                     "Stripping Steam Temperature": {u: "°C", v: [274.9, 284.9, 289.9, 289.7, 283.6, 274.2]},
                     "Stripping Steam (Crude)": {u: "kg/hr", v: [22500, 21998, 20500, 17500, 15374, 15500]},
-                    "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [1200, 2150, 1092, 1450, 1209, 1000]},
+                    "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [1300, 2300, 1100, 1200, 941, 2035, 1000]},
                     "Stripping Steam (Heavy Diesel)": {u: "kg/hr", v: [350, 450, 300, 300, 300, 300]},
                     "Stabilizer Feed Temperature": {u: "°C", v: [101.9, 103.9, 102.5, 105.6, 108.1, 110.3]},
                     "Stabilizer Reboiler Inlet Temperature": {u: "°C", v: [147.1, 147.8, 149.3, 150.7, 153.3, 155.5]},
@@ -775,10 +787,15 @@
 
     // --- LOGIC ---
     function init() {
-        // Detect OS preference
+        // Add System Theme Listener for Real-time switching
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+             const newTheme = event.matches ? 'dark' : 'light';
+             document.documentElement.setAttribute('data-theme', newTheme);
+        });
+        
+        // Initial Check
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.setAttribute('data-theme', 'dark');
-            document.getElementById('theme-icon').className = "bi bi-sun-fill";
         }
 
         const oilSelect = document.getElementById('oilTypeSelect');
