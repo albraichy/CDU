@@ -248,7 +248,6 @@
             .table td, .table th { padding: 8px 10px; font-size: 0.8rem; }
             .val-display { font-size: 0.85rem; }
             
-            /* Collapse Logic */
             .card-header-custom { cursor: pointer; padding: 10px 15px; flex-wrap: wrap; gap: 8px; }
             .card-title-text { font-size: 0.95rem; }
             
@@ -284,6 +283,7 @@
             padding: 8px 12px;
             border-radius: 8px;
             font-size: 0.9rem;
+            height: 38px; /* Standard height */
         }
         
         .form-control::placeholder { 
@@ -303,7 +303,9 @@
             border-color: var(--operator-blue);
             color: #ffffff;
             transition: all 0.3s ease;
-            padding-top: 8px; padding-bottom: 8px;
+            padding-top: 0; padding-bottom: 0;
+            height: 38px; /* Match Input Height */
+            display: flex; align-items: center; justify-content: center;
         }
         .btn-calc-custom:hover { background-color: #003d73; border-color: #003d73; color: #ffffff; }
 
@@ -399,7 +401,7 @@
             </div>
             <div class="col-md-2">
                 <label class="form-label" data-i18n="inputUnit">Unit</label>
-                <select class="form-select" id="unitSelect" onchange="updatePlaceholder();"></select>
+                <select class="form-select" id="unitSelect" onchange="updatePlaceholder();">
                     <option value="KBPD">KBPD</option>
                     <option value="sm3hr">sm3/h</option>
                 </select>
@@ -786,7 +788,7 @@
             document.documentElement.setAttribute('data-theme', 'dark');
         }
 
-        // Restore Language from LocalStorage
+        // Restore Language
         const savedLang = localStorage.getItem('refinery-lang');
         if (savedLang) {
             curLang = savedLang;
@@ -802,12 +804,11 @@
         // Init UI with saved language
         applyLanguageUI();
         updateModes();
-        // Do not calculate yet!
     }
 
     function handleModeChange() {
         updatePlaceholder();
-        // No auto calculate
+        // No auto calc
     }
 
     function updateModes() {
@@ -867,7 +868,6 @@
     }
 
     function calculateResults() {
-        // 1. Show the Results Container
         document.getElementById('results-row').style.display = 'flex';
 
         const oilType = document.getElementById('oilTypeSelect').value;
@@ -932,7 +932,6 @@
         }
         document.getElementById('quality-body').innerHTML = qualHTML;
 
-        // Render Quality Alert Notes
         renderQualityNotes();
     }
 
@@ -954,7 +953,7 @@
             <li>${STRINGS[curLang].note1}</li>
             <li>${STRINGS[curLang].note2}</li>
             <li>${STRINGS[curLang].note3}</li>
-        `;
+        </ul>`;
     }
 
     // Mobile Manual Toggle
@@ -968,7 +967,6 @@
 
     function toggleLanguage() {
         curLang = curLang === 'en' ? 'ar' : 'en';
-        // Save to storage
         localStorage.setItem('refinery-lang', curLang);
         applyLanguageUI();
     }
@@ -976,7 +974,6 @@
     function applyLanguageUI() {
         document.body.dir = curLang === 'ar' ? 'rtl' : 'ltr';
         
-        // Animate Slider
         const container = document.getElementById('lang-switch');
         const optEn = document.getElementById('opt-en');
         const optAr = document.getElementById('opt-ar');
@@ -991,7 +988,6 @@
             optAr.classList.remove('active');
         }
         
-        // Translate UI
         document.querySelectorAll('[data-i18n]').forEach(el => {
             let key = el.getAttribute('data-i18n');
             if (STRINGS[curLang][key]) el.innerText = STRINGS[curLang][key];
