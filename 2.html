@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CDU Dashboard (V5 - Stable)</title>
+    <title>CDU Parameters Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- KIPIC THEME CONFIGURATION --- */
+        /* --- KIPIC BRAND THEME --- */
         :root {
             --kipic-navy: #002F6C;       
             --kipic-green: #6FAE27;      
@@ -29,13 +29,13 @@
             --table-stripe: #f8f9fa;
             --table-row-bg: #ffffff;     
             --input-bg: #ffffff;
-            --input-text: #2c3e50;
             --footer-bg: #e9ecef;
             
-            /* Badge & Inputs */
+            /* Badge Colors (Solid Blue in Light) */
             --badge-bg: var(--kipic-navy);
             --badge-text: #ffffff;
             --badge-border: var(--kipic-navy);
+            
             --arrow-color: var(--kipic-navy);
             --placeholder-color: #6c757d;
         }
@@ -56,15 +56,15 @@
             --table-stripe: #1c232b;     
             
             --input-bg: #2b2b36;
-            --input-text: #e0e0e0;
             --footer-bg: #1a1a1a;
             --kipic-navy: #0d1b2a; 
             --kipic-green: #7bc938;
             
-            /* Badge & Inputs */
+            /* Badge Colors (Solid Green in Dark) */
             --badge-bg: var(--kipic-green);
             --badge-text: #000000;
             --badge-border: var(--kipic-green);
+            
             --arrow-color: var(--kipic-green);
             --placeholder-color: #adb5bd;
         }
@@ -105,7 +105,7 @@
             color: #d1e7dd; 
         }
 
-        /* Controls (Fixed LTR) */
+        /* Fixed LTR for Controls */
         .header-controls {
             position: absolute;
             top: 50%;
@@ -155,6 +155,7 @@
             color: rgba(255, 255, 255, 0.6);
             transition: color 0.3s;
         }
+        
         .lang-option.active { color: #fff; }
 
         .lang-slider {
@@ -168,9 +169,12 @@
             transition: transform 0.3s ease;
             z-index: 1;
         }
-        .lang-switch-container.ar-active .lang-slider { transform: translateX(92%); }
+        
+        .lang-switch-container.ar-active .lang-slider {
+            transform: translateX(92%);
+        }
 
-        /* --- CARDS --- */
+        /* --- CARDS & COLLAPSE --- */
         .card {
             background-color: var(--bg-card);
             border: none;
@@ -181,6 +185,7 @@
             border-top: 3px solid var(--kipic-navy); 
             transition: border-color 0.3s ease;
         }
+        
         [data-theme="dark"] .card { border-top-color: var(--kipic-green) !important; }
         
         .card-header-custom {
@@ -203,7 +208,7 @@
         }
         [data-theme="dark"] .card-title-text { color: var(--kipic-green); }
 
-        /* --- FEED BADGE (Solid) --- */
+        /* --- FEED BADGE --- */
         .feed-badge {
             background-color: var(--badge-bg);
             border: 1px solid var(--badge-border);
@@ -266,20 +271,18 @@
             .card-header-custom[aria-expanded="true"] .collapse-icon { transform: rotate(0deg) !important; }
         }
 
-        /* --- INPUTS --- */
+        /* --- INPUTS & PLACEHOLDER --- */
         .form-label { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
         
         .form-control, .form-select {
             background-color: var(--input-bg);
-            color: var(--input-text);
+            color: var(--text-main);
             border: 1px solid var(--border-color);
             padding: 8px 12px;
             border-radius: 8px;
             font-size: 0.9rem;
-            height: 38px;
         }
         
-        /* Force Placeholder Visibility */
         .form-control::placeholder { 
             color: var(--placeholder-color) !important; 
             opacity: 1 !important; 
@@ -298,8 +301,6 @@
             color: #ffffff;
             transition: all 0.3s ease;
             padding-top: 8px; padding-bottom: 8px;
-            height: 38px;
-            display: flex; align-items: center; justify-content: center;
         }
         .btn-calc-custom:hover { background-color: #003d73; border-color: #003d73; color: #ffffff; }
 
@@ -395,7 +396,7 @@
             </div>
             <div class="col-md-2">
                 <label class="form-label" data-i18n="inputUnit">Unit</label>
-                <select class="form-select" id="unitSelect" onchange="updatePlaceholder();">
+                <select class="form-select" id="unitSelect" onchange="updatePlaceholder(); calculateResults();">
                     <option value="KBPD">KBPD</option>
                     <option value="sm3hr">sm3/h</option>
                 </select>
@@ -403,7 +404,7 @@
             <div class="col-md-4">
                 <label class="form-label" data-i18n="feedRate">Feed Rate</label>
                 <div class="d-flex gap-2">
-                    <input type="text" class="form-control" id="feedInput" placeholder="Range..." inputmode="decimal">
+                    <input type="text" class="form-control" id="feedInput" placeholder="Range..." inputmode="decimal" oninput="calculateResults()">
                     <button class="btn btn-calc-custom px-4" onclick="calculateResults()" data-i18n="calcBtn">
                         Calculate
                     </button>
@@ -412,7 +413,7 @@
         </div>
     </div>
 
-    <div class="row g-3 g-md-4" id="results-row" style="display: none;">
+    <div class="row g-3 g-md-4">
         
         <div class="col-lg-6">
             <div class="card h-100">
@@ -426,7 +427,7 @@
                         <i class="bi bi-chevron-down collapse-icon"></i>
                     </div>
                 </div>
-                <div id="collapseParams" class="collapse">
+                <div id="collapseParams" class="collapse show">
                     <div class="card-body p-0 table-responsive">
                         <table class="table table-hover table-sm">
                             <thead>
@@ -446,7 +447,7 @@
             
             <div class="card mb-3 mb-md-4">
                 <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseYields" aria-expanded="false">
-                    <div class="header-actions d-flex w-100 justify-content-between align-items-center">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
                          <h5 class="card-title-text">
                             <i class="bi bi-graph-up-arrow"></i>
                             <span data-i18n="prodYields">Production Yields</span>
@@ -454,7 +455,7 @@
                         <i class="bi bi-chevron-down collapse-icon"></i>
                     </div>
                 </div>
-                <div id="collapseYields" class="collapse">
+                <div id="collapseYields" class="collapse show">
                     <div class="card-body p-0">
                         <table class="table table-sm mb-0">
                             <thead>
@@ -471,7 +472,7 @@
 
             <div class="card mb-0">
                 <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseQuality" aria-expanded="false">
-                    <div class="header-actions d-flex w-100 justify-content-between align-items-center">
+                    <div class="d-flex w-100 justify-content-between align-items-center">
                         <h5 class="card-title-text">
                             <i class="bi bi-clipboard-check"></i>
                             <span data-i18n="prodQuality">Quality Specifications</span>
@@ -524,6 +525,7 @@
     // --- HELPER: Parse English or Arabic Numerals ---
     function parseLocaleNumber(stringNumber) {
         if (!stringNumber) return NaN;
+        // Replace Eastern Arabic Numerals with Western
         var englishDigits = stringNumber
             .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
         return parseFloat(englishDigits);
@@ -567,29 +569,29 @@
                     "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [1300, 2300, 1100, 1200, 941, 2035, 1000]},
                     "Stripping Steam (Heavy Diesel)": {u: "kg/hr", v: [350, 450, 300, 300, 300, 300]},
                     "Stabilizer Feed Temperature": {u: "°C", v: [101.9, 103.9, 102.5, 105.6, 108.1, 110.3]},
-                    "Stabilizer Reboiler Inlet Temperature": {u: "°C", v: [147.1, 147.8, 149.3, 150.7, 153.3, 155.5]},
-                    "Stabilizer Reboiler Outlet Temperature": {u: "°C", v: [159.9, 158.4, 159.1, 158.1, 159.1, 159.9]},
-                    "Stabilizer Reflux Flow": {u: "sm3/h", v: [34.9, 29.7, 31.5, 25.8, 21.1, 21.0]},
-                    "Bottom Pump Around to Reboiler Inlet": {u: "°C", v: [235.0, 218.5, 227.3, 220.6, 217.7, 216.5]},
-                    "Bottom Pump Around to Reboiler Flow": {u: "sm3/h", v: [900.0, 1002.0, 775.0, 780.0, 700.0, 541.0]},
-                    "AR Product Temperature": {u: "°C", v: [170.0, 164.2, 170.3, 161.3, 166.1, 156.6]}
+                    "Stabilizer Reboiler Inlet Temperature": {u: "°C", v: [147.5, 154.2, 150.2, 151.0, 151.1, 161.6, 155.7]},
+                    "Stabilizer Reboiler Outlet Temperature": {u: "°C", v: [159.3, 215.3, 159.7, 158.6, 157.9, 166.4, 160.1]},
+                    "Stabilizer Reflux Flow": {u: "sm3/h", v: [29.5, 13.1, 36.5, 27.2, 23.0, 15.7, 22.1]},
+                    "Bottom Pump Around to Reboiler Inlet": {u: "°C", v: [227.9, 263.8, 209.2, 206.5, 226.4, 199.8, 216.0]},
+                    "Bottom Pump Around to Reboiler Flow": {u: "sm3/h", v: [965, 569, 440, 369, 666, 462, 541]},
+                    "AR Product Temperature": {u: "°C", v: [168.3, 170.0, 176.4, 157.0, 170.0, 169.3, 155.9]}
                 },
                 yields: {
-                    "LPG": [15.9, 17.3, 13.1, 14.6, 15.2, 12.7],
-                    "Naphtha": [265.7, 258.5, 214.4, 193.1, 142.7, 107.8],
-                    "Kerosene": [240.6, 240.9, 204.8, 182.6, 128.1, 111.5],
-                    "Light Diesel": [199.0, 200.5, 185.4, 161.4, 134.9, 104.8],
+                    "LPG": [17.9, 2.0, 12.6, 11.6, 12.5, 0.8, 12.5],
+                    "Naphtha": [267.4, 224.9, 234.7, 187.0, 183.0, 137.9, 111.7],
+                    "Kerosene": [243.0, 228.1, 204.4, 166.5, 168.5, 103.6, 110.9],
+                    "Light Diesel": [207.8, 198.1, 195.0, 174.2, 157.9, 133.7, 110.3],
                     "Heavy Diesel": [55.0, 67.0, 20.0, 30.0, 20.0, 25.0],
-                    "Atmospheric Residue (AR)": [618.4, 601.2, 541.3, 500.2, 443.9, 358.7]
+                    "Atmospheric Residue (AR)": [651.6, 679.8, 577.6, 541.3, 479.1, 390.1, 376.7]
                 },
                 quality: {
-                    "Desalted Crude": { "Salt HEM": {u: "PTB", v: [0.8, 0.5, 0.68, 0.55, 0.45, 0.6]}, "BS&W": {u: "%", v: [1.4, 1.0, 0.7, 0.6, 0.5, 0.5]} },
+                    "Desalted Crude": { "Salt HEM": {u: "PTB", v: [0.65, 0.6, 0.6, 0.7, 1.0, 0.6, 0.6]}, "BS&W": {u: "%", v: [1.3, 0.6, 0.8, 0.7, 0.55, 0.5, 0.5]} },
                     "Desalter Effluent": { "pH": {u: "pH", v: [5.0, 7.6, 6.0, 5.8, 7.0, 5.5]} },
-                    "SSW": { "pH": {u: "pH", v: [8.5, 9.0, 9.57, 8.7, 9.0, 7.8]} },
-                    "Naphtha": { "RVP": {u: "psi", v: [8.8, 9.1, 8.35, 8.9, 8.76, 8.8]}, "T95": {u: "°C", v: [141, 140, 143, 139, 143, 143]} },
-                    "Kerosene": { "Freeze Point": {u: "°C", v: [-48, -51, -50, -51, -54, -52]}, "T95": {u: "°C", v: [245, 240, 245, 239, 232, 237]} },
-                    "Diesel": { "T95": {u: "°C", v: [348, 356, 339, 340, 320, 324]}, "Cloud Point": {u: "°C", v: [-2, -1, -6, -5.5, -12, -9]} },
-                    "AR": { "API": {u: "API", v: [13.0, 13.0, 12.6, 12.9, 12.5, 13.0]}, "Sulfur": {u: "wt%", v: [5.0, 4.59, 4.5, 4.6, 4.5, 4.4]} }
+                    "SSW": { "pH": {u: "pH", v: [8.5, 8, 8.1, 9, 9.4, 8.5, 7.5]} },
+                    "Naphtha": { "RVP": {u: "psi", v: [9.16, 9.1, 8.9, 8.45, 8.51, 8, 8.65]}, "T95": {u: "°C", v: [143, 147, 144, 142, 140, 145, 143]} },
+                    "Kerosene": { "Freeze Point": {u: "°C", v: [-48, -49, -48, -52, -51, -56, -52]}, "T95": {u: "°C", v: [245, 252, 247, 240, 245, 231, 238]} },
+                    "Diesel": { "T95": {u: "°C", v: [331, 325, 334, 327, 336, 324, 311]}, "Cloud Point": {u: "°C", v: [-6, -9, -6, -9, -6, -11, -13]} },
+                    "AR": { "API": {u: "API", v: [12.6, 13.1, 12.9, 13, 12.9, 13, 14]}, "Sulfur": {u: "wt%", v: [4.6, 4.4, 4.66, 4.8, 4.4, 4.3, 4.38]} }
                 }
             },
             "Max Kero (No Heavy Diesel)": {
@@ -634,7 +636,8 @@
                     "Bottom Pump Around to Reboiler Flow": {u: "sm3/h", v: [965, 569, 440, 369, 666, 462, 541]},
                     "AR Product Temperature": {u: "°C", v: [168.3, 170.0, 176.4, 157.0, 170.0, 169.3, 155.9]}
                 },
-                yields: { "LPG": [10.3], "Naphtha": [248.5], "Kerosene": [226.9], "Light Diesel": [222.0], "Heavy Diesel": [0], "AR": [653.6] },
+                yields: {
+                    "LPG": [10.3], "Naphtha": [248.5], "Kerosene": [226.9], "Light Diesel": [222.0], "Heavy Diesel": [0], "AR": [653.6] },
                 quality: { 
                     "Desalted Crude": { "Salt HEM": {u:"PTB", v:[0.7]}, "BS&W": {u:"%", v:[1.0]} },
                     "Naphtha": { "RVP": {u:"psi", v:[8.5]} },
@@ -739,67 +742,38 @@
     let curLang = 'en';
 
     // --- LOGIC ---
-    
-    // Use DOMContentLoaded to ensure elements exist before populating
-    document.addEventListener('DOMContentLoaded', () => {
-        // System Theme Listener
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-             const newTheme = event.matches ? 'dark' : 'light';
-             document.documentElement.setAttribute('data-theme', newTheme);
-        });
+    function init() {
+        // Detect OS preference
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.setAttribute('data-theme', 'dark');
-        }
-
-        // Restore Language
-        const savedLang = localStorage.getItem('refinery-lang');
-        if (savedLang) {
-            curLang = savedLang;
+            document.getElementById('theme-icon').className = "bi bi-sun-fill";
         }
 
         const oilSelect = document.getElementById('oilTypeSelect');
-        // Ensure oilSelect exists
-        if (oilSelect) {
-            for (let type in DB) {
-                let opt = document.createElement('option');
-                opt.value = type; opt.text = type;
-                oilSelect.add(opt);
-            }
-            // Init UI with saved language
-            applyLanguageUI();
-            updateModes();
+        for (let type in DB) {
+            let opt = document.createElement('option');
+            opt.value = type; opt.text = type;
+            oilSelect.add(opt);
         }
-        
-        // Enter Key Listener
-        const feedInput = document.getElementById("feedInput");
-        if (feedInput) {
-            feedInput.addEventListener("keypress", function(event) {
-              if (event.key === "Enter") {
-                event.preventDefault();
-                calculateResults();
-              }
-            });
-        }
-    });
+        updateModes();
+        updateStaticNotes(); // Init static footer text
+    }
 
     function handleModeChange() {
         updatePlaceholder();
-        // No auto calc
+        calculateResults();
     }
 
     function updateModes() {
         const oilType = document.getElementById('oilTypeSelect').value;
         const modeSelect = document.getElementById('modeSelect');
         modeSelect.innerHTML = "";
-        
-        if (DB[oilType]) {
-            for (let mode in DB[oilType]) {
-                let opt = document.createElement('option');
-                opt.value = mode; opt.text = mode;
-                modeSelect.add(opt);
-            }
-            handleModeChange();
+        for (let mode in DB[oilType]) {
+            let opt = document.createElement('option');
+            opt.value = mode; opt.text = mode;
+            modeSelect.add(opt);
         }
+        handleModeChange();
     }
 
     function updatePlaceholder() {
@@ -807,25 +781,22 @@
         const mode = document.getElementById('modeSelect').value;
         const unit = document.getElementById('unitSelect').value;
         const input = document.getElementById('feedInput');
+        const feeds = DB[oilType][mode].feeds;
+        let min = Math.min(...feeds);
+        let max = Math.max(...feeds);
         
-        if (DB[oilType] && DB[oilType][mode]) {
-            const feeds = DB[oilType][mode].feeds;
-            let min = Math.min(...feeds);
-            let max = Math.max(...feeds);
-            
-            if (min === max) {
-                let val = (unit === 'sm3hr') ? (min * CONVERSION_FACTOR).toFixed(0) : min;
-                let text = (curLang === 'en' ? STRINGS.en.fixed : STRINGS.ar.fixed) + val;
-                input.placeholder = text;
-                input.value = val; 
-            } else {
-                if (unit === 'sm3hr') {
-                    min = (min * CONVERSION_FACTOR).toFixed(0);
-                    max = (max * CONVERSION_FACTOR).toFixed(0);
-                }
-                let text = (curLang === 'en' ? STRINGS.en.range : STRINGS.ar.range) + `${min} - ${max}`;
-                input.placeholder = text;
+        if (min === max) {
+            let val = (unit === 'sm3hr') ? (min * CONVERSION_FACTOR).toFixed(0) : min;
+            let text = (curLang === 'en' ? STRINGS.en.fixed : STRINGS.ar.fixed) + val;
+            input.placeholder = text;
+            input.value = val; 
+        } else {
+            if (unit === 'sm3hr') {
+                min = (min * CONVERSION_FACTOR).toFixed(0);
+                max = (max * CONVERSION_FACTOR).toFixed(0);
             }
+            let text = (curLang === 'en' ? STRINGS.en.range : STRINGS.ar.range) + `${min} - ${max}`;
+            input.placeholder = text;
         }
     }
 
@@ -850,12 +821,11 @@
     }
 
     function calculateResults() {
-        document.getElementById('results-row').style.display = 'flex';
-
         const oilType = document.getElementById('oilTypeSelect').value;
         const mode = document.getElementById('modeSelect').value;
         const unit = document.getElementById('unitSelect').value;
         
+        // Custom parsing to support Arabic numerals in "text" input
         let rawVal = document.getElementById('feedInput').value;
         let rawInput = parseLocaleNumber(rawVal);
         
@@ -936,7 +906,7 @@
             <li>${STRINGS[curLang].note1}</li>
             <li>${STRINGS[curLang].note2}</li>
             <li>${STRINGS[curLang].note3}</li>
-        </ul>`;
+        `;
     }
 
     // Mobile Manual Toggle
@@ -950,11 +920,6 @@
 
     function toggleLanguage() {
         curLang = curLang === 'en' ? 'ar' : 'en';
-        localStorage.setItem('refinery-lang', curLang);
-        applyLanguageUI();
-    }
-
-    function applyLanguageUI() {
         document.body.dir = curLang === 'ar' ? 'rtl' : 'ltr';
         
         // Animate Slider
@@ -982,6 +947,8 @@
         renderQualityNotes(); 
         updateStaticNotes();
     }
+
+    window.onload = init;
 </script>
 
 </body>
