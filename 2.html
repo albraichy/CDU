@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- KIPIC BRAND THEME --- */
+        /* --- KIPIC THEME CONFIGURATION --- */
         :root {
             --kipic-navy: #002F6C;       
             --kipic-green: #6FAE27;      
@@ -29,6 +29,7 @@
             --table-stripe: #f8f9fa;
             --table-row-bg: #ffffff;     
             --input-bg: #ffffff;
+            --input-text: #2c3e50;
             --footer-bg: #e9ecef;
             
             /* Badge Colors (Solid Blue in Light) */
@@ -49,13 +50,14 @@
             --border-color: #343a40;
             --header-text: #e0e0e0;
             
-            /* Dark Tables */
+            /* Dark Navy Tables Background */
             --table-head-bg: #0d1b2a;    
             --table-head-text: #ced4da;
             --table-row-bg: #151a21;     
             --table-stripe: #1c232b;     
             
             --input-bg: #2b2b36;
+            --input-text: #e0e0e0;
             --footer-bg: #1a1a1a;
             --kipic-navy: #0d1b2a; 
             --kipic-green: #7bc938;
@@ -208,12 +210,12 @@
         }
         [data-theme="dark"] .card-title-text { color: var(--kipic-green); }
 
-        /* --- FEED BADGE --- */
+        /* --- FEED BADGE (Fixed) --- */
         .feed-badge {
             background-color: var(--badge-bg);
             border: 1px solid var(--badge-border);
             color: var(--badge-text);
-            padding: 5px 16px;
+            padding: 5px 14px;
             border-radius: 6px;
             font-family: 'Roboto Mono', monospace;
             font-weight: 700;
@@ -223,20 +225,22 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* --- DESKTOP VIEW --- */
+        /* --- DESKTOP VIEW (>768px) --- */
         @media (min-width: 769px) {
             .collapse-icon { display: none !important; }
             .card-header-custom { cursor: default !important; pointer-events: none; }
             .collapse { display: block !important; height: auto !important; visibility: visible !important; }
+            /* Allow interactions with badge on desktop if needed */
             .card-header-custom .header-actions { pointer-events: auto; } 
         }
 
-        /* --- MOBILE VIEW --- */
+        /* --- MOBILE VIEW (<=768px) --- */
         @media (max-width: 768px) {
             .main-header { padding: 1rem 1.2rem; }
             .header-title-main { font-size: 1.3rem; }
             .header-subtitle { font-size: 0.9rem; }
             
+            /* Hide Theme Toggle on Mobile */
             #theme-toggle-btn { display: none !important; }
             .header-controls { position: static; transform: none; margin-top: 10px; justify-content: center; }
             
@@ -246,17 +250,23 @@
             .table td, .table th { padding: 8px 10px; font-size: 0.8rem; }
             .val-display { font-size: 0.85rem; }
             
-            .card-header-custom { cursor: pointer; padding: 10px 15px; flex-wrap: wrap; gap: 8px; }
+            /* Mobile Collapse Styles */
+            .card-header-custom { cursor: pointer; padding: 10px 15px; flex-wrap: wrap; gap: 5px; }
             .card-title-text { font-size: 0.95rem; }
             
-            .feed-badge { font-size: 0.75rem; padding: 3px 8px; margin-top: 2px; }
-            
+            /* Wrapper for Badge and Arrow to keep them together */
             .header-actions {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
                 width: 100%;
                 margin-top: 5px;
+            }
+            
+            .feed-badge { 
+                font-size: 0.8rem; 
+                padding: 4px 10px; 
+                /* Badge styling */
             }
             
             .collapse-icon {
@@ -271,12 +281,12 @@
             .card-header-custom[aria-expanded="true"] .collapse-icon { transform: rotate(0deg) !important; }
         }
 
-        /* --- INPUTS & PLACEHOLDER --- */
+        /* --- INPUTS & BUTTONS --- */
         .form-label { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
         
         .form-control, .form-select {
             background-color: var(--input-bg);
-            color: var(--text-main);
+            color: var(--input-text);
             border: 1px solid var(--border-color);
             padding: 8px 12px;
             border-radius: 8px;
@@ -301,8 +311,8 @@
             border-color: var(--operator-blue);
             color: #ffffff;
             transition: all 0.3s ease;
-            padding-top: 8px; padding-bottom: 8px;
-            height: 38px;
+            padding-top: 0; padding-bottom: 0;
+            height: 38px; 
             display: flex; align-items: center; justify-content: center;
         }
         .btn-calc-custom:hover { background-color: #003d73; border-color: #003d73; color: #ffffff; }
@@ -425,7 +435,7 @@
                         <i class="bi bi-speedometer2"></i>
                         <span data-i18n="opParams">Operational Parameters</span>
                     </h5>
-                    <div class="header-actions d-flex align-items-center gap-2">
+                    <div class="header-actions">
                         <div id="feed-display-badge" class="feed-badge">--</div>
                         <i class="bi bi-chevron-down collapse-icon"></i>
                     </div>
@@ -450,7 +460,7 @@
             
             <div class="card mb-3 mb-md-4">
                 <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseYields" aria-expanded="false">
-                    <div class="d-flex w-100 justify-content-between align-items-center">
+                    <div class="header-actions">
                          <h5 class="card-title-text">
                             <i class="bi bi-graph-up-arrow"></i>
                             <span data-i18n="prodYields">Production Yields</span>
@@ -475,7 +485,7 @@
 
             <div class="card mb-0">
                 <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseQuality" aria-expanded="false">
-                    <div class="d-flex w-100 justify-content-between align-items-center">
+                    <div class="header-actions">
                         <h5 class="card-title-text">
                             <i class="bi bi-clipboard-check"></i>
                             <span data-i18n="prodQuality">Quality Specifications</span>
