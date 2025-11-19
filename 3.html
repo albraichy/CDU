@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- KIPIC BRAND THEME --- */
+        /* --- KIPIC BRAND THEME (Reference Code) --- */
         :root {
             --kipic-navy: #002F6C;       
             --kipic-green: #6FAE27;      
@@ -31,13 +31,13 @@
             --input-bg: #ffffff;
             --footer-bg: #e9ecef;
             
-            /* Badge Colors (Solid Blue in Light) */
+            /* Badge Colors */
             --badge-bg: var(--kipic-navy);
             --badge-text: #ffffff;
             --badge-border: var(--kipic-navy);
             
             --arrow-color: var(--kipic-navy);
-            --placeholder-color: #6c757d;
+            --placeholder-color: #adb5bd;
         }
 
         [data-theme="dark"] {
@@ -60,13 +60,13 @@
             --kipic-navy: #0d1b2a; 
             --kipic-green: #7bc938;
             
-            /* Badge Colors (Solid Green in Dark) */
-            --badge-bg: var(--kipic-green);
-            --badge-text: #000000;
+            /* Badge Colors */
+            --badge-bg: rgba(111, 174, 39, 0.15);
+            --badge-text: var(--kipic-green);
             --badge-border: var(--kipic-green);
             
             --arrow-color: var(--kipic-green);
-            --placeholder-color: #adb5bd;
+            --placeholder-color: #6c757d;
         }
 
         body {
@@ -168,12 +168,9 @@
             transition: transform 0.3s ease;
             z-index: 1;
         }
-        
-        .lang-switch-container.ar-active .lang-slider {
-            transform: translateX(92%);
-        }
+        .lang-switch-container.ar-active .lang-slider { transform: translateX(92%); }
 
-        /* --- CARDS & COLLAPSE --- */
+        /* --- CARDS --- */
         .card {
             background-color: var(--bg-card);
             border: none;
@@ -184,7 +181,6 @@
             border-top: 3px solid var(--kipic-navy); 
             transition: border-color 0.3s ease;
         }
-        
         [data-theme="dark"] .card { border-top-color: var(--kipic-green) !important; }
         
         .card-header-custom {
@@ -337,7 +333,7 @@
         .val-display { font-family: 'Roboto Mono', monospace; font-weight: 600; }
         .unit-small { font-size: 0.8em; color: var(--text-muted); margin-inline-start: 6px; font-weight: 400; }
 
-        /* --- FOOTER & ALERTS --- */
+        /* --- FOOTER --- */
         .quality-alert {
             background-color: rgba(255, 193, 7, 0.1);
             border-inline-start: 4px solid #ffc107;
@@ -405,12 +401,14 @@
             </div>
             <div class="col-md-4">
                 <label class="form-label" data-i18n="feedRate">Feed Rate</label>
-                <form onsubmit="event.preventDefault(); calculateResults();" class="d-flex gap-2">
-                    <input type="text" class="form-control" id="feedInput" placeholder="Range..." inputmode="decimal" enterkeyhint="go">
-                    <button type="button" class="btn btn-calc-custom px-4" onclick="calculateResults()" data-i18n="calcBtn">
-                        Calculate
-                    </button>
-                </form>
+                <div class="d-flex gap-2">
+                    <form onsubmit="event.preventDefault(); calculateResults();" class="d-flex gap-2 w-100">
+                        <input type="text" class="form-control" id="feedInput" placeholder="Range..." inputmode="decimal" enterkeyhint="go">
+                        <button type="button" class="btn btn-calc-custom px-4" onclick="calculateResults()" data-i18n="calcBtn">
+                            Calculate
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -734,11 +732,11 @@
         }
     };
 
-    const MODE_TRANSLATIONS = {
-        "Max Kero (with Heavy Diesel)": "أقصى كيروسين (مع ديزل ثقيل)",
-        "Max Kero (No Heavy Diesel)": "أقصى كيروسين (بدون ديزل ثقيل)",
-        "Max Naphtha Mode": "وضع أقصى نافثا",
-        "Base Case": "الحالة الأساسية"
+    const MODE_LABELS = {
+        "Max Kero (with Heavy Diesel)": { en: "with Heavy Diesel", ar: "مع ديزل ثقيل" },
+        "Max Kero (No Heavy Diesel)": { en: "no Heavy Diesel", ar: "بدون ديزل ثقيل" },
+        "Max Naphtha Mode": { en: "Naphtha Mode", ar: "نمط النافثا" },
+        "Base Case": { en: "Base Case", ar: "الحالة الأساسية" }
     };
 
     const STRINGS = {
@@ -762,7 +760,7 @@
             oilType: "نوع النفط", opMode: "وضع التشغيل", inputUnit: "وحدة الإدخال", feedRate: "كمية التكرير",
             calcBtn: "احسب", opParams: "معايير التشغيل", paramName: "المعيار", value: "القيمة",
             prodYields: "كميات الإنتاج", product: "المنتج", prodQuality: "مواصفات الجودة", 
-            stream: "المجموعة / التيار", property: "الخاصية", limit: "القيمة",
+            stream: "الفئة", property: "المعيار", limit: "القيمة",
             notesTitle: "ملاحظات وإرشادات عامة", range: "النطاق: ", fixed: "قيمة ثابتة: ",
             
             qNote1: "ذا انخفضت درجة حموضة الماء منزوع الحمضية عن 8، يجب التحويل إلى ماء الضغط المنخفض المكثف.",
@@ -802,11 +800,9 @@
                 oilSelect.add(opt);
             }
             
-            // Populate modes initially based on first oil type
-            updateModes();
-            
-            // Init UI with saved language (AFTER populating options)
+            // Init UI with saved language
             applyLanguageUI();
+            updateModes(); // Logic to fill modes now considers language
         }
         
         // Enter Key Listener
@@ -818,24 +814,19 @@
                 calculateResults();
               }
             });
-            // When typing, hide old results to avoid confusion
-            feedInput.addEventListener('input', () => {
-                 // Optional: Keep results or hide? User requested manual update only. 
-                 // We will keep results visible but they won't update until Calculate is clicked.
-            });
         }
     });
 
     function handleModeChange() {
         updatePlaceholder();
-        // No auto calc
+        document.getElementById('results-row').style.display = 'none';
     }
 
     function updateModes() {
         const oilType = document.getElementById('oilTypeSelect').value;
         const modeSelect = document.getElementById('modeSelect');
         
-        // Save current selection if possible
+        // Save selection to restore if possible
         const currentVal = modeSelect.value;
         
         modeSelect.innerHTML = "";
@@ -843,11 +834,11 @@
         if (DB[oilType]) {
             for (let mode in DB[oilType]) {
                 let opt = document.createElement('option');
-                opt.value = mode; 
+                opt.value = mode; // The internal key
                 
-                // Apply Translation logic here
-                if (curLang === 'ar' && MODE_TRANSLATIONS[mode]) {
-                    opt.text = MODE_TRANSLATIONS[mode];
+                // Display Text Mapping
+                if (MODE_LABELS[mode]) {
+                    opt.text = MODE_LABELS[mode][curLang];
                 } else {
                     opt.text = mode;
                 }
@@ -855,7 +846,7 @@
                 modeSelect.add(opt);
             }
             
-            // Try to restore selection if valid
+            // Restore selection if it exists in new list
             if (currentVal && Array.from(modeSelect.options).some(o => o.value === currentVal)) {
                 modeSelect.value = currentVal;
             }
@@ -868,7 +859,6 @@
         const oilType = document.getElementById('oilTypeSelect').value;
         const mode = document.getElementById('modeSelect').value;
         const unit = document.getElementById('unitSelect').value;
-        const input = document.getElementById('feedInput');
         
         if (DB[oilType] && DB[oilType][mode]) {
             const feeds = DB[oilType][mode].feeds;
@@ -878,18 +868,17 @@
             if (min === max) {
                 let val = (unit === 'sm3hr') ? (min * CONVERSION_FACTOR).toFixed(0) : min;
                 let text = (curLang === 'en' ? STRINGS.en.fixed : STRINGS.ar.fixed) + val;
-                input.placeholder = text;
-                // input.value = val; // removed auto-fill per request
+                document.getElementById('feedInput').placeholder = text;
             } else {
                 if (unit === 'sm3hr') {
                     min = (min * CONVERSION_FACTOR).toFixed(0);
                     max = (max * CONVERSION_FACTOR).toFixed(0);
                 }
                 let text = (curLang === 'en' ? STRINGS.en.range : STRINGS.ar.range) + `${min} - ${max}`;
-                input.placeholder = text;
+                document.getElementById('feedInput').placeholder = text;
             }
         }
-        // Don't hide results, just don't update them
+        document.getElementById('results-row').style.display = 'none';
     }
 
     function lerp(x, x0, x1, y0, y1) {
@@ -923,10 +912,7 @@
         let rawInput = parseLocaleNumber(rawVal);
         
         if (isNaN(rawInput)) {
-            // document.getElementById('feed-display-badge').innerText = "--";
-            // keep old results if invalid input? or clear?
-            // Usually clear or show error. Let's clear badge.
-             document.getElementById('feed-display-badge').innerText = "--";
+            document.getElementById('feed-display-badge').innerText = "--";
             return;
         }
 
@@ -1022,6 +1008,7 @@
     function applyLanguageUI() {
         document.body.dir = curLang === 'ar' ? 'rtl' : 'ltr';
         
+        // Animate Slider
         const container = document.getElementById('lang-switch');
         const optEn = document.getElementById('opt-en');
         const optAr = document.getElementById('opt-ar');
@@ -1042,13 +1029,15 @@
             if (STRINGS[curLang][key]) el.innerText = STRINGS[curLang][key];
         });
         
-        // Update Modes Dropdown text without resetting selection if possible
+        // Update Mode Dropdown text without resetting selection
         updateModes();
         
         updatePlaceholder();
         renderQualityNotes(); 
         updateStaticNotes();
     }
+
+    window.onload = init;
 </script>
 
 </body>
