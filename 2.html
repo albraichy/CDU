@@ -4,17 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CDU Parameters Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- KIPIC BRAND THEME (Reference Code #5) --- */
+        /* --- KIPIC BRAND THEME --- */
         :root {
             --kipic-navy: #002F6C;       
             --kipic-green: #6FAE27;      
             --kipic-gradient: linear-gradient(135deg, var(--kipic-navy) 60%, #004494 100%);
             --operator-blue: #004e92;    
+
+            /* Light Mode */
             --bg-body: #f3f5f8;
             --bg-card: #ffffff;
             --text-main: #2c3e50;
@@ -31,16 +34,20 @@
         }
 
         [data-theme="dark"] {
+            /* Dark Mode */
             --bg-body: #121212;
             --bg-card: #1e1e24;
             --text-main: #e0e0e0;
             --text-muted: #a0a0a0;
             --border-color: #343a40;
             --header-text: #e0e0e0;
+            
+            /* Dark Navy Tables */
             --table-head-bg: #0d1b2a;    
             --table-head-text: #ced4da;
             --table-row-bg: #151a21;     
             --table-stripe: #1c232b;     
+            
             --input-bg: #2b2b36;
             --footer-bg: #1a1a1a;
             --kipic-navy: #0d1b2a; 
@@ -91,8 +98,10 @@
             inset-inline-end: 25px;
             display: flex;
             gap: 12px;
+            align-items: center;
         }
 
+        /* Theme Toggle Button */
         .icon-btn {
             background: rgba(255,255,255,0.15);
             border: 1px solid rgba(255,255,255,0.25);
@@ -107,11 +116,55 @@
             transition: all 0.2s;
         }
         .icon-btn:hover { background: var(--kipic-green); border-color: var(--kipic-green); }
-        
-        /* Dark Mode Toggle Logic: Hidden on mobile */
-        #theme-toggle-btn { display: flex; } 
 
-        .lang-toggle { width: auto; padding: 0 15px; font-weight: 700; font-size: 0.9rem; }
+        /* Language Switch (Custom Toggle) */
+        .lang-switch-container {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 2px;
+            display: flex;
+            position: relative;
+            cursor: pointer;
+            width: 80px;
+            height: 36px;
+        }
+        
+        .lang-option {
+            flex: 1;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            z-index: 2;
+            line-height: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            transition: color 0.3s;
+        }
+        
+        .lang-option.active { color: #fff; }
+
+        .lang-slider {
+            position: absolute;
+            top: 3px;
+            bottom: 3px;
+            width: 50%;
+            background: var(--kipic-green);
+            border-radius: 16px;
+            transition: transform 0.3s ease;
+            z-index: 1;
+        }
+        
+        /* Position slider based on language */
+        [dir="ltr"] .lang-slider { transform: translateX(0); }
+        [dir="rtl"] .lang-slider { transform: translateX(-100%); } /* In RTL context */
+        
+        /* When we are in RTL mode, the DOM order is Right to Left. 
+           - option 1 (EN) is Right. option 2 (AR) is Left.
+           - slider needs to be on Right for EN, Left for AR.
+        */
+        html[dir="ltr"] .lang-slider.move-right { transform: translateX(100%); }
+        html[dir="rtl"] .lang-slider.move-right { transform: translateX(0); }
+
 
         /* --- CARDS --- */
         .card {
@@ -134,7 +187,15 @@
             padding: 15px 20px;
             border-bottom: 1px solid var(--border-color);
             background-color: transparent;
+            cursor: pointer; /* Indicates clickable for collapse */
         }
+
+        /* Chevron Rotation */
+        .collapse-icon {
+            transition: transform 0.3s ease;
+            color: var(--text-muted);
+        }
+        [aria-expanded="true"] .collapse-icon { transform: rotate(180deg); }
 
         .card-title-text {
             color: var(--kipic-navy);
@@ -163,7 +224,11 @@
         }
         .form-control::placeholder { color: var(--text-muted); opacity: 0.6; }
 
-        [dir="rtl"] .form-select { background-position: left 0.75rem center; padding-right: 0.75rem; padding-left: 2.25rem; }
+        [dir="rtl"] .form-select {
+            background-position: left 0.75rem center;
+            padding-right: 0.75rem;
+            padding-left: 2.25rem;
+        }
 
         .btn-calc-custom {
             background-color: var(--operator-blue);
@@ -188,9 +253,11 @@
             font-weight: 700;
             font-size: 0.95rem;
             direction: ltr;
-            white-space: nowrap; /* Prevent wrapping */
         }
-        [data-theme="dark"] .feed-badge { border-color: var(--kipic-green); color: var(--kipic-green); }
+        [data-theme="dark"] .feed-badge {
+            border-color: var(--kipic-green);
+            color: var(--kipic-green);
+        }
 
         /* --- TABLES --- */
         .table { margin-bottom: 0; border-color: var(--border-color); color: var(--text-main); }
@@ -251,22 +318,13 @@
             .header-title-main { font-size: 1.3rem; }
             .header-subtitle { font-size: 0.9rem; }
             
-            /* Hide Theme Toggle on Mobile */
             #theme-toggle-btn { display: none !important; }
-            
-            /* Adjust Controls position */
             .header-controls { position: static; transform: none; margin-top: 10px; justify-content: center; }
             
             .card { margin-bottom: 15px; }
-            .card-body { padding: 0; }
-            
-            /* Tighter padding for mobile tables */
             .table td, .table th { padding: 8px 10px; font-size: 0.85rem; }
             .val-display { font-size: 0.9rem; }
-            
-            /* Smaller Feed Badge */
             .feed-badge { font-size: 0.85rem; padding: 4px 10px; }
-            .card-header-custom { padding: 10px 15px; }
         }
     </style>
 </head>
@@ -283,9 +341,12 @@
                 <button class="icon-btn" id="theme-toggle-btn" onclick="toggleTheme()" title="Switch Theme">
                     <i class="bi bi-sun-fill" id="theme-icon"></i>
                 </button>
-                <button class="icon-btn lang-toggle" onclick="toggleLanguage()">
-                    <span id="lang-text">EN</span>
-                </button>
+                
+                <div class="lang-switch-container" onclick="toggleLanguage()">
+                    <div class="lang-slider" id="lang-slider"></div>
+                    <span class="lang-option active" id="opt-en">EN</span>
+                    <span class="lang-option" id="opt-ar">AR</span>
+                </div>
             </div>
         </div>
     </div>
@@ -313,7 +374,7 @@
             <div class="col-md-4">
                 <label class="form-label" data-i18n="feedRate">Feed Rate</label>
                 <div class="d-flex gap-2">
-                    <input type="number" class="form-control" id="feedInput" placeholder="Range..." oninput="calculateResults()">
+                    <input type="number" class="form-control" id="feedInput" placeholder="Range..." inputmode="numeric" oninput="calculateResults()">
                     <button class="btn btn-calc-custom px-4" onclick="calculateResults()" data-i18n="calcBtn">
                         Calculate
                     </button>
@@ -326,23 +387,28 @@
         
         <div class="col-lg-6">
             <div class="card h-100">
-                <div class="card-header-custom">
+                <div class="card-header-custom" data-bs-toggle="collapse" data-bs-target="#collapseParams">
                     <h5 class="card-title-text">
                         <i class="bi bi-speedometer2"></i>
                         <span data-i18n="opParams">Operational Parameters</span>
                     </h5>
-                    <div id="feed-display-badge" class="feed-badge">--</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div id="feed-display-badge" class="feed-badge">--</div>
+                        <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
                 </div>
-                <div class="card-body p-0 table-responsive">
-                    <table class="table table-hover table-sm">
-                        <thead>
-                            <tr>
-                                <th data-i18n="paramName">Parameter Name</th>
-                                <th class="text-end" data-i18n="value">Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="params-body"></tbody>
-                    </table>
+                <div id="collapseParams" class="collapse show">
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="paramName">Parameter Name</th>
+                                    <th class="text-end" data-i18n="value">Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="params-body"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -350,43 +416,49 @@
         <div class="col-lg-6">
             
             <div class="card mb-3 mb-md-4">
-                <div class="card-header-custom">
+                <div class="card-header-custom" data-bs-toggle="collapse" data-bs-target="#collapseYields">
                     <h5 class="card-title-text">
                         <i class="bi bi-graph-up-arrow"></i>
                         <span data-i18n="prodYields">Production Yields</span>
                     </h5>
+                    <i class="bi bi-chevron-down collapse-icon"></i>
                 </div>
-                <div class="card-body p-0">
-                    <table class="table table-sm mb-0">
-                        <thead>
-                            <tr>
-                                <th data-i18n="product">Product</th>
-                                <th class="text-end">Flow (sm3/h)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="yields-body"></tbody>
-                    </table>
+                <div id="collapseYields" class="collapse show">
+                    <div class="card-body p-0">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="product">Product</th>
+                                    <th class="text-end">Flow (sm3/h)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="yields-body"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <div class="card mb-0">
-                <div class="card-header-custom">
+                <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseQuality">
                     <h5 class="card-title-text">
                         <i class="bi bi-clipboard-check"></i>
                         <span data-i18n="prodQuality">Quality Specifications</span>
                     </h5>
+                    <i class="bi bi-chevron-down collapse-icon"></i>
                 </div>
-                <div class="card-body p-0 table-responsive">
-                    <table class="table table-sm mb-0">
-                        <thead>
-                            <tr>
-                                <th data-i18n="stream">Stream</th>
-                                <th data-i18n="property">Property</th>
-                                <th class="text-end" data-i18n="limit">Limit/Value</th>
-                            </tr>
-                        </thead>
-                        <tbody id="quality-body"></tbody>
-                    </table>
+                <div id="collapseQuality" class="collapse">
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="stream">Stream</th>
+                                    <th data-i18n="property">Property</th>
+                                    <th class="text-end" data-i18n="limit">Limit/Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="quality-body"></tbody>
+                        </table>
+                    </div>
                 </div>
                 
                 <div class="quality-alert" id="quality-notes-area" style="display: none;">
@@ -403,8 +475,13 @@
         <h6 class="fw-bold mb-3 text-uppercase" style="color: var(--text-main);">
             <i class="bi bi-info-circle-fill me-2"></i><span data-i18n="notesTitle">General Notes & Guidelines</span>
         </h6>
-        <div class="footer-notes" id="footer-notes-list">
-            </div>
+        <div class="footer-notes">
+            <ul id="footer-static-notes">
+                <li data-i18n="note1"></li>
+                <li data-i18n="note2"></li>
+                <li data-i18n="note3"></li>
+            </ul>
+        </div>
     </div>
 </footer>
 
@@ -446,7 +523,7 @@
                     "Overflash Flow": {u: "sm3/h", v: [112.5, 84.3, 108.4, 83.5, 75.2, 72.7]},
                     "Stripping Steam Temperature": {u: "°C", v: [274.9, 284.9, 289.9, 289.7, 283.6, 274.2]},
                     "Stripping Steam (Crude)": {u: "kg/hr", v: [22500, 21998, 20500, 17500, 15374, 15500]},
-                    "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [1200, 2150, 1092, 1450, 1209, 1000]},
+                    "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [1300, 2300, 1100, 1200, 941, 2035, 1000]},
                     "Stripping Steam (Heavy Diesel)": {u: "kg/hr", v: [350, 450, 300, 300, 300, 300]},
                     "Stabilizer Feed Temperature": {u: "°C", v: [101.9, 103.9, 102.5, 105.6, 108.1, 110.3]},
                     "Stabilizer Reboiler Inlet Temperature": {u: "°C", v: [147.1, 147.8, 149.3, 150.7, 153.3, 155.5]},
@@ -628,7 +705,7 @@
             qNote2: "If Desalter Effluent pH goes below 4.5, Contact U35 to optimize Caustic Injection.",
 
             // Static Footer Notes
-            note1: "The above parameters based on previous performance with maximum yields + stable operations. Variation acceptable if column profile maintained.",
+            note1: "The above parameters based on previous performance with maximum yields + stable operations.. However, a variation is acceptable if the column profile is being maintained. Further fine tuning may be required in order to optimize the yields further. Minor adjustments can be done as needed. However, for any major deviation from the above, prior discussion with process engineer is recommended.",
             note2: "Above are general guidelines, however desalter process parameters & chemical dosage shared through NALCO group to be followed.",
             note3: "To be optimized depending on Diesel Cloud Point, On Spec -7 ° C winter and 4 °C summer."
         },
@@ -645,7 +722,7 @@
             qNote2: "إذا انخفضت درجة حمضية مياه صرف نزع الأملاح عن 4.5، تواصل مع U35 لتحسين حقن رماد الصودا.",
 
             // Static Footer Notes
-            note1: "تستند المعايير أعلاه إلى قيم أداء فعلي سابق مع أقصى إنتاجية + عمليات مستقرة، التباين في القيم مقبول إذا تم الحفاظ على السلم الحراري لعمود تكرير النفط الخام.",
+            note1: "تستند المعايير أعلاه إلى قيم أداء فعلي سابق مع أقصى إنتاجية + عمليات مستقرة، التباين في القيم مقبول إذا تم الحفاظ على السلم الحراري لعمود تكرير النفط الخام، قد يلزم إجراء مزيد من الضبط الدقيق لتحسين الإنتاجية بشكل أكبر، كما يمكن إجراء تعديلات طفيفة حسب الحاجة، مع ذلك يُنصح بمناقشة أي انحراف كبير عن القيم أعلاه مع مهندس العمليات مسبقًا.",
             note2: "ما ورد أعلاه إرشادات عامة، ومع ذلك يجب اتباع معايير عملية إزالة الأملاح والجرعات الكيميائية المشاركة من قبل مجموعة NALCO.",
             note3: "يجب تعديل معايير التشغيل بناءً على نقطة التغييم للديزل (Cloud Point): المواصفات -7 °C شتاءً و 4 °C صيفاً."
         }
@@ -655,7 +732,7 @@
 
     // --- LOGIC ---
     function init() {
-        // System Preference Auto-Detect
+        // Detect OS preference
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.setAttribute('data-theme', 'dark');
             document.getElementById('theme-icon').className = "bi bi-sun-fill";
@@ -668,6 +745,7 @@
             oilSelect.add(opt);
         }
         updateModes();
+        updateStaticNotes(); // Init static footer text
     }
 
     function handleModeChange() {
@@ -745,7 +823,6 @@
         const data = DB[oilType][mode];
         let targetKBPD = (unit === 'sm3hr') ? rawInput / CONVERSION_FACTOR : rawInput;
         
-        // Badge
         let displayFeed = "";
         if (unit === 'KBPD') {
              let sm3Val = (rawInput * CONVERSION_FACTOR).toFixed(1);
@@ -793,7 +870,7 @@
         }
         document.getElementById('quality-body').innerHTML = qualHTML;
 
-        // Render Quality Alert Notes
+        // Render Quality Alert Notes (Conditional)
         renderQualityNotes();
     }
 
@@ -809,6 +886,15 @@
         area.style.display = 'block';
     }
 
+    function updateStaticNotes() {
+        const footerList = document.getElementById('footer-static-notes');
+        footerList.innerHTML = `
+            <li>${STRINGS[curLang].note1}</li>
+            <li>${STRINGS[curLang].note2}</li>
+            <li>${STRINGS[curLang].note3}</li>
+        `;
+    }
+
     function toggleTheme() {
         const html = document.documentElement;
         const icon = document.getElementById('theme-icon');
@@ -820,8 +906,23 @@
     function toggleLanguage() {
         curLang = curLang === 'en' ? 'ar' : 'en';
         document.body.dir = curLang === 'ar' ? 'rtl' : 'ltr';
-        document.getElementById('lang-text').innerText = curLang.toUpperCase();
         
+        // Animate Slider
+        const slider = document.getElementById('lang-slider');
+        const optEn = document.getElementById('opt-en');
+        const optAr = document.getElementById('opt-ar');
+        
+        if (curLang === 'ar') {
+            slider.classList.add('move-right');
+            optAr.classList.add('active');
+            optEn.classList.remove('active');
+        } else {
+            slider.classList.remove('move-right');
+            optEn.classList.add('active');
+            optAr.classList.remove('active');
+        }
+        
+        // Translate UI
         document.querySelectorAll('[data-i18n]').forEach(el => {
             let key = el.getAttribute('data-i18n');
             if (STRINGS[curLang][key]) el.innerText = STRINGS[curLang][key];
@@ -829,14 +930,7 @@
         
         updatePlaceholder();
         renderQualityNotes(); 
-        
-        // Populate footer dynamic notes
-        const footerList = document.getElementById('footer-notes-list');
-        footerList.innerHTML = `<ul>
-            <li>${STRINGS[curLang].note1}</li>
-            <li>${STRINGS[curLang].note2}</li>
-            <li>${STRINGS[curLang].note3}</li>
-        </ul>`;
+        updateStaticNotes();
     }
 
     window.onload = init;
