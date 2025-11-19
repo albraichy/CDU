@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- KIPIC BRAND THEME (Reference Code) --- */
+        /* --- KIPIC BRAND THEME --- */
         :root {
             --kipic-navy: #002F6C;       
             --kipic-green: #6FAE27;      
@@ -31,7 +31,7 @@
             --input-bg: #ffffff;
             --footer-bg: #e9ecef;
             
-            /* Badge Colors */
+            /* Badge Colors (Solid Blue in Light) */
             --badge-bg: var(--kipic-navy);
             --badge-text: #ffffff;
             --badge-border: var(--kipic-navy);
@@ -60,9 +60,9 @@
             --kipic-navy: #0d1b2a; 
             --kipic-green: #7bc938;
             
-            /* Badge Colors */
-            --badge-bg: rgba(111, 174, 39, 0.15);
-            --badge-text: var(--kipic-green);
+            /* Badge Colors (Solid Green in Dark) */
+            --badge-bg: var(--kipic-green);
+            --badge-text: #000000;
             --badge-border: var(--kipic-green);
             
             --arrow-color: var(--kipic-green);
@@ -168,7 +168,10 @@
             transition: transform 0.3s ease;
             z-index: 1;
         }
-        .lang-switch-container.ar-active .lang-slider { transform: translateX(92%); }
+        
+        .lang-switch-container.ar-active .lang-slider {
+            transform: translateX(92%);
+        }
 
         /* --- CARDS & COLLAPSE --- */
         .card {
@@ -181,6 +184,7 @@
             border-top: 3px solid var(--kipic-navy); 
             transition: border-color 0.3s ease;
         }
+        
         [data-theme="dark"] .card { border-top-color: var(--kipic-green) !important; }
         
         .card-header-custom {
@@ -223,6 +227,7 @@
             .collapse-icon { display: none !important; }
             .card-header-custom { cursor: default !important; pointer-events: none; }
             .collapse { display: block !important; height: auto !important; visibility: visible !important; }
+            /* Enable pointer events for header badge/controls */
             .card-header-custom .header-actions { pointer-events: auto; } 
         }
 
@@ -232,6 +237,7 @@
             .header-title-main { font-size: 1.3rem; }
             .header-subtitle { font-size: 0.9rem; }
             
+            /* Hide Theme Toggle on Mobile */
             #theme-toggle-btn { display: none !important; }
             .header-controls { position: static; transform: none; margin-top: 10px; justify-content: center; }
             
@@ -646,9 +652,9 @@
                 quality: {
                     "Desalted Crude": { "Salt HEM": {u: "PTB", v: [0.65, 0.6, 0.6, 0.7, 1.0, 0.6, 0.6]}, "BS&W": {u: "%", v: [1.3, 0.6, 0.8, 0.7, 0.55, 0.5, 0.5]} },
                     "Desalter Effluent": { "pH": {u: "pH", v: [5.0, 7.6, 6.0, 5.8, 7.0, 5.5]} },
-                    "SSW": { "pH": {u: "pH", v: [8.5, 9.0, 9.57, 8.7, 9.0, 7.8]} },
-                    "Naphtha": { "RVP": {u: "psi", v: [8.8, 9.1, 8.35, 8.9, 8.76, 8.8]}, "T95": {u: "°C", v: [143, 147, 144, 142, 140, 145, 143]} },
-                    "Kerosene": { "Freeze Point": {u: "°C", v: [-48, -51, -50, -51, -54, -52]}, "T95": {u: "°C", v: [245, 252, 247, 240, 245, 231, 238]} },
+                    "SSW": { "pH": {u: "pH", v: [8.5, 8, 8.1, 9, 9.4, 8.5, 7.5]} },
+                    "Naphtha": { "RVP": {u: "psi", v: [9.16, 9.1, 8.9, 8.45, 8.51, 8, 8.65]}, "T95": {u: "°C", v: [143, 147, 144, 142, 140, 145, 143]} },
+                    "Kerosene": { "Freeze Point": {u: "°C", v: [-48, -49, -48, -52, -51, -56, -52]}, "T95": {u: "°C", v: [245, 252, 247, 240, 245, 231, 238]} },
                     "Diesel": { "T95": {u: "°C", v: [331, 325, 334, 327, 336, 324, 311]}, "Cloud Point": {u: "°C", v: [-6, -9, -6, -9, -6, -11, -13]} },
                     "AR": { "API": {u: "API", v: [12.6, 13.1, 12.9, 13, 12.9, 13, 14]}, "Sulfur": {u: "wt%", v: [4.6, 4.4, 4.66, 4.8, 4.4, 4.3, 4.38]} }
                 }
@@ -703,6 +709,32 @@
                     "AR": { "Sulfur": {u:"wt%", v:[5.78]} }
                 }
             }
+        },
+        "KMHC": {
+            "Base Case": {
+                feeds: [200, 120],
+                params: {
+                    "Heater Outlet Temperature": {u: "°C", v: [369.1, 370.3]},
+                    "Column Top Temperature": {u: "°C", v: [111.7, 112.4]},
+                    "Top Column Pressure": {u: "barg", v: [1.01, 1.00]},
+                    "Top Pump Around Flow": {u: "sm3/h", v: [1339, 1270]},
+                    "Middle Pump Around Flow": {u: "sm3/h", v: [1243, 623]},
+                    "Bottom Pump Around Flow": {u: "sm3/h", v: [1038, 548]},
+                    "Column Bottom Temperature": {u: "°C", v: [342.0, 347.7]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [177.0, 178.7]},
+                    "Stripping Steam (Crude)": {u: "kg/hr", v: [23972, 15123]},
+                    "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [2340, 1775]},
+                    "Stripping Steam (Heavy Diesel)": {u: "kg/hr", v: [108, 108]}
+                },
+                yields: { "LPG": [3.1, 3.6], "Naphtha": [222.7, 130.0], "Kerosene": [224.6, 105.8], "Light Diesel": [197.6, 128.3], "Heavy Diesel": [0, 0], "AR": [680.0, 424.5] },
+                quality: { 
+                    "Desalted Crude": { "Salt": {u:"PTB", v:[0.6, 1.1]}, "BS&W": {u:"%", v:[0.6, 1.0]} },
+                    "Naphtha": { "RVP": {u:"psi", v:[9.0, 8.1]} },
+                    "Kerosene": { "Freeze Point": {u:"°C", v:[-49, -48]} },
+                    "Diesel": { "Cloud Point": {u:"°C", v:[-9, -7]} },
+                    "AR": { "Sulfur": {u:"wt%", v:[4.46, 4.92]} }
+                }
+            }
         }
     };
 
@@ -719,7 +751,7 @@
             oilType: "Oil Type", opMode: "Operating Mode", inputUnit: "Input Unit", feedRate: "Feed Rate",
             calcBtn: "Calculate", opParams: "Operational Parameters", paramName: "Parameter Name", value: "Value",
             prodYields: "Production Yields", product: "Product", prodQuality: "Quality Specifications", 
-            stream: "Group / Stream", property: "Property", limit: "Value",
+            stream: "Category", property: "Parameter", limit: "Value",
             notesTitle: "General Notes & Guidelines", range: "Range: ", fixed: "Fixed: ",
             
             qNote1: "If SSW pH goes below 8, switchover to LP Condensate processing.",
@@ -776,7 +808,9 @@
             
             // Init UI with saved language
             applyLanguageUI();
-            updateModes(); // Logic to fill modes now considers language
+            // Logic to fill modes now considers language
+            // IMPORTANT: Do NOT calculate results here, only setup UI
+            updateModes(false); 
         }
         
         // Enter Key Listener
@@ -788,16 +822,15 @@
                 calculateResults();
               }
             });
-            // When typing, keep results visible (No auto-hide) per request
         }
     });
 
     function handleModeChange() {
         updatePlaceholder();
-        // No auto calc and no hiding results
+        // Removed hiding logic - keeps results visible
     }
 
-    function updateModes() {
+    function updateModes(preserveSelection = true) {
         const oilType = document.getElementById('oilTypeSelect').value;
         const modeSelect = document.getElementById('modeSelect');
         
@@ -822,7 +855,7 @@
             }
             
             // Restore selection if it exists in new list
-            if (currentVal && Array.from(modeSelect.options).some(o => o.value === currentVal)) {
+            if (preserveSelection && currentVal && Array.from(modeSelect.options).some(o => o.value === currentVal)) {
                 modeSelect.value = currentVal;
             }
             
@@ -853,7 +886,6 @@
                 document.getElementById('feedInput').placeholder = text;
             }
         }
-        // Results remain visible if they were already there
     }
 
     function lerp(x, x0, x1, y0, y1) {
@@ -877,7 +909,7 @@
     }
 
     function calculateResults() {
-        // Show results container only on calculate
+        // Show results container
         document.getElementById('results-row').style.display = 'flex';
 
         const oilType = document.getElementById('oilTypeSelect').value;
@@ -1006,7 +1038,7 @@
         });
         
         // Update Mode Dropdown text without resetting selection
-        updateModes();
+        updateModes(true);
         
         updatePlaceholder();
         renderQualityNotes(); 
