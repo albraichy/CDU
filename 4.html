@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDU Parameters Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- KIPIC BRAND THEME --- */
+        :root {
+            --kipic-navy: #002F6C;       
+            --kipic-green: #6FAE27;      
+            --kipic-gradient: linear-gradient(135deg, var(--kipic-navy) 60%, #004494 100%);
+            --operator-blue: #004e92;    
+
+            /* Light Mode */
+            --bg-body: #f3f5f8;
+            --bg-card: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #6c757d;
+            --border-color: #e9ecef;
+            --header-text: #ffffff;
+            --table-head-bg: #f1f3f5;    
+            --table-head-text: #495057;
+            --table-stripe: #f8f9fa;
+            --table-row-bg: #ffffff;     
+            --input-bg: #ffffff;
+            --footer-bg: #e9ecef;
+            
+            /* Badge Colors (Solid Blue in Light) */
+            --badge-bg: var(--kipic-navy);
+            --badge-text: #ffffff;
+            --badge-border: var(--kipic-navy);
+            
+            --arrow-color: var(--kipic-navy);
+            --placeholder-color: #adb5bd;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Mode */
+            --bg-body: #121212;
+            --bg-card: #1e1e24;
+            --text-main: #e0e0e0;
+            --text-muted: #b0b0b0;
+            --border-color: #343a40;
+            --header-text: #e0e0e0;
+            
+            /* Dark Tables */
+            --table-head-bg: #0d1b2a;    
+            --table-head-text: #ced4da;
+            --table-row-bg: #151a21;     
+            --table-stripe: #1c232b;     
+            
+            --input-bg: #2b2b36;
+            --footer-bg: #1a1a1a;
+            --kipic-navy: #0d1b2a; 
+            --kipic-green: #7bc938;
+            
+            /* Badge Colors (Solid Green in Dark) */
+            --badge-bg: var(--kipic-green);
+            --badge-text: #000000;
+            --badge-border: var(--kipic-green);
+            
+            --arrow-color: var(--kipic-green);
+            --placeholder-color: #6c757d;
+        }
+
+        body {
+            font-family: 'Roboto', 'Tajawal', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease;
+        }
+
+        /* --- HEADER --- */
+        .main-header {
+            background: var(--kipic-gradient);
+            color: var(--header-text);
+            padding: 1.5rem 2rem;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            text-align: center;
+            border-bottom: 4px solid var(--kipic-green); 
+        }
+
+        .header-title-main {
+            font-weight: 800;
+            font-size: 1.8rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .header-subtitle {
+            font-weight: 400;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 4px;
+            color: #d1e7dd; 
+        }
+
+        /* Fixed LTR for Controls */
+        .header-controls {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            inset-inline-end: 25px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            direction: ltr !important; 
+        }
+
+        .icon-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: #fff;
+            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover { background: var(--kipic-green); border-color: var(--kipic-green); }
+
+        /* Language Switch */
+        .lang-switch-container {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 2px;
+            display: flex;
+            position: relative;
+            cursor: pointer;
+            width: 76px;
+            height: 34px;
+        }
+        
+        .lang-option {
+            flex: 1;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            z-index: 2;
+            line-height: 28px;
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.3s;
+        }
+        .lang-option.active { color: #fff; }
+
+        .lang-slider {
+            position: absolute;
+            top: 2px;
+            bottom: 2px;
+            left: 2px;
+            width: 50%;
+            background: var(--kipic-green);
+            border-radius: 16px;
+            transition: transform 0.3s ease;
+            z-index: 1;
+        }
+        
+        .lang-switch-container.ar-active .lang-slider {
+            transform: translateX(92%);
+        }
+
+        /* --- CARDS & COLLAPSE --- */
+        .card {
+            background-color: var(--bg-card);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+            overflow: hidden;
+            border-top: 3px solid var(--kipic-navy); 
+            transition: border-color 0.3s ease;
+        }
+        
+        [data-theme="dark"] .card { border-top-color: var(--kipic-green) !important; }
+        
+        .card-header-custom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: transparent;
+        }
+
+        .card-title-text {
+            color: var(--kipic-navy);
+            font-weight: 700;
+            margin: 0;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        [data-theme="dark"] .card-title-text { color: var(--kipic-green); }
+
+        /* --- FEED BADGE --- */
+        .feed-badge {
+            background-color: var(--badge-bg);
+            border: 1px solid var(--badge-border);
+            color: var(--badge-text);
+            padding: 5px 16px;
+            border-radius: 6px;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 700;
+            font-size: 0.9rem;
+            direction: ltr;
+            white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- DESKTOP VIEW --- */
+        @media (min-width: 769px) {
+            .collapse-icon { display: none !important; }
+            .card-header-custom { cursor: default !important; pointer-events: none; }
+            .collapse { display: block !important; height: auto !important; visibility: visible !important; }
+            /* Enable pointer events for header badge/controls */
+            .card-header-custom .header-actions { pointer-events: auto; } 
+        }
+
+        /* --- MOBILE VIEW --- */
+        @media (max-width: 768px) {
+            .main-header { padding: 1rem 1.2rem; }
+            .header-title-main { font-size: 1.3rem; }
+            .header-subtitle { font-size: 0.9rem; }
+            
+            /* Hide Theme Toggle on Mobile */
+            #theme-toggle-btn { display: none !important; }
+            .header-controls { position: static; transform: none; margin-top: 10px; justify-content: center; }
+            
+            .card { margin-bottom: 12px; }
+            .card-body { padding: 0; }
+            
+            .table td, .table th { padding: 8px 10px; font-size: 0.8rem; }
+            .val-display { font-size: 0.85rem; }
+            
+            .card-header-custom { cursor: pointer; padding: 10px 15px; flex-wrap: wrap; gap: 8px; }
+            .card-title-text { font-size: 0.95rem; }
+            
+            .feed-badge { font-size: 0.75rem; padding: 3px 8px; margin-top: 2px; }
+            
+            .header-actions {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                margin-top: 5px;
+            }
+            
+            .collapse-icon {
+                transition: transform 0.3s ease;
+                color: var(--arrow-color);
+                font-size: 1rem;
+                font-weight: bold;
+                display: block;
+            }
+            [dir="ltr"] .collapse-icon { transform: rotate(-90deg); }
+            [dir="rtl"] .collapse-icon { transform: rotate(90deg); }
+            .card-header-custom[aria-expanded="true"] .collapse-icon { transform: rotate(0deg) !important; }
+        }
+
+        /* --- INPUTS --- */
+        .form-label { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        
+        .form-control, .form-select {
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            height: 38px;
+        }
+        
+        .form-control::placeholder { 
+            color: var(--placeholder-color) !important; 
+            opacity: 1 !important; 
+        }
+        
+        /* Style for Disabled Input to look clean but clearly locked */
+        .form-control:disabled {
+            background-color: rgba(0,0,0,0.05);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            border-color: var(--border-color);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--kipic-green);
+            box-shadow: 0 0 0 3px rgba(111, 174, 39, 0.15);
+        }
+        
+        [dir="rtl"] .form-select { background-position: left 0.75rem center; padding-right: 0.75rem; padding-left: 2.25rem; }
+
+        .btn-calc-custom {
+            background-color: var(--operator-blue);
+            border-color: var(--operator-blue);
+            color: #ffffff;
+            transition: all 0.3s ease;
+            padding-top: 0; padding-bottom: 0;
+            height: 38px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-calc-custom:hover { background-color: #003d73; border-color: #003d73; color: #ffffff; }
+
+        /* --- TABLES --- */
+        .table { margin-bottom: 0; border-color: var(--border-color); color: var(--text-main); }
+        .table thead th {
+            background-color: var(--table-head-bg);
+            color: var(--table-head-text);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding: 10px 15px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        [data-theme="dark"] .table thead th { border-bottom-color: #495057; }
+        .table td {
+            background-color: var(--table-row-bg);
+            padding: 8px 15px;
+            vertical-align: middle;
+            border-color: var(--border-color);
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+        .table-hover tbody tr:hover td { background-color: var(--table-stripe); }
+        .group-cell {
+            background-color: var(--table-head-bg) !important;
+            color: var(--kipic-navy);
+            font-weight: 700;
+            border-inline-end: 2px solid var(--border-color);
+        }
+        [data-theme="dark"] .group-cell { color: var(--kipic-green); }
+        .val-display { font-family: 'Roboto Mono', monospace; font-weight: 600; }
+        .unit-small { font-size: 0.8em; color: var(--text-muted); margin-inline-start: 6px; font-weight: 400; }
+
+        /* --- FOOTER & ALERTS --- */
+        .quality-alert {
+            background-color: rgba(255, 193, 7, 0.1);
+            border-inline-start: 4px solid #ffc107;
+            padding: 10px 15px;
+            font-size: 0.8rem;
+            color: var(--text-main);
+            border-top: 1px solid var(--border-color);
+        }
+        .quality-alert ul, .footer-notes ul { list-style: none; padding-left: 0; margin: 0; }
+        
+        .site-footer {
+            margin-top: auto;
+            background-color: var(--footer-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 20px 0;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .footer-notes li { margin-bottom: 8px; padding-inline-start: 15px; position: relative; line-height: 1.5; }
+        .footer-notes li::before { content: "•"; color: var(--kipic-green); font-weight: bold; position: absolute; inset-inline-start: 0; }
+    </style>
+</head>
+<body>
+
+<header class="main-header">
+    <div class="container-fluid p-0">
+        <div class="row align-items-center justify-content-center position-relative">
+            <div class="col-12 text-center">
+                <div class="header-title-main" data-i18n="mainTitle">Crude Distillation Unit</div>
+                <div class="header-subtitle" data-i18n="subTitle">Operational Parameters</div>
+            </div>
+            <div class="header-controls">
+                <button class="icon-btn" id="theme-toggle-btn" onclick="toggleThemeManual()" title="Switch Theme">
+                    <i class="bi bi-sun-fill" id="theme-icon"></i>
+                </button>
+                
+                <div class="lang-switch-container" id="lang-switch" onclick="toggleLanguage()">
+                    <div class="lang-slider"></div>
+                    <span class="lang-option active" id="opt-en">EN</span>
+                    <span class="lang-option" id="opt-ar">AR</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container py-4 py-md-5">
+    
+    <div class="card p-3 p-md-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label" data-i18n="oilType">Oil Type</label>
+                <select class="form-select" id="oilTypeSelect" onchange="updateModes()"></select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" data-i18n="opMode">Operating Mode</label>
+                <select class="form-select" id="modeSelect" onchange="handleModeChange()"></select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" data-i18n="inputUnit">Unit</label>
+                <select class="form-select" id="unitSelect" onchange="updatePlaceholder();">
+                    <option value="KBPD">KBPD</option>
+                    <option value="sm3hr">sm3/h</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" data-i18n="feedRate">Feed Rate</label>
+                <div class="d-flex gap-2">
+                    <form onsubmit="event.preventDefault(); calculateResults();" class="d-flex gap-2 w-100">
+                        <input type="text" class="form-control" id="feedInput" placeholder="Range..." inputmode="decimal" enterkeyhint="go">
+                        <button type="button" class="btn btn-calc-custom px-4" onclick="calculateResults()" data-i18n="calcBtn">
+                            Calculate
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 g-md-4" id="results-row" style="display: none;">
+        
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseParams" aria-expanded="false">
+                    <h5 class="card-title-text">
+                        <i class="bi bi-speedometer2"></i>
+                        <span data-i18n="opParams">Operational Parameters</span>
+                    </h5>
+                    <div class="header-actions">
+                        <div id="feed-display-badge" class="feed-badge">--</div>
+                        <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                </div>
+                <div id="collapseParams" class="collapse">
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="paramName">Parameter Name</th>
+                                    <th class="text-end" data-i18n="value">Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="params-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            
+            <div class="card mb-3 mb-md-4">
+                <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseYields" aria-expanded="false">
+                    <div class="header-actions d-flex w-100 justify-content-between align-items-center">
+                         <h5 class="card-title-text">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            <span data-i18n="prodYields">Production Yields</span>
+                        </h5>
+                        <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                </div>
+                <div id="collapseYields" class="collapse">
+                    <div class="card-body p-0">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="product">Product</th>
+                                    <th class="text-end">Flow (sm3/h)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="yields-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-0">
+                <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseQuality" aria-expanded="false">
+                    <div class="header-actions d-flex w-100 justify-content-between align-items-center">
+                        <h5 class="card-title-text">
+                            <i class="bi bi-clipboard-check"></i>
+                            <span data-i18n="prodQuality">Quality Specifications</span>
+                        </h5>
+                        <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                </div>
+                <div id="collapseQuality" class="collapse">
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="stream">Stream</th>
+                                    <th data-i18n="property">Property</th>
+                                    <th class="text-end" data-i18n="limit">Limit/Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="quality-body"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="quality-alert" id="quality-notes-area" style="display: none;">
+                        <ul id="quality-notes-list"></ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<footer class="site-footer">
+    <div class="container">
+        <h6 class="fw-bold mb-3 text-uppercase" style="color: var(--text-main);">
+            <i class="bi bi-info-circle-fill me-2"></i><span data-i18n="notesTitle">General Notes & Guidelines</span>
+        </h6>
+        <div class="footer-notes">
+            <ul id="footer-static-notes">
+                <li data-i18n="note1"></li>
+                <li data-i18n="note2"></li>
+                <li data-i18n="note3"></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+
+<script>
+    const CONVERSION_FACTOR = 6.624; 
+
+    // --- HELPER: Parse English or Arabic Numerals ---
+    function parseLocaleNumber(stringNumber) {
+        if (!stringNumber) return NaN;
+        // If it's already a number (e.g. set by value = X), convert to string first
+        stringNumber = stringNumber.toString();
+        var englishDigits = stringNumber
+            .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+        return parseFloat(englishDigits);
+    }
+
+    // --- DATA ---
+    const DB = {
+        "KEC": {
+            "Max Kero (with Heavy Diesel)": {
+                feeds: [205, 200, 175, 155, 130, 105],
+                params: {
+                    "Crude Feed (Tank)": {u: "sm3/h", v: [1341.9, 1321.0, 1159.4, 1031.3, 851.6, 696.4]},
+                    "Slops": {u: "sm3/h", v: [36.1, 33.0, 29.5, 41.1, 3.3, 0]},
+                    "Wild Naphtha": {u: "sm3/h", v: [10.0, 9.1, 26.8, 10.2, 6.6, 10.0]},
+                    "Heater Feed Rate": {u: "sm3/h", v: [1230.0, 1220.0, 1055.9, 970.0, 804.7, 660.0]},
+                    "Washwater to Desalter V02": {u: "sm3/h", v: [50.2, 53.0, 45.5, 41.1, 34.0, 27.0]},
+                    "Washwater to E01": {u: "sm3/h", v: [16.7, 18.0, 15.0, 13.5, 12.0, 9.0]},
+                    "V-0001 Inlet Temperature": {u: "°C", v: [149.3, 148.8, 150.0, 148.0, 148.8, 147.3]},
+                    "V-0002 Inlet Temperature": {u: "°C", v: [148.4, 147.9, 149.2, 147.1, 147.9, 146.4]},
+                    "E-10 Outlet Temperature": {u: "°C", v: [199.9, 201.9, 200.1, 198.2, 199.6, 202.7]},
+                    "Heater Outlet Temperature": {u: "°C", v: [371.0, 370.8, 370.9, 371.0, 370.3, 371.0]},
+                    "Column Top Temperature": {u: "°C", v: [112.0, 112.0, 112.0, 111.0, 111.0, 111.0]},
+                    "Top Column Pressure": {u: "barg", v: [1.03, 1.03, 1.03, 1.02, 1.03, 1.00]},
+                    "Top Pump Around Flow": {u: "sm3/h", v: [1620.6, 1550.0, 1385.0, 1360.0, 1160.0, 1170.0]},
+                    "Top Pump Around Draw Temperature": {u: "°C", v: [126.9, 126.3, 127.6, 125.9, 127.4, 126.9]},
+                    "Top Pump Around Return Temperature": {u: "°C", v: [103.2, 105.1, 104.8, 105.1, 106.5, 106.8]},
+                    "Middle Pump Around Flow": {u: "sm3/h", v: [1186.0, 1124.0, 1015.0, 890.0, 765.6, 685.0]},
+                    "Middle Pump Around Draw Temperature": {u: "°C", v: [219.0, 215.9, 216.8, 213.5, 208.1, 208.1]},
+                    "Middle Pump Around Return Temperature": {u: "°C", v: [164.6, 158.3, 163.9, 157.6, 154.2, 160.4]},
+                    "Bottom Pump Around Flow": {u: "sm3/h", v: [900.0, 1002.0, 775.0, 780.0, 700.0, 541.0]},
+                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [291.1, 291.3, 295.6, 292.1, 287.3, 286.9]},
+                    "Bottom Pump Around Return Temperature": {u: "°C", v: [243.9, 246.2, 249.1, 248.3, 248.5, 246.2]},
+                    "Column Bottom Temperature": {u: "°C", v: [347.6, 348.5, 345.4, 347.4, 344.0, 341.9]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [178.3, 176.1, 178.7, 176.3, 176.8, 178.8]},
+                    "Kerosene Reboiler Temperature": {u: "°C", v: [215.6, 215.5, 215.3, 216.0, 217.4, 218.3]},
+                    "Light Diesel Draw Temperature": {u: "°C", v: [264.0, 261.9, 265.8, 261.1, 259.2, 259.5]},
+                    "Heavy Diesel Draw Temperature": {u: "°C", v: [318.3, 319.9, 317.3, 315.8, 309.9, 309.6]},
+                    "Overflash Flow": {u: "sm3/h", v: [112.5, 84.3, 108.4, 83.5, 75.2, 72.7]},
+                    "Stripping Steam Temperature": {u: "°C", v: [274.9, 284.9, 289.9, 289.7, 283.6, 274.2]},
+                    "Stripping Steam (Crude)": {u: "kg/hr", v: [22500, 21998, 20500, 17500, 15374, 15500]},
+                    "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [1300, 2300, 1100, 1200, 941, 2035, 1000]},
+                    "Stripping Steam (Heavy Diesel)": {u: "kg/hr", v: [350, 450, 300, 300, 300, 300]},
+                    "Stabilizer Feed Temperature": {u: "°C", v: [101.9, 103.9, 102.5, 105.6, 108.1, 110.3]},
+                    "Stabilizer Reboiler Inlet Temperature": {u: "°C", v: [147.1, 147.8, 149.3, 150.7, 153.3, 155.5]},
+                    "Stabilizer Reboiler Outlet Temperature": {u: "°C", v: [159.9, 158.4, 159.1, 158.1, 159.1, 159.9]},
+                    "Stabilizer Reflux Flow": {u: "sm3/h", v: [34.9, 29.7, 31.5, 25.8, 21.1, 21.0]},
+                    "Bottom Pump Around to Reboiler Inlet": {u: "°C", v: [235.0, 218.5, 227.3, 220.6, 217.7, 216.5]},
+                    "Bottom Pump Around to Reboiler Flow": {u: "sm3/h", v: [900.0, 1002.0, 775.0, 780.0, 700.0, 541.0]},
+                    "AR Product Temperature": {u: "°C", v: [170.0, 164.2, 170.3, 161.3, 166.1, 156.6]}
+                },
+                yields: {
+                    "LPG": [15.9, 17.3, 13.1, 14.6, 15.2, 12.7],
+                    "Naphtha": [265.7, 258.5, 214.4, 193.1, 142.7, 107.8],
+                    "Kerosene": [240.6, 240.9, 204.8, 182.6, 128.1, 111.5],
+                    "Light Diesel": [199.0, 200.5, 185.4, 161.4, 134.9, 104.8],
+                    "Heavy Diesel": [55.0, 67.0, 20.0, 30.0, 20.0, 25.0],
+                    "Atmospheric Residue (AR)": [618.4, 601.2, 541.3, 500.2, 443.9, 358.7]
+                },
+                quality: {
+                    "Desalted Crude": { "Salt HEM": {u: "PTB", v: [0.8, 0.5, 0.68, 0.55, 0.45, 0.6]}, "BS&W": {u: "%", v: [1.4, 1.0, 0.7, 0.6, 0.5, 0.5]} },
+                    "Desalter Effluent": { "pH": {u: "pH", v: [5.0, 7.6, 6.0, 5.8, 7.0, 5.5]} },
+                    "SSW": { "pH": {u: "pH", v: [8.5, 9.0, 9.57, 8.7, 9.0, 7.8]} },
+                    "Naphtha": { "RVP": {u: "psi", v: [8.8, 9.1, 8.35, 8.9, 8.76, 8.8]}, "T95": {u: "°C", v: [141, 140, 143, 139, 143, 143]} },
+                    "Kerosene": { "Freeze Point": {u: "°C", v: [-48, -51, -50, -51, -54, -52]}, "T95": {u: "°C", v: [245, 240, 245, 239, 232, 237]} },
+                    "Diesel": { "T95": {u: "°C", v: [348, 356, 339, 340, 320, 324]}, "Cloud Point": {u: "°C", v: [-2, -1, -6, -5.5, -12, -9]} },
+                    "AR": { "API": {u: "API", v: [13.0, 13.0, 12.6, 12.9, 12.5, 13.0]}, "Sulfur": {u: "wt%", v: [5.0, 4.59, 4.5, 4.6, 4.5, 4.4]} }
+                }
+            },
+            "Max Kero (No Heavy Diesel)": {
+                feeds: [200, 195, 180, 160, 150, 120, 105],
+                params: {
+                     "Crude Feed (Tank)": {u: "sm3/h", v: [1326.7, 1300.3, 1203.9, 1060.7, 979.9, 789.7, 689.4]},
+                    "Slops": {u: "sm3/h", v: [48.8, 25.8, 3.4, 34.2, 24.6, 0, 0]},
+                    "Wild Naphtha": {u: "sm3/h", v: [0, 7.0, 30.0, 8.2, 0, 27.8, 11.9]},
+                    "Heater Feed Rate": {u: "sm3/h", v: [1220.0, 1200.1, 1080.8, 960.0, 897.7, 673.8, 660.0]},
+                    "Washwater to Desalter V02": {u: "sm3/h", v: [49.6, 52.0, 44.6, 45.5, 37.1, 31.5, 27.0]},
+                    "Washwater to E01": {u: "sm3/h", v: [16.5, 20.0, 14.9, 14.5, 12.4, 10.5, 9.0]},
+                    "V-0001 Inlet Temperature": {u: "°C", v: [146.7, 150.8, 150.3, 150.6, 149.6, 149.6, 147.5]},
+                    "V-0002 Inlet Temperature": {u: "°C", v: [145.8, 150.2, 149.4, 149.5, 148.6, 148.6, 146.6]},
+                    "E-10 Outlet Temperature": {u: "°C", v: [200.0, 207.3, 194.0, 25.9, 194.8, 206.2, 201.9]},
+                    "Heater Outlet Temperature": {u: "°C", v: [371.0, 368.6, 371.0, 371.0, 371.0, 368.0, 371.0]},
+                    "Column Top Temperature": {u: "°C", v: [111.0, 111.1, 112.0, 110.0, 112.0, 112.4, 111.0]},
+                    "Top Column Pressure": {u: "barg", v: [1.03, 1.04, 1.03, 1.03, 1.03, 0.97, 1.00]},
+                    "Top Pump Around Flow": {u: "sm3/h", v: [1670, 1345, 1430, 1391, 1191, 1058, 1170]},
+                    "Top Pump Around Draw Temperature": {u: "°C", v: [125.1, 127.0, 126.6, 125.6, 129.4, 124.3, 126.9]},
+                    "Top Pump Around Return Temperature": {u: "°C", v: [104.4, 106.4, 101.1, 107.4, 104.4, 103.1, 107.6]},
+                    "Middle Pump Around Flow": {u: "sm3/h", v: [1180, 1245, 1040, 892, 870, 798, 682]},
+                    "Middle Pump Around Draw Temperature": {u: "°C", v: [216.8, 227.2, 216.0, 214.2, 217.4, 205.6, 208.2]},
+                    "Middle Pump Around Return Temperature": {u: "°C", v: [157.1, 157.1, 167.0, 167.4, 165.9, 162.6, 157.9]},
+                    "Bottom Pump Around Flow": {u: "sm3/h", v: [965, 1045, 790, 770, 666, 620, 540]},
+                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [290.8, 290.0, 297.0, 293.9, 295.8, 287.7, 287.6]},
+                    "Bottom Pump Around Return Temperature": {u: "°C", v: [246.1, 263.3, 250.9, 250.4, 251.5, 258.1, 245.8]},
+                    "Column Bottom Temperature": {u: "°C", v: [344.1, 341.4, 344.4, 342.6, 344.5, 339.2, 336.1]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [175.9, 176.4, 174.8, 174.5, 179.1, 173.1, 179.1]},
+                    "Kerosene Reboiler Temperature": {u: "°C", v: [215.0, 217.6, 213.9, 215.5, 215.8, 217.6, 217.2]},
+                    "Light Diesel Draw Temperature": {u: "°C", v: [264.8, 268.8, 264.3, 262.2, 265.9, 259.9, 260.6]},
+                    "Heavy Diesel Draw Temperature": {u: "°C", v: [24.5, 43.5, 53.3, 48.6, 32.8, 44.2, 22.3]},
+                    "Overflash Flow": {u: "sm3/h", v: [33.4, 0.05, 151.9, 126.5, 85.4, 67.7, 86.9]},
+                    "Stripping Steam Temperature": {u: "°C", v: [274.9, 267.8, 287.5, 279.6, 281.4, 265.1, 273.3]},
+                    "Stripping Steam (Crude)": {u: "kg/hr", v: [23893, 23944, 19997, 20523, 17341, 14314, 15248]},
+                    "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [1300, 2300, 1100, 1200, 941, 2035, 1000]},
+                    "Stripping Steam (Heavy Diesel)": {u: "kg/hr", v: [27, 105, -12.5, -12.5, 83, 128, 35]},
+                    "Stabilizer Feed Temperature": {u: "°C", v: [104.5, 111.6, 117.8, 115.0, 106.4, 128.4, 110.5]},
+                    "Stabilizer Reboiler Inlet Temperature": {u: "°C", v: [147.5, 154.2, 150.2, 151.0, 151.1, 161.6, 155.7]},
+                    "Stabilizer Reboiler Outlet Temperature": {u: "°C", v: [159.3, 215.3, 159.7, 158.6, 157.9, 166.4, 160.1]},
+                    "Stabilizer Reflux Flow": {u: "sm3/h", v: [29.5, 13.1, 36.5, 27.2, 23.0, 15.7, 22.1]},
+                    "Bottom Pump Around to Reboiler Inlet": {u: "°C", v: [227.9, 263.8, 209.2, 206.5, 226.4, 199.8, 216.0]},
+                    "Bottom Pump Around to Reboiler Flow": {u: "sm3/h", v: [965, 569, 440, 369, 666, 462, 541]},
+                    "AR Product Temperature": {u: "°C", v: [168.3, 170.0, 176.4, 157.0, 170.0, 169.3, 155.9]}
+                },
+                yields: {
+                    "LPG": [17.9, 2.0, 12.6, 11.6, 12.5, 0.8, 12.5],
+                    "Naphtha": [267.4, 224.9, 234.7, 187.0, 183.0, 137.9, 111.7],
+                    "Kerosene": [243.0, 228.1, 204.4, 166.5, 168.5, 103.6, 110.9],
+                    "Light Diesel": [207.8, 198.1, 195.0, 174.2, 157.9, 133.7, 110.3],
+                    "Heavy Diesel": [0, 0, 0, 0, 0, 0, 0],
+                    "Atmospheric Residue (AR)": [651.6, 679.8, 577.6, 541.3, 479.1, 390.1, 376.7]
+                },
+                quality: {
+                    "Desalted Crude": { "Salt HEM": {u: "PTB", v: [0.65, 0.6, 0.6, 0.7, 1.0, 0.6, 0.6]}, "BS&W": {u: "%", v: [1.3, 0.6, 0.8, 0.7, 0.55, 0.5, 0.5]} },
+                    "Desalter Effluent": { "pH": {u: "pH", v: [5.0, 7.6, 6.0, 5.8, 7.0, 5.5]} },
+                    "SSW": { "pH": {u: "pH", v: [8.5, 8, 8.1, 9, 9.4, 8.5, 7.5]} },
+                    "Naphtha": { "RVP": {u: "psi", v: [9.16, 9.1, 8.9, 8.45, 8.51, 8, 8.65]}, "T95": {u: "°C", v: [143, 147, 144, 142, 140, 145, 143]} },
+                    "Kerosene": { "Freeze Point": {u: "°C", v: [-48, -49, -48, -52, -51, -56, -52]}, "T95": {u: "°C", v: [245, 252, 247, 240, 245, 231, 238]} },
+                    "Diesel": { "T95": {u: "°C", v: [331, 325, 334, 327, 336, 324, 311]}, "Cloud Point": {u: "°C", v: [-6, -9, -6, -9, -6, -11, -13]} },
+                    "AR": { "API": {u: "API", v: [12.6, 13.1, 12.9, 13, 12.9, 13, 14]}, "Sulfur": {u: "wt%", v: [4.6, 4.4, 4.66, 4.8, 4.4, 4.3, 4.38]} }
+                }
+            },
+             "Max Naphtha Mode": {
+                feeds: [205],
+                params: {
+                    "Heater Outlet Temperature": {u: "°C", v: [371.0]},
+                    "Column Top Temperature": {u: "°C", v: [115.1]},
+                    "Top Column Pressure": {u: "barg", v: [1.00]},
+                    "Top Pump Around Flow": {u: "sm3/h", v: [1621]},
+                    "Middle Pump Around Flow": {u: "sm3/h", v: [1261]},
+                    "Bottom Pump Around Flow": {u: "sm3/h", v: [901]},
+                    "Column Bottom Temperature": {u: "°C", v: [343.5]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [177.2]},
+                    "Stripping Steam (Crude)": {u: "kg/hr", v: [24500]},
+                    "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [930]},
+                    "Stripping Steam (Heavy Diesel)": {u: "kg/hr", v: [0]}
+                },
+                yields: { "LPG": [10.3], "Naphtha": [248.5], "Kerosene": [226.9], "Light Diesel": [222.0], "Heavy Diesel": [0], "AR": [653.6] },
+                quality: { 
+                    "Desalted Crude": { "Salt HEM": {u:"PTB", v:[0.7]}, "BS&W": {u:"%", v:[1.0]} },
+                    "Naphtha": { "RVP": {u:"psi", v:[8.5]} },
+                    "Kerosene": { "Freeze Point": {u:"°C", v:[-49]} },
+                    "Diesel": { "Cloud Point": {u:"°C", v:[-6]} },
+                    "AR": { "Sulfur": {u:"wt%", v:[4.44]} }
+                }
+            }
+        },
+        "KSRC": {
+            "Base Case": {
+                feeds: [120],
+                params: {
+                    "Heater Outlet Temperature": {u: "°C", v: [370.0]},
+                    "Column Top Temperature": {u: "°C", v: [113.0]},
+                    "Top Column Pressure": {u: "barg", v: [1.0]},
+                    "Top Pump Around Flow": {u: "sm3/h", v: [1270]},
+                    "Middle Pump Around Flow": {u: "sm3/h", v: [862]},
+                    "Bottom Pump Around Flow": {u: "sm3/h", v: [532]},
+                    "Column Bottom Temperature": {u: "°C", v: [348.1]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [188.5]},
+                    "Stripping Steam (Crude)": {u: "kg/hr", v: [9650]},
+                    "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [2500]},
+                    "Stripping Steam (Heavy Diesel)": {u: "kg/hr", v: [109]}
+                },
+                yields: { "LPG": [0], "Naphtha": [128.0], "Kerosene": [46.7], "Light Diesel": [143.0], "Heavy Diesel": [0], "AR": [532.8] },
+                quality: { 
+                    "Desalted Crude": { "Salt": {u:"PTB", v:[0.4]}, "BS&W": {u:"%", v:[0.7]} },
+                    "Naphtha": { "RVP": {u:"psi", v:[7.25]} },
+                    "Kerosene": { "Freeze Point": {u:"°C", v:[-81]} },
+                    "Diesel": { "Cloud Point": {u:"°C", v:[-36]} },
+                    "AR": { "Sulfur": {u:"wt%", v:[5.78]} }
+                }
+            }
+        },
+        "KMHC": {
+            "Base Case": {
+                feeds: [200, 120],
+                params: {
+                    "Heater Outlet Temperature": {u: "°C", v: [369.1, 370.3]},
+                    "Column Top Temperature": {u: "°C", v: [111.7, 112.4]},
+                    "Top Column Pressure": {u: "barg", v: [1.01, 1.00]},
+                    "Top Pump Around Flow": {u: "sm3/h", v: [1339, 1270]},
+                    "Middle Pump Around Flow": {u: "sm3/h", v: [1243, 623]},
+                    "Bottom Pump Around Flow": {u: "sm3/h", v: [1038, 548]},
+                    "Column Bottom Temperature": {u: "°C", v: [342.0, 347.7]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [177.0, 178.7]},
+                    "Stripping Steam (Crude)": {u: "kg/hr", v: [23972, 15123]},
+                    "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [2340, 1775]},
+                    "Stripping Steam (Heavy Diesel)": {u: "kg/hr", v: [108, 108]}
+                },
+                yields: { "LPG": [3.1, 3.6], "Naphtha": [222.7, 130.0], "Kerosene": [224.6, 105.8], "Light Diesel": [197.6, 128.3], "Heavy Diesel": [0, 0], "AR": [680.0, 424.5] },
+                quality: { 
+                    "Desalted Crude": { "Salt": {u:"PTB", v:[0.6, 1.1]}, "BS&W": {u:"%", v:[0.6, 1.0]} },
+                    "Naphtha": { "RVP": {u:"psi", v:[9.0, 8.1]} },
+                    "Kerosene": { "Freeze Point": {u:"°C", v:[-49, -48]} },
+                    "Diesel": { "Cloud Point": {u:"°C", v:[-9, -7]} },
+                    "AR": { "Sulfur": {u:"wt%", v:[4.46, 4.92]} }
+                }
+            }
+        }
+    };
+
+    const MODE_LABELS = {
+        "Max Kero (with Heavy Diesel)": { en: "with Heavy Diesel", ar: "مع ديزل ثقيل" },
+        "Max Kero (No Heavy Diesel)": { en: "no Heavy Diesel", ar: "بدون ديزل ثقيل" },
+        "Max Naphtha Mode": { en: "Naphtha Mode", ar: "وضع النافثا" },
+        "Base Case": { en: "Base Case", ar: "الحالة الأساسية" }
+    };
+
+    const STRINGS = {
+        en: {
+            mainTitle: "Crude Distillation Unit", subTitle: "Operational Parameters",
+            oilType: "Oil Type", opMode: "Operating Mode", inputUnit: "Input Unit", feedRate: "Feed Rate",
+            calcBtn: "Calculate", opParams: "Operational Parameters", paramName: "Parameter Name", value: "Value",
+            prodYields: "Production Yields", product: "Product", prodQuality: "Quality Specifications", 
+            stream: "Category", property: "Parameter", limit: "Value",
+            notesTitle: "General Notes & Guidelines", range: "Range: ", fixed: "Fixed: ",
+            
+            qNote1: "If SSW pH goes below 8, switchover to LP Condensate processing.",
+            qNote2: "If Desalter Effluent pH goes below 4.5, Contact U35 to optimize Caustic Injection.",
+
+            note1: "The above parameters based on previous performance with maximum yields + stable operations.. However, a variation is acceptable if the column profile is being maintained. Further fine tuning may be required in order to optimize the yields further. Minor adjustments can be done as needed. However, for any major deviation from the above, prior discussion with process engineer is recommended.",
+            note2: "Above are general guidelines, however desalter process parameters & chemical dosage shared through NALCO group to be followed.",
+            note3: "To be optimized depending on Diesel Cloud Point, On Spec -7 ° C winter and 4 °C summer."
+        },
+        ar: {
+            mainTitle: "وحدة تكرير النفط الخام", subTitle: "معايير التشغيل",
+            oilType: "نوع النفط", opMode: "وضع التشغيل", inputUnit: "وحدة الإدخال", feedRate: "كمية التكرير",
+            calcBtn: "احسب", opParams: "معايير التشغيل", paramName: "المعيار", value: "القيمة",
+            prodYields: "كميات الإنتاج", product: "المنتج", prodQuality: "مواصفات الجودة", 
+            stream: "الفئة", property: "المعيار", limit: "القيمة",
+            notesTitle: "ملاحظات وإرشادات عامة", range: "النطاق: ", fixed: "قيمة ثابتة: ",
+            
+            qNote1: "ذا انخفضت درجة حموضة الماء منزوع الحمضية عن 8، يجب التحويل إلى ماء الضغط المنخفض المكثف.",
+            qNote2: "إذا انخفضت درجة حمضية مياه صرف نزع الأملاح عن 4.5، تواصل مع U35 لتحسين حقن رماد الصودا.",
+
+            note1: "تستند المعايير أعلاه إلى قيم أداء فعلي سابق مع أقصى إنتاجية + عمليات مستقرة، التباين في القيم مقبول إذا تم الحفاظ على السلم الحراري لعمود تكرير النفط الخام، قد يلزم إجراء مزيد من الضبط الدقيق لتحسين الإنتاجية بشكل أكبر، كما يمكن إجراء تعديلات طفيفة حسب الحاجة، مع ذلك يُنصح بمناقشة أي انحراف كبير عن القيم أعلاه مع مهندس العمليات مسبقًا.",
+            note2: "ما ورد أعلاه إرشادات عامة، ومع ذلك يجب اتباع معايير عملية إزالة الأملاح والجرعات الكيميائية المشاركة من قبل مجموعة NALCO.",
+            note3: "يجب تعديل معايير التشغيل بناءً على نقطة التغييم للديزل (Cloud Point): المواصفات -7 °C شتاءً و 4 °C صيفاً."
+        }
+    };
+
+    let curLang = 'en';
+
+    // --- LOGIC ---
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        // System Theme Listener
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+             const newTheme = event.matches ? 'dark' : 'light';
+             document.documentElement.setAttribute('data-theme', newTheme);
+        });
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+
+        // Restore Language
+        const savedLang = localStorage.getItem('refinery-lang');
+        if (savedLang) {
+            curLang = savedLang;
+        }
+
+        const oilSelect = document.getElementById('oilTypeSelect');
+        if (oilSelect) {
+            for (let type in DB) {
+                let opt = document.createElement('option');
+                opt.value = type; opt.text = type;
+                oilSelect.add(opt);
+            }
+            
+            // Init UI with saved language
+            applyLanguageUI();
+            // Logic to fill modes now considers language
+            // IMPORTANT: Do NOT calculate results here, only setup UI
+            updateModes(false); 
+        }
+        
+        // Enter Key Listener
+        const feedInput = document.getElementById("feedInput");
+        if (feedInput) {
+            feedInput.addEventListener("keypress", function(event) {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                calculateResults();
+              }
+            });
+        }
+    });
+
+    function handleModeChange() {
+        updatePlaceholder();
+        // Removed hiding logic - keeps results visible
+    }
+
+    function updateModes(preserveSelection = true) {
+        const oilType = document.getElementById('oilTypeSelect').value;
+        const modeSelect = document.getElementById('modeSelect');
+        
+        // Save selection to restore if possible
+        const currentVal = modeSelect.value;
+        
+        modeSelect.innerHTML = "";
+        
+        if (DB[oilType]) {
+            for (let mode in DB[oilType]) {
+                let opt = document.createElement('option');
+                opt.value = mode; // The internal key
+                
+                // Display Text Mapping
+                if (MODE_LABELS[mode]) {
+                    opt.text = MODE_LABELS[mode][curLang];
+                } else {
+                    opt.text = mode;
+                }
+                
+                modeSelect.add(opt);
+            }
+            
+            // Restore selection if it exists in new list
+            if (preserveSelection && currentVal && Array.from(modeSelect.options).some(o => o.value === currentVal)) {
+                modeSelect.value = currentVal;
+            }
+            
+            handleModeChange();
+        }
+    }
+
+    function updatePlaceholder() {
+        const oilType = document.getElementById('oilTypeSelect').value;
+        const mode = document.getElementById('modeSelect').value;
+        const unit = document.getElementById('unitSelect').value;
+        const feedInput = document.getElementById('feedInput');
+        
+        if (DB[oilType] && DB[oilType][mode]) {
+            const feeds = DB[oilType][mode].feeds;
+            let min = Math.min(...feeds);
+            let max = Math.max(...feeds);
+            
+            if (min === max) {
+                // --- FIXED VALUE LOGIC ---
+                let val = (unit === 'sm3hr') ? (min * CONVERSION_FACTOR).toFixed(0) : min;
+                let text = (curLang === 'en' ? STRINGS.en.fixed : STRINGS.ar.fixed) + val;
+                
+                feedInput.placeholder = text;
+                feedInput.value = val;          // Auto-fill Value
+                feedInput.disabled = true;      // Disable Input
+                
+                calculateResults();             // Auto-trigger Calculation
+            } else {
+                // --- RANGE LOGIC ---
+                if (unit === 'sm3hr') {
+                    min = (min * CONVERSION_FACTOR).toFixed(0);
+                    max = (max * CONVERSION_FACTOR).toFixed(0);
+                }
+                let text = (curLang === 'en' ? STRINGS.en.range : STRINGS.ar.range) + `${min} - ${max}`;
+                
+                feedInput.placeholder = text;
+                feedInput.disabled = false;     // Enable Input
+                feedInput.value = "";           // Clear Input for new typing
+            }
+        }
+    }
+
+    function lerp(x, x0, x1, y0, y1) {
+        return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
+    }
+
+    function getInterpolatedValue(targetFeed, feeds, values) {
+        if (feeds.length === 1) return values[0];
+        if (feeds.includes(targetFeed)) return values[feeds.indexOf(targetFeed)];
+        
+        let points = feeds.map((f, i) => ({f: f, v: values[i]})).sort((a, b) => a.f - b.f);
+        if (targetFeed <= points[0].f) return points[0].v;
+        if (targetFeed >= points[points.length-1].f) return points[points.length-1].v;
+
+        for (let i = 0; i < points.length - 1; i++) {
+            if (targetFeed >= points[i].f && targetFeed <= points[i+1].f) {
+                return lerp(targetFeed, points[i].f, points[i+1].f, points[i].v, points[i+1].v);
+            }
+        }
+        return 0;
+    }
+
+    function calculateResults() {
+        // Show results container
+        document.getElementById('results-row').style.display = 'flex';
+
+        const oilType = document.getElementById('oilTypeSelect').value;
+        const mode = document.getElementById('modeSelect').value;
+        const unit = document.getElementById('unitSelect').value;
+        
+        let rawVal = document.getElementById('feedInput').value;
+        let rawInput = parseLocaleNumber(rawVal);
+        
+        if (isNaN(rawInput)) {
+            document.getElementById('feed-display-badge').innerText = "--";
+            return;
+        }
+
+        const data = DB[oilType][mode];
+        let targetKBPD = (unit === 'sm3hr') ? rawInput / CONVERSION_FACTOR : rawInput;
+        
+        let displayFeed = "";
+        if (unit === 'KBPD') {
+             let sm3Val = (rawInput * CONVERSION_FACTOR).toFixed(1);
+             displayFeed = `${rawInput} KBPD (${sm3Val} sm3/h)`;
+        } else {
+             let kbpdVal = (rawInput / CONVERSION_FACTOR).toFixed(1);
+             displayFeed = `${rawInput} sm3/h (${kbpdVal} KBPD)`;
+        }
+        document.getElementById('feed-display-badge').innerText = displayFeed;
+
+        // Params
+        let paramHTML = "";
+        for (let key in data.params) {
+            let item = data.params[key];
+            let val = getInterpolatedValue(targetKBPD, data.feeds, item.v);
+            let display = val.toLocaleString(undefined, {maximumFractionDigits: 1});
+            paramHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}<span class="unit-small">${item.u}</span></td></tr>`;
+        }
+        document.getElementById('params-body').innerHTML = paramHTML;
+
+        // Yields
+        let yieldHTML = "";
+        for (let key in data.yields) {
+            let val = getInterpolatedValue(targetKBPD, data.feeds, data.yields[key]);
+            let display = val.toLocaleString(undefined, {maximumFractionDigits: 1});
+            yieldHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}</td></tr>`;
+        }
+        document.getElementById('yields-body').innerHTML = yieldHTML;
+
+        // Quality
+        let qualHTML = "";
+        for (let groupName in data.quality) {
+            let groupData = data.quality[groupName];
+            let subKeys = Object.keys(groupData);
+            subKeys.forEach((subKey, index) => {
+                let item = groupData[subKey];
+                let val = getInterpolatedValue(targetKBPD, data.feeds, item.v);
+                let display = (subKey.includes("Point") || subKey.includes("T95")) ? val.toFixed(0) : val.toFixed(2);
+                qualHTML += "<tr>";
+                if (index === 0) qualHTML += `<td class="group-cell" rowspan="${subKeys.length}">${groupName}</td>`;
+                qualHTML += `<td>${subKey}</td>`;
+                qualHTML += `<td class="text-end val-display">${display}<span class="unit-small">${item.u}</span></td>`;
+                qualHTML += "</tr>";
+            });
+        }
+        document.getElementById('quality-body').innerHTML = qualHTML;
+
+        renderQualityNotes();
+    }
+
+    function renderQualityNotes() {
+        const langObj = STRINGS[curLang];
+        const list = document.getElementById('quality-notes-list');
+        const area = document.getElementById('quality-notes-area');
+        
+        list.innerHTML = `
+            <li><i class='bi bi-exclamation-triangle-fill text-warning'></i> ${langObj.qNote1}</li>
+            <li><i class='bi bi-exclamation-triangle-fill text-warning'></i> ${langObj.qNote2}</li>
+        `;
+        area.style.display = 'block';
+    }
+
+    function updateStaticNotes() {
+        const footerList = document.getElementById('footer-static-notes');
+        footerList.innerHTML = `
+            <li>${STRINGS[curLang].note1}</li>
+            <li>${STRINGS[curLang].note2}</li>
+            <li>${STRINGS[curLang].note3}</li>
+        `;
+    }
+
+    // Mobile Manual Toggle
+    function toggleThemeManual() {
+        const html = document.documentElement;
+        const icon = document.getElementById('theme-icon');
+        const isDark = html.getAttribute('data-theme') === 'dark';
+        html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+        icon.className = isDark ? "bi bi-sun-fill" : "bi bi-moon-stars-fill";
+    }
+
+    function toggleLanguage() {
+        curLang = curLang === 'en' ? 'ar' : 'en';
+        localStorage.setItem('refinery-lang', curLang);
+        applyLanguageUI();
+    }
+
+    function applyLanguageUI() {
+        document.body.dir = curLang === 'ar' ? 'rtl' : 'ltr';
+        
+        // Animate Slider
+        const container = document.getElementById('lang-switch');
+        const optEn = document.getElementById('opt-en');
+        const optAr = document.getElementById('opt-ar');
+        
+        if (curLang === 'ar') {
+            container.classList.add('ar-active');
+            optAr.classList.add('active');
+            optEn.classList.remove('active');
+        } else {
+            container.classList.remove('ar-active');
+            optEn.classList.add('active');
+            optAr.classList.remove('active');
+        }
+        
+        // Translate UI
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            let key = el.getAttribute('data-i18n');
+            if (STRINGS[curLang][key]) el.innerText = STRINGS[curLang][key];
+        });
+        
+        // Update Mode Dropdown text without resetting selection
+        updateModes(true);
+        
+        updatePlaceholder();
+        renderQualityNotes(); 
+        updateStaticNotes();
+    }
+
+    window.onload = init;
+</script>
+
+</body>
+</html>
