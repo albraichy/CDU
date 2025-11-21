@@ -322,7 +322,16 @@
             border-inline-end: 2px solid var(--border-color);
         }
         [data-theme="dark"] .group-cell { color: var(--kipic-green); }
-        .val-display { font-family: 'Roboto Mono', monospace; font-weight: 600; }
+        
+        /* VALUE DISPLAY FIX */
+        .val-display { 
+            font-family: 'Roboto Mono', monospace; 
+            font-weight: 600;
+            /* Force LTR to keep negative signs correct and units to the right */
+            direction: ltr; 
+            unicode-bidi: isolate;
+        }
+        
         .unit-small { font-size: 0.8em; color: var(--text-muted); margin-inline-start: 6px; font-weight: 400; }
 
         /* --- FOOTER & ALERTS --- */
@@ -487,7 +496,7 @@
                             <thead>
                                 <tr>
                                     <th data-i18n="product">Product</th>
-                                    <th class="text-end">Flow (sm3/h)</th>
+                                    <th class="text-end" data-i18n="flowHeader">Flow (sm3/h)</th>
                                 </tr>
                             </thead>
                             <tbody id="yields-body"></tbody>
@@ -556,8 +565,7 @@
     }
 
     // --- DATA STRUCTURE ---
-    // NOTE: feedsSM3 arrays are rounded to match external Excel display for proper input ranges.
-    // Washwater units updated to sm3/h for ALL modes.
+    // Updated with precise Excel values (raw data for accuracy), Washwater units fixed to sm3/h
     const DB = {
         "KEC": {
             "Max Kero (with Heavy Diesel)": {
@@ -860,6 +868,8 @@
             stream: "Category", property: "Parameter", limit: "Value",
             notesTitle: "General Notes & Guidelines", range: "Range: ", fixed: "Fixed: ",
             
+            flowHeader: "Flow (sm3/h)",
+
             qNote1: "If SSW pH goes below 8, switchover to LP Condensate processing.",
             qNote2: "If Desalter Effluent pH goes below 4.5, Contact U35 to optimize Caustic Injection.",
 
@@ -877,6 +887,8 @@
             stream: "الفئة", property: "المعيار", limit: "القيمة",
             notesTitle: "ملاحظات وإرشادات عامة", range: "النطاق: ", fixed: "قيمة ثابتة: ",
             
+            flowHeader: "التيار (sm3/h)",
+
             qNote1: "ذا انخفضت درجة حموضة الماء منزوع الحمضية عن 8، يجب التحويل إلى ماء الضغط المنخفض المكثف.",
             qNote2: "إذا انخفضت درجة حمضية مياه صرف نزع الأملاح عن 4.5، تواصل مع U35 لتحسين حقن رماد الصودا.",
 
@@ -1062,9 +1074,9 @@
 
         let displayFeed = "";
         if (unit === 'KBPD') {
-             displayFeed = `${rawInput} KBPD (${interpolatedSM3.toFixed(1)} sm3/h)`;
+             displayFeed = `${rawInput} KBPD (${interpolatedSM3.toFixed(0)} sm3/h)`;
         } else {
-             displayFeed = `${rawInput} sm3/h (${interpolatedKBPD.toFixed(1)} KBPD)`;
+             displayFeed = `${rawInput} sm3/h (${interpolatedKBPD.toFixed(0)} KBPD)`;
         }
         document.getElementById('feed-display-badge').innerText = displayFeed;
 
@@ -1077,12 +1089,20 @@
              crudeFeedVal = interpolatedKBPD;
              crudeFeedUnit = "KBPD";
         }
-        paramHTML += `<tr><td>Crude Feed (Tank)</td><td class="text-end val-display">${crudeFeedVal.toLocaleString(undefined, {maximumFractionDigits: 1})}<span class="unit-small">${crudeFeedUnit}</span></td></tr>`;
+        paramHTML += `<tr><td>Crude Feed (Tank)</td><td class="text-end val-display">${crudeFeedVal.toLocaleString(undefined, {maximumFractionDigits: 0})}<span class="unit-small">${crudeFeedUnit}</span></td></tr>`;
 
         for (let key in data.params) {
             let item = data.params[key];
             let val = getInterpolatedValue(rawInput, referenceFeeds, item.v);
-            let display = val.toLocaleString(undefined, {maximumFractionDigits: 2}); // Increased precision slightly
+            
+            // --- ROUNDING LOGIC (PER REQUEST) ---
+            let display;
+            if (key === "Top Column Pressure") {
+                display = val.toFixed(2);
+            } else {
+                display = val.toFixed(0);
+            }
+            
             paramHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}<span class="unit-small">${item.u}</span></td></tr>`;
         }
         document.getElementById('params-body').innerHTML = paramHTML;
@@ -1090,7 +1110,8 @@
         let yieldHTML = "";
         for (let key in data.yields) {
             let val = getInterpolatedValue(rawInput, referenceFeeds, data.yields[key]);
-            let display = val.toLocaleString(undefined, {maximumFractionDigits: 1});
+            // --- ROUNDING LOGIC: Integer ---
+            let display = val.toFixed(0);
             yieldHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}</td></tr>`;
         }
         document.getElementById('yields-body').innerHTML = yieldHTML;
@@ -1102,7 +1123,10 @@
             subKeys.forEach((subKey, index) => {
                 let item = groupData[subKey];
                 let val = getInterpolatedValue(rawInput, referenceFeeds, item.v);
-                let display = (subKey.includes("Point") || subKey.includes("T95")) ? val.toFixed(0) : val.toFixed(2);
+                
+                // --- ROUNDING LOGIC: 1 Decimal ---
+                let display = val.toFixed(1);
+                
                 qualHTML += "<tr>";
                 if (index === 0) qualHTML += `<td class="group-cell" rowspan="${subKeys.length}">${groupName}</td>`;
                 qualHTML += `<td>${subKey}</td>`;
@@ -1162,14 +1186,53 @@
             optEn.classList.add('active');
             optAr.classList.remove('active');
         }
+        
+        // --- PERSISTENCE FIX: Don't let updateModes reset the UI ---
+        // We update the dropdowns, but we manually handle the result visibility below
+        updateModes(true, false); 
+
         document.querySelectorAll('[data-i18n]').forEach(el => {
             let key = el.getAttribute('data-i18n');
             if (STRINGS[curLang][key]) el.innerText = STRINGS[curLang][key];
         });
-        updateModes(true);
+        
         updatePlaceholder();
         renderQualityNotes(); 
         updateStaticNotes();
+
+        // If there's a value in the input, re-calculate to update the result text (headers etc)
+        const feedInput = document.getElementById('feedInput');
+        if (feedInput && feedInput.value.trim() !== "") {
+             calculateResults();
+        }
+    }
+    
+    // Modified to allow skipping the handler trigger (for language switching)
+    function updateModes(preserveSelection = true, triggerHandler = true) {
+        const oilType = document.getElementById('oilTypeSelect').value;
+        const modeSelect = document.getElementById('modeSelect');
+        const currentVal = modeSelect.value;
+        modeSelect.innerHTML = "";
+        
+        if (DB[oilType]) {
+            for (let mode in DB[oilType]) {
+                let opt = document.createElement('option');
+                opt.value = mode;
+                if (MODE_LABELS[mode]) {
+                    opt.text = MODE_LABELS[mode][curLang];
+                } else {
+                    opt.text = mode;
+                }
+                modeSelect.add(opt);
+            }
+            if (preserveSelection && currentVal && Array.from(modeSelect.options).some(o => o.value === currentVal)) {
+                modeSelect.value = currentVal;
+            }
+            
+            if (triggerHandler) {
+                handleModeChange();
+            }
+        }
     }
 
     window.onload = () => {}; 
