@@ -38,6 +38,10 @@
             
             --arrow-color: var(--kipic-navy);
             --placeholder-color: #adb5bd;
+            
+            --alert-bg: #ffebee;
+            --alert-text: #c62828;
+            --alert-border: #ef9a9a;
         }
 
         [data-theme="dark"] {
@@ -67,6 +71,10 @@
             
             --arrow-color: var(--kipic-green);
             --placeholder-color: #6c757d;
+
+            --alert-bg: #2c0b0e;
+            --alert-text: #ff8a80;
+            --alert-border: #5c1e24;
         }
 
         body {
@@ -290,7 +298,6 @@
             opacity: 1 !important; 
         }
         
-        /* Style for Disabled Input to look clean but clearly locked */
         .form-control:disabled {
             background-color: rgba(0,0,0,0.05);
             color: var(--text-muted);
@@ -315,6 +322,27 @@
             display: flex; align-items: center; justify-content: center;
         }
         .btn-calc-custom:hover { background-color: #003d73; border-color: #003d73; color: #ffffff; }
+        .btn-calc-custom:disabled {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* Warning Alert Style */
+        .range-warning {
+            background-color: var(--alert-bg);
+            color: var(--alert-text);
+            border: 1px solid var(--alert-border);
+            font-size: 0.8rem;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 8px;
+            display: none; /* Hidden by default */
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
 
         /* --- TABLES --- */
         .table { margin-bottom: 0; border-color: var(--border-color); color: var(--text-main); }
@@ -415,13 +443,19 @@
             </div>
             <div class="col-md-4">
                 <label class="form-label" data-i18n="feedRate">Feed Rate</label>
-                <div class="d-flex gap-2">
-                    <form onsubmit="event.preventDefault(); calculateResults();" class="d-flex gap-2 w-100">
-                        <input type="text" class="form-control" id="feedInput" placeholder="Range..." inputmode="decimal" enterkeyhint="go">
-                        <button type="button" class="btn btn-calc-custom px-4" onclick="calculateResults()" data-i18n="calcBtn">
-                            Calculate
-                        </button>
-                    </form>
+                <div class="d-flex flex-column">
+                    <div class="d-flex gap-2 w-100">
+                        <form onsubmit="event.preventDefault(); calculateResults();" class="d-flex gap-2 w-100">
+                            <input type="text" class="form-control" id="feedInput" placeholder="Range..." inputmode="decimal" enterkeyhint="go">
+                            <button type="button" id="calcBtn" class="btn btn-calc-custom px-4" onclick="calculateResults()" data-i18n="calcBtn">
+                                Calculate
+                            </button>
+                        </form>
+                    </div>
+                    <div id="rangeAlert" class="range-warning">
+                        <i class="bi bi-exclamation-circle-fill"></i>
+                        <span id="rangeMsg">Value out of operational range</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -534,8 +568,6 @@
 </footer>
 
 <script>
-    const CONVERSION_FACTOR = 6.624; 
-
     // --- HELPER: Parse English or Arabic Numerals ---
     function parseLocaleNumber(stringNumber) {
         if (!stringNumber) return NaN;
@@ -545,14 +577,15 @@
         return parseFloat(englishDigits);
     }
 
-    // --- DATA ---
+    // --- DATA STRUCTURE (EXACT MAPPING) ---
+    // Note: feedsKBPD and feedsSM3 correspond index-by-index from the Excel sheet.
     const DB = {
         "KEC": {
             "Max Kero (with Heavy Diesel)": {
-                feeds: [205, 200, 175, 155, 130, 105],
+                feedsKBPD: [205, 200, 175, 155, 130, 105],
+                feedsSM3:  [1342, 1321, 1159.4, 1031.3, 851.6, 696.4],
                 params: {
-                    "Crude Feed (Tank)": {u: "sm3/h", v: [1341.9, 1321.0, 1159.4, 1031.3, 851.6, 696.4]},
-                    "Slops": {u: "sm3/h", v: [36.1, 33.0, 29.5, 41.1, 3.3, 0]},
+                    "Slops": {u: "sm3/h", v: [36.0, 33.0, 29.5, 41.1, 3.3, 0]},
                     "Wild Naphtha": {u: "sm3/h", v: [10.0, 9.1, 26.8, 10.2, 6.6, 10.0]},
                     "Heater Feed Rate": {u: "sm3/h", v: [1230.0, 1220.0, 1055.9, 970.0, 804.7, 660.0]},
                     "Washwater to Desalter V02": {u: "sm3/h", v: [50.2, 53.0, 45.5, 41.1, 34.0, 27.0]},
@@ -609,9 +642,9 @@
                 }
             },
             "Max Kero (No Heavy Diesel)": {
-                feeds: [200, 195, 180, 160, 150, 120, 105],
+                feedsKBPD: [200, 195, 180, 160, 150, 120, 105],
+                feedsSM3: [1326.7, 1300.3, 1203.9, 1060.7, 979.9, 789.7, 689.4],
                 params: {
-                     "Crude Feed (Tank)": {u: "sm3/h", v: [1326.7, 1300.3, 1203.9, 1060.7, 979.9, 789.7, 689.4]},
                     "Slops": {u: "sm3/h", v: [48.8, 25.8, 3.4, 34.2, 24.6, 0, 0]},
                     "Wild Naphtha": {u: "sm3/h", v: [0, 7.0, 30.0, 8.2, 0, 27.8, 11.9]},
                     "Heater Feed Rate": {u: "sm3/h", v: [1220.0, 1200.1, 1080.8, 960.0, 897.7, 673.8, 660.0]},
@@ -669,7 +702,8 @@
                 }
             },
              "Max Naphtha Mode": {
-                feeds: [205],
+                feedsKBPD: [205],
+                feedsSM3: [1341.9],
                 params: {
                     "Heater Outlet Temperature": {u: "°C", v: [371.0]},
                     "Column Top Temperature": {u: "°C", v: [115.1]},
@@ -695,7 +729,8 @@
         },
         "KSRC": {
             "Base Case": {
-                feeds: [120],
+                feedsKBPD: [120],
+                feedsSM3: [795],
                 params: {
                     "Heater Outlet Temperature": {u: "°C", v: [370.0]},
                     "Column Top Temperature": {u: "°C", v: [113.0]},
@@ -721,7 +756,8 @@
         },
         "KMHC": {
             "Base Case": {
-                feeds: [200, 120],
+                feedsKBPD: [200, 120],
+                feedsSM3: [1340, 800],
                 params: {
                     "Heater Outlet Temperature": {u: "°C", v: [369.1, 370.3]},
                     "Column Top Temperature": {u: "°C", v: [111.7, 112.4]},
@@ -768,7 +804,9 @@
 
             note1: "The above parameters based on previous performance with maximum yields + stable operations.. However, a variation is acceptable if the column profile is being maintained. Further fine tuning may be required in order to optimize the yields further. Minor adjustments can be done as needed. However, for any major deviation from the above, prior discussion with process engineer is recommended.",
             note2: "Above are general guidelines, however desalter process parameters & chemical dosage shared through NALCO group to be followed.",
-            note3: "To be optimized depending on Diesel Cloud Point, On Spec -7 ° C winter and 4 °C summer."
+            note3: "To be optimized depending on Diesel Cloud Point, On Spec -7 ° C winter and 4 °C summer.",
+            
+            alertMsg: "Value out of operational range"
         },
         ar: {
             mainTitle: "وحدة تكرير النفط الخام", subTitle: "معايير التشغيل",
@@ -783,16 +821,15 @@
 
             note1: "تستند المعايير أعلاه إلى قيم أداء فعلي سابق مع أقصى إنتاجية + عمليات مستقرة، التباين في القيم مقبول إذا تم الحفاظ على السلم الحراري لعمود تكرير النفط الخام، قد يلزم إجراء مزيد من الضبط الدقيق لتحسين الإنتاجية بشكل أكبر، كما يمكن إجراء تعديلات طفيفة حسب الحاجة، مع ذلك يُنصح بمناقشة أي انحراف كبير عن القيم أعلاه مع مهندس العمليات مسبقًا.",
             note2: "ما ورد أعلاه إرشادات عامة، ومع ذلك يجب اتباع معايير عملية إزالة الأملاح والجرعات الكيميائية المشاركة من قبل مجموعة NALCO.",
-            note3: "يجب تعديل معايير التشغيل بناءً على نقطة التغييم للديزل (Cloud Point): المواصفات -7 °C شتاءً و 4 °C صيفاً."
+            note3: "يجب تعديل معايير التشغيل بناءً على نقطة التغييم للديزل (Cloud Point): المواصفات -7 °C شتاءً و 4 °C صيفاً.",
+            
+            alertMsg: "القيمة خارج نطاق التشغيل المسموح"
         }
     };
 
     let curLang = 'en';
 
-    // --- LOGIC ---
-    
     document.addEventListener('DOMContentLoaded', () => {
-        // System Theme Listener
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
              const newTheme = event.matches ? 'dark' : 'light';
              document.documentElement.setAttribute('data-theme', newTheme);
@@ -801,11 +838,8 @@
             document.documentElement.setAttribute('data-theme', 'dark');
         }
 
-        // Restore Language
         const savedLang = localStorage.getItem('refinery-lang');
-        if (savedLang) {
-            curLang = savedLang;
-        }
+        if (savedLang) curLang = savedLang;
 
         const oilSelect = document.getElementById('oilTypeSelect');
         if (oilSelect) {
@@ -814,21 +848,21 @@
                 opt.value = type; opt.text = type;
                 oilSelect.add(opt);
             }
-            
-            // Init UI with saved language
             applyLanguageUI();
-            // Logic to fill modes now considers language
-            // IMPORTANT: Do NOT calculate results here, only setup UI
             updateModes(false); 
         }
         
-        // Enter Key Listener
+        // Input Listener for Validation
         const feedInput = document.getElementById("feedInput");
         if (feedInput) {
+            feedInput.addEventListener("input", validateInput);
             feedInput.addEventListener("keypress", function(event) {
               if (event.key === "Enter") {
                 event.preventDefault();
-                calculateResults();
+                // Only calc if not disabled
+                if(!document.getElementById('calcBtn').disabled) {
+                    calculateResults();
+                }
               }
             });
         }
@@ -836,38 +870,29 @@
 
     function handleModeChange() {
         updatePlaceholder();
-        // Removed hiding logic - keeps results visible
+        validateInput(); // Re-validate on mode change
     }
 
     function updateModes(preserveSelection = true) {
         const oilType = document.getElementById('oilTypeSelect').value;
         const modeSelect = document.getElementById('modeSelect');
-        
-        // Save selection to restore if possible
         const currentVal = modeSelect.value;
-        
         modeSelect.innerHTML = "";
         
         if (DB[oilType]) {
             for (let mode in DB[oilType]) {
                 let opt = document.createElement('option');
-                opt.value = mode; // The internal key
-                
-                // Display Text Mapping
+                opt.value = mode;
                 if (MODE_LABELS[mode]) {
                     opt.text = MODE_LABELS[mode][curLang];
                 } else {
                     opt.text = mode;
                 }
-                
                 modeSelect.add(opt);
             }
-            
-            // Restore selection if it exists in new list
             if (preserveSelection && currentVal && Array.from(modeSelect.options).some(o => o.value === currentVal)) {
                 modeSelect.value = currentVal;
             }
-            
             handleModeChange();
         }
     }
@@ -879,31 +904,73 @@
         const feedInput = document.getElementById('feedInput');
         
         if (DB[oilType] && DB[oilType][mode]) {
-            const feeds = DB[oilType][mode].feeds;
+            const data = DB[oilType][mode];
+            let feeds = (unit === 'KBPD') ? data.feedsKBPD : data.feedsSM3;
             let min = Math.min(...feeds);
             let max = Math.max(...feeds);
             
             if (min === max) {
-                // --- FIXED VALUE LOGIC ---
-                let val = (unit === 'sm3hr') ? (min * CONVERSION_FACTOR).toFixed(0) : min;
-                let text = (curLang === 'en' ? STRINGS.en.fixed : STRINGS.ar.fixed) + val;
-                
+                let text = (curLang === 'en' ? STRINGS.en.fixed : STRINGS.ar.fixed) + min;
                 feedInput.placeholder = text;
-                feedInput.value = val;          // Auto-fill Value
-                feedInput.disabled = true;      // Disable Input
-                
-                calculateResults();             // Auto-trigger Calculation
+                feedInput.value = min;
+                feedInput.disabled = true;
+                // Auto calc only if valid
+                calculateResults();
             } else {
-                // --- RANGE LOGIC ---
-                if (unit === 'sm3hr') {
-                    min = (min * CONVERSION_FACTOR).toFixed(0);
-                    max = (max * CONVERSION_FACTOR).toFixed(0);
-                }
                 let text = (curLang === 'en' ? STRINGS.en.range : STRINGS.ar.range) + `${min} - ${max}`;
-                
                 feedInput.placeholder = text;
-                feedInput.disabled = false;     // Enable Input
-                feedInput.value = "";           // Clear Input for new typing
+                feedInput.disabled = false;
+                feedInput.value = "";
+                
+                // Reset UI on unit change
+                document.getElementById('results-row').style.display = 'none';
+                document.getElementById('rangeAlert').style.display = 'none';
+                document.getElementById('calcBtn').disabled = true; // Disable until typed
+            }
+        }
+        validateInput();
+    }
+
+    // --- NEW VALIDATION FUNCTION ---
+    function validateInput() {
+        const oilType = document.getElementById('oilTypeSelect').value;
+        const mode = document.getElementById('modeSelect').value;
+        const unit = document.getElementById('unitSelect').value;
+        const feedInput = document.getElementById('feedInput');
+        const calcBtn = document.getElementById('calcBtn');
+        const alertBox = document.getElementById('rangeAlert');
+        const alertMsg = document.getElementById('rangeMsg');
+        
+        if(feedInput.disabled) {
+             alertBox.style.display = 'none';
+             calcBtn.disabled = false;
+             return;
+        }
+
+        let val = parseLocaleNumber(feedInput.value);
+        
+        if (isNaN(val) || feedInput.value.trim() === "") {
+            alertBox.style.display = 'none';
+            calcBtn.disabled = true;
+            return;
+        }
+
+        if (DB[oilType] && DB[oilType][mode]) {
+            const data = DB[oilType][mode];
+            let feeds = (unit === 'KBPD') ? data.feedsKBPD : data.feedsSM3;
+            let min = Math.min(...feeds);
+            let max = Math.max(...feeds);
+
+            if (val < min || val > max) {
+                // SHOW ERROR
+                alertBox.style.display = 'flex';
+                let msgBase = STRINGS[curLang].alertMsg;
+                alertMsg.innerText = `${msgBase} (${min} - ${max})`;
+                calcBtn.disabled = true;
+            } else {
+                // HIDE ERROR
+                alertBox.style.display = 'none';
+                calcBtn.disabled = false;
             }
         }
     }
@@ -912,98 +979,87 @@
         return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
     }
 
-    function getInterpolatedValue(targetFeed, feeds, values) {
-        if (feeds.length === 1) return values[0];
-        if (feeds.includes(targetFeed)) return values[feeds.indexOf(targetFeed)];
-        
-        let points = feeds.map((f, i) => ({f: f, v: values[i]})).sort((a, b) => a.f - b.f);
-        if (targetFeed <= points[0].f) return points[0].v;
-        if (targetFeed >= points[points.length-1].f) return points[points.length-1].v;
+    function getInterpolatedValue(inputVal, refArray, valArray) {
+        if (refArray.length === 1) return valArray[0];
+        let points = refArray.map((f, i) => ({f: f, v: valArray[i]})).sort((a, b) => a.f - b.f);
+        if (inputVal <= points[0].f) return points[0].v;
+        if (inputVal >= points[points.length-1].f) return points[points.length-1].v;
 
         for (let i = 0; i < points.length - 1; i++) {
-            if (targetFeed >= points[i].f && targetFeed <= points[i+1].f) {
-                return lerp(targetFeed, points[i].f, points[i+1].f, points[i].v, points[i+1].v);
+            if (inputVal >= points[i].f && inputVal <= points[i+1].f) {
+                return lerp(inputVal, points[i].f, points[i+1].f, points[i].v, points[i+1].v);
             }
         }
         return 0;
     }
 
     function calculateResults() {
-        // Show results container
+        const calcBtn = document.getElementById('calcBtn');
+        if (calcBtn.disabled) return;
+
         document.getElementById('results-row').style.display = 'flex';
 
         const oilType = document.getElementById('oilTypeSelect').value;
         const mode = document.getElementById('modeSelect').value;
         const unit = document.getElementById('unitSelect').value;
-        
         let rawVal = document.getElementById('feedInput').value;
         let rawInput = parseLocaleNumber(rawVal);
         
-        if (isNaN(rawInput)) {
-            document.getElementById('feed-display-badge').innerText = "--";
-            return;
+        const data = DB[oilType][mode];
+        let referenceFeeds, interpolatedKBPD, interpolatedSM3;
+        
+        if (unit === 'KBPD') {
+            referenceFeeds = data.feedsKBPD;
+            interpolatedSM3 = getInterpolatedValue(rawInput, referenceFeeds, data.feedsSM3);
+            interpolatedKBPD = rawInput;
+        } else {
+            referenceFeeds = data.feedsSM3;
+            interpolatedKBPD = getInterpolatedValue(rawInput, referenceFeeds, data.feedsKBPD);
+            interpolatedSM3 = rawInput;
         }
 
-        const data = DB[oilType][mode];
-        // Convert Input to KBPD for lookup (Standard)
-        let targetKBPD = (unit === 'sm3hr') ? rawInput / CONVERSION_FACTOR : rawInput;
-        
         let displayFeed = "";
         if (unit === 'KBPD') {
-             let sm3Val = (rawInput * CONVERSION_FACTOR).toFixed(1);
-             displayFeed = `${rawInput} KBPD (${sm3Val} sm3/h)`;
+             displayFeed = `${rawInput} KBPD (${interpolatedSM3.toFixed(1)} sm3/h)`;
         } else {
-             let kbpdVal = (rawInput / CONVERSION_FACTOR).toFixed(1);
-             displayFeed = `${rawInput} sm3/h (${kbpdVal} KBPD)`;
+             displayFeed = `${rawInput} sm3/h (${interpolatedKBPD.toFixed(1)} KBPD)`;
         }
         document.getElementById('feed-display-badge').innerText = displayFeed;
 
-        // Params
         let paramHTML = "";
+        let crudeFeedVal, crudeFeedUnit;
+        if (unit === 'KBPD') {
+             crudeFeedVal = interpolatedSM3; 
+             crudeFeedUnit = "sm3/h";
+        } else {
+             crudeFeedVal = interpolatedKBPD;
+             crudeFeedUnit = "KBPD";
+        }
+        paramHTML += `<tr><td>Crude Feed (Tank)</td><td class="text-end val-display">${crudeFeedVal.toLocaleString(undefined, {maximumFractionDigits: 1})}<span class="unit-small">${crudeFeedUnit}</span></td></tr>`;
+
         for (let key in data.params) {
             let item = data.params[key];
-            
-            // Standard Calculation
-            let val = getInterpolatedValue(targetKBPD, data.feeds, item.v);
-            let unitDisplay = item.u;
-
-            // --- SPECIAL SWAP LOGIC FOR CRUDE FEED (TANK) ---
-            if (key === "Crude Feed (Tank)") {
-                if (unit === 'sm3hr') {
-                    // Scenario: Input is sm3/h.
-                    // Requirement: Show exact input value OR swap to KBPD.
-                    // "Result is sm3/h if input KBPD, and vice versa".
-                    // Vice versa means: If Input sm3/h -> Result KBPD.
-                    
-                    // Calculate exact KBPD from input to ensure matching logic
-                    val = rawInput / CONVERSION_FACTOR;
-                    unitDisplay = "KBPD";
-                } 
-                // Else if unit == KBPD, standard interpolation returns sm3/h. Correct.
-            }
-
+            let val = getInterpolatedValue(rawInput, referenceFeeds, item.v);
             let display = val.toLocaleString(undefined, {maximumFractionDigits: 1});
-            paramHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}<span class="unit-small">${unitDisplay}</span></td></tr>`;
+            paramHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}<span class="unit-small">${item.u}</span></td></tr>`;
         }
         document.getElementById('params-body').innerHTML = paramHTML;
 
-        // Yields
         let yieldHTML = "";
         for (let key in data.yields) {
-            let val = getInterpolatedValue(targetKBPD, data.feeds, data.yields[key]);
+            let val = getInterpolatedValue(rawInput, referenceFeeds, data.yields[key]);
             let display = val.toLocaleString(undefined, {maximumFractionDigits: 1});
             yieldHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}</td></tr>`;
         }
         document.getElementById('yields-body').innerHTML = yieldHTML;
 
-        // Quality
         let qualHTML = "";
         for (let groupName in data.quality) {
             let groupData = data.quality[groupName];
             let subKeys = Object.keys(groupData);
             subKeys.forEach((subKey, index) => {
                 let item = groupData[subKey];
-                let val = getInterpolatedValue(targetKBPD, data.feeds, item.v);
+                let val = getInterpolatedValue(rawInput, referenceFeeds, item.v);
                 let display = (subKey.includes("Point") || subKey.includes("T95")) ? val.toFixed(0) : val.toFixed(2);
                 qualHTML += "<tr>";
                 if (index === 0) qualHTML += `<td class="group-cell" rowspan="${subKeys.length}">${groupName}</td>`;
@@ -1013,7 +1069,6 @@
             });
         }
         document.getElementById('quality-body').innerHTML = qualHTML;
-
         renderQualityNotes();
     }
 
@@ -1021,7 +1076,6 @@
         const langObj = STRINGS[curLang];
         const list = document.getElementById('quality-notes-list');
         const area = document.getElementById('quality-notes-area');
-        
         list.innerHTML = `
             <li><i class='bi bi-exclamation-triangle-fill text-warning'></i> ${langObj.qNote1}</li>
             <li><i class='bi bi-exclamation-triangle-fill text-warning'></i> ${langObj.qNote2}</li>
@@ -1038,7 +1092,6 @@
         `;
     }
 
-    // Mobile Manual Toggle
     function toggleThemeManual() {
         const html = document.documentElement;
         const icon = document.getElementById('theme-icon');
@@ -1055,12 +1108,9 @@
 
     function applyLanguageUI() {
         document.body.dir = curLang === 'ar' ? 'rtl' : 'ltr';
-        
-        // Animate Slider
         const container = document.getElementById('lang-switch');
         const optEn = document.getElementById('opt-en');
         const optAr = document.getElementById('opt-ar');
-        
         if (curLang === 'ar') {
             container.classList.add('ar-active');
             optAr.classList.add('active');
@@ -1070,22 +1120,17 @@
             optEn.classList.add('active');
             optAr.classList.remove('active');
         }
-        
-        // Translate UI
         document.querySelectorAll('[data-i18n]').forEach(el => {
             let key = el.getAttribute('data-i18n');
             if (STRINGS[curLang][key]) el.innerText = STRINGS[curLang][key];
         });
-        
-        // Update Mode Dropdown text without resetting selection
         updateModes(true);
-        
         updatePlaceholder();
         renderQualityNotes(); 
         updateStaticNotes();
     }
 
-    window.onload = init;
+    window.onload = () => {}; 
 </script>
 
 </body>
