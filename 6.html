@@ -565,7 +565,8 @@
     }
 
     // --- DATA STRUCTURE ---
-    // Updated with precise Excel values (raw data for accuracy), Washwater units fixed to sm3/h
+    // NOTE: feedsSM3 arrays are rounded to match external Excel display for proper input ranges.
+    // Washwater units updated to sm3/h for ALL modes.
     const DB = {
         "KEC": {
             "Max Kero (with Heavy Diesel)": {
@@ -680,7 +681,7 @@
                 },
                 quality: {
                     "Desalted Crude": { "Salt HEM": {u: "PTB", v: [0.65, 0.6, 0.6, 0.7, 1.0, 0.6, 0.6]}, "BS&W": {u: "%", v: [1.3, 0.6, 0.8, 0.7, 0.55, 0.5, 0.5]} },
-                    "Desalter Effluent": { "pH": {u: "pH", v: [5.0, 5.0, 5.0, 7.0, 4.88, 5.4, 5.45]} },
+                    "Desalter Effluent": { "pH": {u: "pH", v: [5.0, 5.0, 5.0, 7.0, 4.9, 5.4, 5.45]} },
                     "SSW": { "pH": {u: "pH", v: [8.5, 8, 8.1, 9, 9.4, 8.5, 7.5]} },
                     "Naphtha": { "RVP": {u: "psi", v: [9.16, 9.1, 8.9, 8.45, 8.51, 8, 8.65]}, "T95": {u: "°C", v: [143, 147, 144, 142, 140, 145, 143]} },
                     "Kerosene": { "Freeze Point": {u: "°C", v: [-48, -49, -48, -52, -51, -56, -52]}, "T95": {u: "°C", v: [245, 252, 247, 240, 245, 231, 238]} },
@@ -986,15 +987,19 @@
             let min = Math.min(...feeds);
             let max = Math.max(...feeds);
             
-            if (min === max) {
-                let text = (curLang === 'en' ? STRINGS.en.fixed : STRINGS.ar.fixed) + min;
+            // ROUNDING logic for placeholder to ensure validation matches display
+            let displayMin = parseFloat(min.toFixed(0));
+            let displayMax = parseFloat(max.toFixed(0));
+
+            if (displayMin === displayMax) {
+                let text = (curLang === 'en' ? STRINGS.en.fixed : STRINGS.ar.fixed) + displayMin;
                 feedInput.placeholder = text;
-                feedInput.value = min;
+                feedInput.value = displayMin;
                 feedInput.disabled = true;
                 // Auto calc only if fixed
                 calculateResults();
             } else {
-                let text = (curLang === 'en' ? STRINGS.en.range : STRINGS.ar.range) + `${min} - ${max}`;
+                let text = (curLang === 'en' ? STRINGS.en.range : STRINGS.ar.range) + `${displayMin} - ${displayMax}`;
                 feedInput.placeholder = text;
                 feedInput.disabled = false;
                 feedInput.value = "";
@@ -1044,15 +1049,19 @@
         let feeds = (unit === 'KBPD') ? data.feedsKBPD : data.feedsSM3;
         let min = Math.min(...feeds);
         let max = Math.max(...feeds);
+        
+        // --- VALIDATION FIX ---
+        // We compare against ROUNDED limits because that's what the user sees/inputs
+        let limitMin = parseFloat(min.toFixed(0));
+        let limitMax = parseFloat(max.toFixed(0));
 
-        // --- VALIDATION CHECK ---
-        // Allow small floating point tolerance
-        if (min !== max && (rawInput < min || rawInput > max)) {
+        // Use small tolerance for float comparison if needed, but explicit rounding works best here
+        if (limitMin !== limitMax && (rawInput < limitMin || rawInput > limitMax)) {
             // Show Error, Hide Results
             resultRow.style.display = 'none';
             alertBox.style.display = 'flex';
             let msgBase = STRINGS[curLang].alertMsg;
-            alertMsg.innerText = `${msgBase} (${min} - ${max})`;
+            alertMsg.innerText = `${msgBase} (${limitMin} - ${limitMax})`;
             return; // Stop calculation
         }
 
@@ -1089,18 +1098,19 @@
              crudeFeedVal = interpolatedKBPD;
              crudeFeedUnit = "KBPD";
         }
-        paramHTML += `<tr><td>Crude Feed (Tank)</td><td class="text-end val-display">${crudeFeedVal.toLocaleString(undefined, {maximumFractionDigits: 0})}<span class="unit-small">${crudeFeedUnit}</span></td></tr>`;
+        // Crude Feed: toFixed(0) -> No thousand separator
+        paramHTML += `<tr><td>Crude Feed (Tank)</td><td class="text-end val-display">${crudeFeedVal.toFixed(0)}<span class="unit-small">${crudeFeedUnit}</span></td></tr>`;
 
         for (let key in data.params) {
             let item = data.params[key];
             let val = getInterpolatedValue(rawInput, referenceFeeds, item.v);
             
-            // --- ROUNDING LOGIC (PER REQUEST) ---
+            // --- ROUNDING LOGIC ---
             let display;
             if (key === "Top Column Pressure") {
                 display = val.toFixed(2);
             } else {
-                display = val.toFixed(0);
+                display = val.toFixed(0); // No decimal, No comma
             }
             
             paramHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}<span class="unit-small">${item.u}</span></td></tr>`;
@@ -1110,7 +1120,7 @@
         let yieldHTML = "";
         for (let key in data.yields) {
             let val = getInterpolatedValue(rawInput, referenceFeeds, data.yields[key]);
-            // --- ROUNDING LOGIC: Integer ---
+            // Yields: Integer, no comma
             let display = val.toFixed(0);
             yieldHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}</td></tr>`;
         }
@@ -1124,7 +1134,7 @@
                 let item = groupData[subKey];
                 let val = getInterpolatedValue(rawInput, referenceFeeds, item.v);
                 
-                // --- ROUNDING LOGIC: 1 Decimal ---
+                // Quality: 1 decimal place
                 let display = val.toFixed(1);
                 
                 qualHTML += "<tr>";
@@ -1187,8 +1197,7 @@
             optAr.classList.remove('active');
         }
         
-        // --- PERSISTENCE FIX: Don't let updateModes reset the UI ---
-        // We update the dropdowns, but we manually handle the result visibility below
+        // --- PERSISTENCE FIX ---
         updateModes(true, false); 
 
         document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -1200,14 +1209,12 @@
         renderQualityNotes(); 
         updateStaticNotes();
 
-        // If there's a value in the input, re-calculate to update the result text (headers etc)
         const feedInput = document.getElementById('feedInput');
         if (feedInput && feedInput.value.trim() !== "") {
              calculateResults();
         }
     }
     
-    // Modified to allow skipping the handler trigger (for language switching)
     function updateModes(preserveSelection = true, triggerHandler = true) {
         const oilType = document.getElementById('oilTypeSelect').value;
         const modeSelect = document.getElementById('modeSelect');
