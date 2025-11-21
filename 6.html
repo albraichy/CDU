@@ -546,13 +546,16 @@
 </footer>
 
 <script>
+    // --- HELPER: Parse English or Arabic Numerals ---
     function parseLocaleNumber(stringNumber) {
         if (!stringNumber) return NaN;
         stringNumber = stringNumber.toString();
-        var englishDigits = stringNumber.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+        var englishDigits = stringNumber
+            .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
         return parseFloat(englishDigits);
     }
 
+    // --- DATA STRUCTURE (COMPLETE & VERIFIED) ---
     const DB = {
         "KEC": {
             "Max Kero (with Heavy Diesel)": {
@@ -562,11 +565,11 @@
                     "Slops": {u: "sm3/hr", v: [36.11, 33.02, 29.54, 41.13, 3.25, 0.0]},
                     "Wild Naphtha": {u: "sm3/hr", v: [10.00, 9.10, 26.77, 10.24, 6.60, 9.96]},
                     "Heater Feed Rate": {u: "sm3/hr", v: [1230.0, 1220.0, 1055.92, 969.97, 804.68, 660.0]},
-                    "Washwater flow to Desalter V02 (75% of total) (2)": {u: "%", v: [50.23, 53.0, 45.47, 41.07, 34.0, 27.0]},
-                    "Washwater flow to Desalter E01 crude side (25% of total) (2)": {u: "%", v: [16.74, 18.0, 14.99, 13.54, 12.0, 9.0]},
+                    "Washwater to Desalter V02": {u: "%", v: [50.23, 53.0, 45.47, 41.07, 34.0, 27.0]},
+                    "Washwater to E01": {u: "%", v: [16.74, 18.0, 14.99, 13.54, 12.0, 9.0]},
                     "V-0001 inlet temperature(2)": {u: "°C", v: [149.3, 148.77, 150.04, 147.99, 148.78, 147.32]},
                     "V-0002 inlet temperature (2)": {u: "°C", v: [148.43, 147.89, 149.22, 147.07, 147.88, 146.37]},
-                    "E-10 Exchanger Outlet Temp to Preflash Drum (3)": {u: "°C", v: [199.91, 201.91, 200.1, 198.24, 199.57, 202.72]},
+                    "E-10 Outlet Temperature": {u: "°C", v: [199.91, 201.91, 200.1, 198.24, 199.57, 202.72]},
                     "Heater Outlet Temperature": {u: "°C", v: [371.0, 370.83, 370.93, 370.96, 370.33, 370.99]},
                     "Column Top Temperature": {u: "°C", v: [112.0, 112.0, 112.0, 111.0, 111.01, 111.0]},
                     "Top Column Pressure": {u: "barg", v: [1.03, 1.03, 1.03, 1.02, 1.03, 1.0]},
@@ -587,8 +590,8 @@
                     "Overflash flow": {u: "sm3/hr", v: [112.53, 84.3, 108.44, 83.48, 75.15, 72.74]},
                     "Stripping Steam Temperature": {u: "°C", v: [274.88, 284.95, 289.93, 289.66, 283.59, 274.21]},
                     "Stripping steam to crude column": {u: "kg/hr", v: [22500.01, 21997.97, 20500.01, 17499.94, 15374.19, 15500.08]},
-                    "Stripping Steam to Light Diesel Stripper (3)": {u: "kg/hr", v: [1200.0, 2150.02, 1092.0, 1450.0, 1209.13, 999.99]},
-                    "Stripping Steam to Heavy Diesel Stripper (3)": {u: "kg/hr", v: [350.0, 450.0, 300.0, 300.0, 300.0, 300.01]},
+                    "Stripping Steam to Light Diesel Stripper": {u: "kg/hr", v: [1200.0, 2150.02, 1092.0, 1450.0, 1209.13, 999.99]},
+                    "Stripping Steam to Heavy Diesel Stripper": {u: "kg/hr", v: [350.0, 450.0, 300.0, 300.0, 300.0, 300.01]},
                     "Stabilizer feed temperature": {u: "°C", v: [101.85, 103.88, 102.49, 105.58, 108.12, 110.27]},
                     "Stabilizer reboiler inlet temperature": {u: "°C", v: [147.14, 147.81, 149.29, 150.67, 153.29, 155.49]},
                     "Stabilizer Reboiler outlet temperature": {u: "°C", v: [159.86, 158.41, 159.07, 158.09, 159.1, 159.95]},
@@ -644,8 +647,8 @@
                     "Overflash flow": {u: "sm3/hr", v: [33.4, 0.05, 151.87, 126.49, 85.36, 67.73, 86.9]},
                     "Stripping Steam Temperature": {u: "°C", v: [274.94, 267.77, 287.51, 279.57, 281.45, 265.13, 273.31]},
                     "Stripping steam to crude column": {u: "kg/hr", v: [23893.36, 23944.07, 19996.92, 20522.97, 17341.42, 14314.22, 15248.32]},
-                    "Stripping Steam to Light Diesel Stripper (3)": {u: "kg/hr", v: [1300.0, 2300.01, 1100.0, 1200.0, 941.25, 2035.48, 1000.0]},
-                    "Stripping Steam to Heavy Diesel Stripper (3)": {u: "kg/hr", v: [26.98, 104.93, -12.5, -12.5, 82.86, 127.9, 35.04]},
+                    "Stripping Steam to Light Diesel Stripper": {u: "kg/hr", v: [1300.0, 2300.01, 1100.0, 1200.0, 941.25, 2035.48, 1000.0]},
+                    "Stripping Steam to Heavy Diesel Stripper": {u: "kg/hr", v: [26.98, 104.93, -12.5, -12.5, 82.86, 127.9, 35.04]},
                     "Stabilizer feed temperature": {u: "°C", v: [104.46, 111.59, 117.79, 115.04, 106.39, 128.42, 110.46]},
                     "Stabilizer reboiler inlet temperature": {u: "°C", v: [147.47, 154.2, 150.23, 151.0, 151.06, 161.63, 155.69]},
                     "Stabilizer Reboiler outlet temperature": {u: "°C", v: [159.32, 215.26, 159.7, 158.58, 157.93, 166.4, 160.14]},
@@ -701,8 +704,8 @@
                     "Overflash flow": {u: "sm3/hr", v: [99.17]},
                     "Stripping Steam Temperature": {u: "°C", v: [288.17]},
                     "Stripping steam to crude column": {u: "kg/hr", v: [24500.06]},
-                    "Stripping Steam to Light Diesel Stripper (3)": {u: "kg/hr", v: [930.01]},
-                    "Stripping Steam to Heavy Diesel Stripper (3)": {u: "kg/hr", v: [0.0]},
+                    "Stripping Steam to Light Diesel Stripper": {u: "kg/hr", v: [930.01]},
+                    "Stripping Steam to Heavy Diesel Stripper": {u: "kg/hr", v: [0.0]},
                     "Stabilizer feed temperature": {u: "°C", v: [116.99]},
                     "Stabilizer reboiler inlet temperature": {u: "°C", v: [149.84]},
                     "Stabilizer Reboiler outlet temperature": {u: "°C", v: [160.72]},
@@ -758,8 +761,8 @@
                     "Overflash flow": {u: "sm3/hr", v: [61.65]},
                     "Stripping Steam Temperature": {u: "°C", v: [302.55]},
                     "Stripping steam to crude column": {u: "kg/hr", v: [9649.9]},
-                    "Stripping Steam to Light Diesel Stripper (3)": {u: "kg/hr", v: [2500.0]},
-                    "Stripping Steam to Heavy Diesel Stripper (3)": {u: "kg/hr", v: [109.08]},
+                    "Stripping Steam to Light Diesel Stripper": {u: "kg/hr", v: [2500.0]},
+                    "Stripping Steam to Heavy Diesel Stripper": {u: "kg/hr", v: [109.08]},
                     "Stabilizer feed temperature": {u: "°C", v: [110.81]},
                     "Stabilizer reboiler inlet temperature": {u: "°C", v: [174.7]},
                     "Stabilizer Reboiler outlet temperature": {u: "°C", v: [186.8]},
@@ -815,8 +818,8 @@
                     "Overflash flow": {u: "sm3/hr", v: [0.16, 97.31]},
                     "Stripping Steam Temperature": {u: "°C", v: [268.08, 265.44]},
                     "Stripping steam to crude column": {u: "kg/hr", v: [23972.14, 15123.41]},
-                    "Stripping Steam to Light Diesel Stripper (3)": {u: "kg/hr", v: [2340.49, 1775.68]},
-                    "Stripping Steam to Heavy Diesel Stripper (3)": {u: "kg/hr", v: [107.98, 108.44]},
+                    "Stripping Steam to Light Diesel Stripper": {u: "kg/hr", v: [2340.49, 1775.68]},
+                    "Stripping Steam to Heavy Diesel Stripper": {u: "kg/hr", v: [107.98, 108.44]},
                     "Stabilizer feed temperature": {u: "°C", v: [111.88, 115.99]},
                     "Stabilizer reboiler inlet temperature": {u: "°C", v: [154.43, 168.94]},
                     "Stabilizer Reboiler outlet temperature": {u: "°C", v: [214.54, 200.65]},
@@ -887,6 +890,7 @@
                 feedInput.placeholder = text;
                 feedInput.value = min;
                 feedInput.disabled = true;
+                // Auto calc only if fixed
                 calculateResults();
             } else {
                 let text = (curLang === 'en' ? STRINGS.en.range : STRINGS.ar.range) + `${min.toFixed(0)} - ${max.toFixed(0)}`;
@@ -936,14 +940,18 @@
         let min = Math.min(...feeds);
         let max = Math.max(...feeds);
 
+        // --- VALIDATION CHECK ---
+        // Allow slight tolerance for float comparison
         if (rawInput < (min - 0.1) || rawInput > (max + 0.1)) {
+            // Show Error, Hide Results
             resultRow.style.display = 'none';
             alertBox.style.display = 'flex';
             let msgBase = STRINGS[curLang].alertMsg;
             alertMsg.innerText = `${msgBase} (${min.toFixed(0)} - ${max.toFixed(0)})`;
-            return;
+            return; // Stop calculation
         }
 
+        // If valid -> Hide Alert, Show Results
         alertBox.style.display = 'none';
         resultRow.style.display = 'flex';
 
@@ -979,7 +987,6 @@
         paramHTML += `<tr><td>Crude Feed (Tank)</td><td class="text-end val-display">${crudeFeedVal.toLocaleString(undefined, {maximumFractionDigits: 1})}<span class="unit-small">${crudeFeedUnit}</span></td></tr>`;
 
         for (let key in data.params) {
-            if (key === "Crude Feed (Tank)") continue; // Already handled
             let item = data.params[key];
             let val = getInterpolatedValue(rawInput, referenceFeeds, item.v);
             let display = val.toLocaleString(undefined, {maximumFractionDigits: 1});
@@ -1014,9 +1021,62 @@
         renderQualityNotes();
     }
 
-    function resetUI() {
-        document.getElementById('results-row').style.display = 'none';
-        document.getElementById('rangeAlert').style.display = 'none';
+    function renderQualityNotes() {
+        const langObj = STRINGS[curLang];
+        const list = document.getElementById('quality-notes-list');
+        const area = document.getElementById('quality-notes-area');
+        list.innerHTML = `
+            <li><i class='bi bi-exclamation-triangle-fill text-warning'></i> ${langObj.qNote1}</li>
+            <li><i class='bi bi-exclamation-triangle-fill text-warning'></i> ${langObj.qNote2}</li>
+        `;
+        area.style.display = 'block';
+    }
+
+    function updateStaticNotes() {
+        const footerList = document.getElementById('footer-static-notes');
+        footerList.innerHTML = `
+            <li>${STRINGS[curLang].note1}</li>
+            <li>${STRINGS[curLang].note2}</li>
+            <li>${STRINGS[curLang].note3}</li>
+        `;
+    }
+
+    function toggleThemeManual() {
+        const html = document.documentElement;
+        const icon = document.getElementById('theme-icon');
+        const isDark = html.getAttribute('data-theme') === 'dark';
+        html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+        icon.className = isDark ? "bi bi-sun-fill" : "bi bi-moon-stars-fill";
+    }
+
+    function toggleLanguage() {
+        curLang = curLang === 'en' ? 'ar' : 'en';
+        localStorage.setItem('refinery-lang', curLang);
+        applyLanguageUI();
+    }
+
+    function applyLanguageUI() {
+        document.body.dir = curLang === 'ar' ? 'rtl' : 'ltr';
+        const container = document.getElementById('lang-switch');
+        const optEn = document.getElementById('opt-en');
+        const optAr = document.getElementById('opt-ar');
+        if (curLang === 'ar') {
+            container.classList.add('ar-active');
+            optAr.classList.add('active');
+            optEn.classList.remove('active');
+        } else {
+            container.classList.remove('ar-active');
+            optEn.classList.add('active');
+            optAr.classList.remove('active');
+        }
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            let key = el.getAttribute('data-i18n');
+            if (STRINGS[curLang][key]) el.innerText = STRINGS[curLang][key];
+        });
+        updateModes(true);
+        updatePlaceholder();
+        renderQualityNotes(); 
+        updateStaticNotes();
     }
 
     window.onload = () => {}; 
