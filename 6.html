@@ -1,1194 +1,519 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" data-theme="light">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CDU Parameters Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
-    
     <style>
-        /* --- KIPIC BRAND THEME --- */
         :root {
-            --kipic-navy: #002F6C;       
-            --kipic-green: #6FAE27;      
-            --kipic-gradient: linear-gradient(135deg, var(--kipic-navy) 60%, #004494 100%);
-            --operator-blue: #004e92;    
-
-            /* Light Mode */
-            --bg-body: #f3f5f8;
-            --bg-card: #ffffff;
-            --text-main: #2c3e50;
-            --text-muted: #6c757d;
-            --border-color: #e9ecef;
-            --header-text: #ffffff;
-            --table-head-bg: #f1f3f5;    
-            --table-head-text: #495057;
-            --table-stripe: #f8f9fa;
-            --table-row-bg: #ffffff;     
-            --input-bg: #ffffff;
-            --footer-bg: #e9ecef;
-            
-            /* Badge Colors */
-            --badge-bg: var(--kipic-navy);
-            --badge-text: #ffffff;
-            --badge-border: var(--kipic-navy);
-            
-            --arrow-color: var(--kipic-navy);
-            --placeholder-color: #adb5bd;
-            
-            --alert-bg: #ffebee;
-            --alert-text: #c62828;
-            --alert-border: #ef9a9a;
-        }
-
-        [data-theme="dark"] {
-            /* Dark Mode */
-            --bg-body: #121212;
-            --bg-card: #1e1e24;
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
             --text-main: #e0e0e0;
-            --text-muted: #b0b0b0;
-            --border-color: #343a40;
-            --header-text: #e0e0e0;
-            
-            /* Dark Tables */
-            --table-head-bg: #0d1b2a;    
-            --table-head-text: #ced4da;
-            --table-row-bg: #151a21;     
-            --table-stripe: #1c232b;     
-            
-            --input-bg: #2b2b36;
-            --footer-bg: #1a1a1a;
-            --kipic-navy: #0d1b2a; 
-            --kipic-green: #7bc938;
-            
-            /* Badge Colors */
-            --badge-bg: var(--kipic-green);
-            --badge-text: #000000;
-            --badge-border: var(--kipic-green);
-            
-            --arrow-color: var(--kipic-green);
-            --placeholder-color: #6c757d;
-
-            --alert-bg: #2c0b0e;
-            --alert-text: #ff8a80;
-            --alert-border: #5c1e24;
+            --text-muted: #a0a0a0;
+            --accent: #007bff;
+            --border: #404040;
+            --success: #28a745;
         }
 
         body {
-            font-family: 'Roboto', 'Tajawal', sans-serif;
-            background-color: var(--bg-body);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
             color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            transition: background-color 0.3s ease;
+            margin: 0;
+            padding: 20px;
         }
 
-        /* --- HEADER --- */
-        .main-header {
-            background: var(--kipic-gradient);
-            color: var(--header-text);
-            padding: 1.5rem 2rem;
-            position: relative;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            text-align: center;
-            border-bottom: 4px solid var(--kipic-green); 
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        .header-title-main {
-            font-weight: 800;
-            font-size: 1.8rem;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .header-subtitle {
-            font-weight: 400;
-            font-size: 1.1rem;
-            opacity: 0.9;
-            margin-top: 4px;
-            color: #d1e7dd; 
-        }
-
-        /* Fixed LTR for Controls */
-        .header-controls {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            inset-inline-end: 25px;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            direction: ltr !important; 
-        }
-
-        .icon-btn {
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.25);
-            color: #fff;
+        .header {
+            background-color: var(--card-bg);
+            padding: 20px;
             border-radius: 8px;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .icon-btn:hover { background: var(--kipic-green); border-color: var(--kipic-green); }
-
-        /* Language Switch */
-        .lang-switch-container {
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 2px;
-            display: flex;
-            position: relative;
-            cursor: pointer;
-            width: 76px;
-            height: 34px;
-        }
-        
-        .lang-option {
-            flex: 1;
-            text-align: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-            z-index: 2;
-            line-height: 28px;
-            color: rgba(255, 255, 255, 0.6);
-            transition: color 0.3s;
-        }
-        .lang-option.active { color: #fff; }
-
-        .lang-slider {
-            position: absolute;
-            top: 2px;
-            bottom: 2px;
-            left: 2px;
-            width: 50%;
-            background: var(--kipic-green);
-            border-radius: 16px;
-            transition: transform 0.3s ease;
-            z-index: 1;
-        }
-        
-        .lang-switch-container.ar-active .lang-slider {
-            transform: translateX(92%);
-        }
-
-        /* --- CARDS & COLLAPSE --- */
-        .card {
-            background-color: var(--bg-card);
-            border: none;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
             margin-bottom: 20px;
-            overflow: hidden;
-            border-top: 3px solid var(--kipic-navy); 
-            transition: border-color 0.3s ease;
-        }
-        
-        [data-theme="dark"] .card { border-top-color: var(--kipic-green) !important; }
-        
-        .card-header-custom {
+            border: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 20px;
-            border-bottom: 1px solid var(--border-color);
-            background-color: transparent;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
-        .card-title-text {
-            color: var(--kipic-navy);
-            font-weight: 700;
-            margin: 0;
-            font-size: 1rem;
+        h1 { margin: 0; font-size: 1.5rem; color: var(--accent); }
+
+        .controls {
             display: flex;
+            gap: 15px;
             align-items: center;
-            gap: 10px;
-        }
-        [data-theme="dark"] .card-title-text { color: var(--kipic-green); }
-
-        /* --- FEED BADGE --- */
-        .feed-badge {
-            background-color: var(--badge-bg);
-            border: 1px solid var(--badge-border);
-            color: var(--badge-text);
-            padding: 5px 16px;
-            border-radius: 6px;
-            font-family: 'Roboto Mono', monospace;
-            font-weight: 700;
-            font-size: 0.9rem;
-            direction: ltr;
-            white-space: nowrap;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
         }
 
-        /* --- INPUTS --- */
-        .form-label { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-        
-        .form-control, .form-select {
-            background-color: var(--input-bg);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label { font-size: 0.9rem; color: var(--text-muted); }
+
+        select, input {
+            background-color: #3d3d3d;
+            border: 1px solid var(--border);
+            color: white;
             padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        input[type="number"] { width: 120px; }
+
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button:hover { background-color: #0056b3; }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
             border-radius: 8px;
-            font-size: 0.9rem;
-            height: 38px;
-        }
-        
-        .form-control::placeholder { 
-            color: var(--placeholder-color) !important; 
-            opacity: 1 !important; 
-        }
-        
-        .form-control:disabled {
-            background-color: rgba(0,0,0,0.05);
-            color: var(--text-muted);
-            cursor: not-allowed;
-            border-color: var(--border-color);
+            padding: 15px;
+            border: 1px solid var(--border);
         }
 
-        .form-control:focus, .form-select:focus {
-            border-color: var(--kipic-green);
-            box-shadow: 0 0 0 3px rgba(111, 174, 39, 0.15);
-        }
-        
-        [dir="rtl"] .form-select { background-position: left 0.75rem center; padding-right: 0.75rem; padding-left: 2.25rem; }
-
-        .btn-calc-custom {
-            background-color: var(--operator-blue);
-            border-color: var(--operator-blue);
-            color: #ffffff;
-            transition: all 0.3s ease;
-            padding-top: 0; padding-bottom: 0;
-            height: 38px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .btn-calc-custom:hover { background-color: #003d73; border-color: #003d73; color: #ffffff; }
-        .btn-calc-custom:disabled {
-            background-color: #6c757d;
-            border-color: #6c757d;
-            cursor: not-allowed;
-            opacity: 0.6;
+        .card-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            color: var(--success);
         }
 
-        /* Warning Alert Style */
-        .range-warning {
-            background-color: var(--alert-bg);
-            color: var(--alert-text);
-            border: 1px solid var(--alert-border);
-            font-size: 0.8rem;
-            padding: 8px 12px;
-            border-radius: 8px;
-            margin-top: 8px;
-            display: none; /* Hidden by default */
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-        }
-
-        /* --- TABLES --- */
-        .table { margin-bottom: 0; border-color: var(--border-color); color: var(--text-main); }
-        .table thead th {
-            background-color: var(--table-head-bg);
-            color: var(--table-head-text);
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            padding: 10px 15px;
-            border-bottom: 2px solid #dee2e6;
-        }
-        [data-theme="dark"] .table thead th { border-bottom-color: #495057; }
-        .table td {
-            background-color: var(--table-row-bg);
-            padding: 8px 15px;
-            vertical-align: middle;
-            border-color: var(--border-color);
-            color: var(--text-main);
+        table {
+            width: 100%;
+            border-collapse: collapse;
             font-size: 0.9rem;
         }
-        .table-hover tbody tr:hover td { background-color: var(--table-stripe); }
-        .group-cell {
-            background-color: var(--table-head-bg) !important;
-            color: var(--kipic-navy);
-            font-weight: 700;
-            border-inline-end: 2px solid var(--border-color);
-        }
-        [data-theme="dark"] .group-cell { color: var(--kipic-green); }
-        .val-display { font-family: 'Roboto Mono', monospace; font-weight: 600; }
-        .unit-small { font-size: 0.8em; color: var(--text-muted); margin-inline-start: 6px; font-weight: 400; }
 
-        /* --- FOOTER & ALERTS --- */
-        .quality-alert {
-            background-color: rgba(255, 193, 7, 0.1);
-            border-inline-start: 4px solid #ffc107;
-            padding: 10px 15px;
-            font-size: 0.8rem;
-            color: var(--text-main);
-            border-top: 1px solid var(--border-color);
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #404040;
         }
-        .quality-alert ul, .footer-notes ul { list-style: none; padding-left: 0; margin: 0; }
+
+        td.value {
+            text-align: right;
+            font-family: 'Consolas', monospace;
+            color: #4fc3f7;
+            font-weight: bold;
+        }
         
-        .site-footer {
-            margin-top: auto;
-            background-color: var(--footer-bg);
-            border-top: 1px solid var(--border-color);
-            padding: 20px 0;
-            font-size: 0.8rem;
+        td.unit {
+            text-align: center;
             color: var(--text-muted);
-        }
-        .footer-notes li { margin-bottom: 8px; padding-inline-start: 15px; position: relative; line-height: 1.5; }
-        .footer-notes li::before { content: "•"; color: var(--kipic-green); font-weight: bold; position: absolute; inset-inline-start: 0; }
-        
-        /* Media Queries */
-        @media (min-width: 769px) {
-            .collapse-icon { display: none !important; }
-            .card-header-custom { cursor: default !important; pointer-events: none; }
-            .collapse { display: block !important; height: auto !important; visibility: visible !important; }
-            .card-header-custom .header-actions { pointer-events: auto; } 
+            width: 50px;
         }
 
-        @media (max-width: 768px) {
-            .main-header { padding: 1rem 1.2rem; }
-            .header-title-main { font-size: 1.3rem; }
-            .header-subtitle { font-size: 0.9rem; }
-            #theme-toggle-btn { display: none !important; }
-            .header-controls { position: static; transform: none; margin-top: 10px; justify-content: center; }
-            .card { margin-bottom: 12px; }
-            .card-body { padding: 0; }
-            .table td, .table th { padding: 8px 10px; font-size: 0.8rem; }
-            .val-display { font-size: 0.85rem; }
-            .card-header-custom { cursor: pointer; padding: 10px 15px; flex-wrap: wrap; gap: 8px; }
-            .card-title-text { font-size: 0.95rem; }
-            .feed-badge { font-size: 0.75rem; padding: 3px 8px; margin-top: 2px; }
-            .header-actions { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 5px; }
-            .collapse-icon { transition: transform 0.3s ease; color: var(--arrow-color); font-size: 1rem; font-weight: bold; display: block; }
-            [dir="ltr"] .collapse-icon { transform: rotate(-90deg); }
-            [dir="rtl"] .collapse-icon { transform: rotate(90deg); }
-            .card-header-custom[aria-expanded="true"] .collapse-icon { transform: rotate(0deg) !important; }
-        }
+        .highlight-row { background-color: rgba(0, 123, 255, 0.1); }
     </style>
 </head>
 <body>
 
-<header class="main-header">
-    <div class="container-fluid p-0">
-        <div class="row align-items-center justify-content-center position-relative">
-            <div class="col-12 text-center">
-                <div class="header-title-main" data-i18n="mainTitle">Crude Distillation Unit</div>
-                <div class="header-subtitle" data-i18n="subTitle">Operational Parameters</div>
-            </div>
-            <div class="header-controls">
-                <button class="icon-btn" id="theme-toggle-btn" onclick="toggleThemeManual()" title="Switch Theme">
-                    <i class="bi bi-sun-fill" id="theme-icon"></i>
-                </button>
-                
-                <div class="lang-switch-container" id="lang-switch" onclick="toggleLanguage()">
-                    <div class="lang-slider"></div>
-                    <span class="lang-option active" id="opt-en">EN</span>
-                    <span class="lang-option" id="opt-ar">AR</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</header>
-
-<div class="container py-4 py-md-5">
-    
-    <div class="card p-3 p-md-4">
-        <div class="row g-3 align-items-end">
-            <div class="col-md-3">
-                <label class="form-label" data-i18n="oilType">Oil Type</label>
-                <select class="form-select" id="oilTypeSelect" onchange="updateModes()"></select>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label" data-i18n="opMode">Operating Mode</label>
-                <select class="form-select" id="modeSelect" onchange="handleModeChange()"></select>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label" data-i18n="inputUnit">Unit</label>
-                <select class="form-select" id="unitSelect" onchange="handleModeChange();">
-                    <option value="KBPD">KBPD</option>
-                    <option value="sm3hr">sm3/h</option>
+<div class="container">
+    <div class="header">
+        <h1>CDU Parameters Dashboard</h1>
+        <div class="controls">
+            <div class="control-group">
+                <label>Select Case / Mode</label>
+                <select id="caseSelect" onchange="updateDashboard()">
+                    <option value="KEC_HD">KEC Max. with Heavy Diesel</option>
+                    <option value="KEC_NoHD">KEC Max. without Heavy Diesel</option>
+                    <option value="KEC_Naphtha">KEC Max. Naphtha Mode</option>
+                    <option value="KSRC">KSRC Base Case</option>
+                    <option value="KMHC">KMHC Base Case</option>
                 </select>
             </div>
-            <div class="col-md-4">
-                <label class="form-label" data-i18n="feedRate">Feed Rate</label>
-                <div class="d-flex flex-column">
-                    <div class="d-flex gap-2 w-100">
-                        <form onsubmit="event.preventDefault(); calculateResults();" class="d-flex gap-2 w-100">
-                            <input type="text" class="form-control" id="feedInput" placeholder="Range..." inputmode="decimal" enterkeyhint="go">
-                            <button type="button" id="calcBtn" class="btn btn-calc-custom px-4" onclick="calculateResults()" data-i18n="calcBtn">
-                                Calculate
-                            </button>
-                        </form>
-                    </div>
-                    <div id="rangeAlert" class="range-warning">
-                        <i class="bi bi-exclamation-circle-fill"></i>
-                        <span id="rangeMsg">Value out of operational range</span>
-                    </div>
-                </div>
+            
+            <div class="control-group">
+                <label>Input Unit</label>
+                <select id="unitSelect" onchange="updateDashboard()">
+                    <option value="KBPD">KBPD</option>
+                    <option value="sm3hr">sm3/hr</option>
+                </select>
             </div>
+
+            <div class="control-group">
+                <label>Feed Rate Input</label>
+                <input type="number" id="feedInput" value="200000" step="100" onchange="updateDashboard()">
+            </div>
+            
+            <button onclick="updateDashboard()">Calculate</button>
         </div>
     </div>
 
-    <div class="row g-3 g-md-4" id="results-row" style="display: none;">
-        
-        <div class="col-lg-6">
-            <div class="card h-100">
-                <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseParams" aria-expanded="false">
-                    <h5 class="card-title-text">
-                        <i class="bi bi-speedometer2"></i>
-                        <span data-i18n="opParams">Operational Parameters</span>
-                    </h5>
-                    <div class="header-actions">
-                        <div id="feed-display-badge" class="feed-badge">--</div>
-                        <i class="bi bi-chevron-down collapse-icon"></i>
-                    </div>
-                </div>
-                <div id="collapseParams" class="collapse">
-                    <div class="card-body p-0 table-responsive">
-                        <table class="table table-hover table-sm">
-                            <thead>
-                                <tr>
-                                    <th data-i18n="paramName">Parameter Name</th>
-                                    <th class="text-end" data-i18n="value">Value</th>
-                                </tr>
-                            </thead>
-                            <tbody id="params-body"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+    <div class="dashboard-grid">
+        <div class="card">
+            <div class="card-title">Operating Parameters</div>
+            <table id="mainParamsTable">
+                </table>
         </div>
 
-        <div class="col-lg-6">
-            
-            <div class="card mb-3 mb-md-4">
-                <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseYields" aria-expanded="false">
-                    <div class="header-actions d-flex w-100 justify-content-between align-items-center">
-                         <h5 class="card-title-text">
-                            <i class="bi bi-graph-up-arrow"></i>
-                            <span data-i18n="prodYields">Production Yields</span>
-                        </h5>
-                        <i class="bi bi-chevron-down collapse-icon"></i>
-                    </div>
-                </div>
-                <div id="collapseYields" class="collapse">
-                    <div class="card-body p-0">
-                        <table class="table table-sm mb-0">
-                            <thead>
-                                <tr>
-                                    <th data-i18n="product">Product</th>
-                                    <th class="text-end">Flow (sm3/h)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="yields-body"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+        <div class="card">
+            <div class="card-title">Temperatures & Pressures</div>
+            <table id="tempPressTable">
+                </table>
+        </div>
 
-            <div class="card mb-0">
-                <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseQuality" aria-expanded="false">
-                    <div class="header-actions d-flex w-100 justify-content-between align-items-center">
-                        <h5 class="card-title-text">
-                            <i class="bi bi-clipboard-check"></i>
-                            <span data-i18n="prodQuality">Quality Specifications</span>
-                        </h5>
-                        <i class="bi bi-chevron-down collapse-icon"></i>
-                    </div>
-                </div>
-                <div id="collapseQuality" class="collapse">
-                    <div class="card-body p-0 table-responsive">
-                        <table class="table table-sm mb-0">
-                            <thead>
-                                <tr>
-                                    <th data-i18n="stream">Stream</th>
-                                    <th data-i18n="property">Property</th>
-                                    <th class="text-end" data-i18n="limit">Limit/Value</th>
-                                </tr>
-                            </thead>
-                            <tbody id="quality-body"></tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="quality-alert" id="quality-notes-area" style="display: none;">
-                        <ul id="quality-notes-list"></ul>
-                    </div>
-                </div>
-            </div>
-
+        <div class="card">
+            <div class="card-title">Product Yields</div>
+            <table id="yieldsTable">
+                </table>
+        </div>
+        
+         <div class="card">
+            <div class="card-title">Product Quality</div>
+            <table id="qualityTable">
+                </table>
         </div>
     </div>
 </div>
 
-<footer class="site-footer">
-    <div class="container">
-        <h6 class="fw-bold mb-3 text-uppercase" style="color: var(--text-main);">
-            <i class="bi bi-info-circle-fill me-2"></i><span data-i18n="notesTitle">General Notes & Guidelines</span>
-        </h6>
-        <div class="footer-notes">
-            <ul id="footer-static-notes">
-                <li data-i18n="note1"></li>
-                <li data-i18n="note2"></li>
-                <li data-i18n="note3"></li>
-            </ul>
-        </div>
-    </div>
-</footer>
-
 <script>
-    // --- HELPER: Parse English or Arabic Numerals ---
-    function parseLocaleNumber(stringNumber) {
-        if (!stringNumber) return NaN;
-        stringNumber = stringNumber.toString();
-        var englishDigits = stringNumber
-            .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
-        return parseFloat(englishDigits);
+/**
+ * DATA STORE - Extracted EXACTLY from uploaded CSVs.
+ * Each array corresponds to the columns in the CSV.
+ * Order matches the Feed array.
+ */
+const DB = {
+    "KEC_HD": {
+        // Headers: 205k, 200k, 175k, 155k, 130k, 105k
+        "Feed_KBPD": [205000, 200000, 175000, 155000, 130000, 105000],
+        "Feed_SM3":  [1341.951991, 1321.033948, 1159.377848, 1031.274637, 851.621826, 696.440801],
+        "params": {
+            "Slops (sm3/hr)": [36.106372, 33.015007, 29.540891, 41.127942, 3.253879, 0],
+            "Wild Naphtha (sm3/hr)": [10.001416, 9.099249, 26.766919, 10.242188, 6.601427, 9.962496],
+            "Heater Feed Rate (sm3/hr)": [1230.000083, 1220.001341, 1055.923089, 969.972893, 804.682980, 659.995091],
+            "Washwater V02 (%)": [50.227652, 53.000019, 45.468433, 41.074638, 33.999966, 26.999822],
+            "Washwater E01 (%)": [16.743041, 17.999916, 14.992113, 13.537255, 11.999146, 9.000259],
+            "V-0001 Inlet Temp (°C)": [149.302138, 148.769760, 150.036856, 147.989337, 148.781775, 147.323743],
+            "Heater Outlet Temp (°C)": [370.996430, 370.827385, 370.929720, 370.961264, 370.329332, 370.990526],
+            "Column Top Temp (°C)": [111.997859, 111.999515, 111.998582, 111.003529, 111.007182, 111.002178],
+            "Top Pump Around Flow (sm3/hr)": [1620.595920, 1549.988153, 1385.006041, 1359.997501, 1159.984360, 1169.999338],
+            "Middle Pump Around Flow (sm3/hr)": [1185.990901, 1123.998158, 1015.005063, 890.001767, 765.592522, 685.003191],
+            "Bottom Pump Around Flow (sm3/hr)": [899.998943, 1001.995621, 775.002137, 780.001867, 700.005222, 540.996098],
+            "Column Bottom Temp (°C)": [347.594398, 348.524915, 345.416373, 347.388624, 344.039343, 341.862458],
+            "Kerosene Draw Temp (°C)": [178.345232, 176.073399, 178.743471, 176.292065, 176.823983, 178.843127],
+            "Light Diesel Draw Temp (°C)": [263.995408, 261.892199, 265.781791, 261.127767, 259.209522, 259.498573],
+            "Heavy Diesel Draw Temp (°C)": [318.315950, 319.896708, 317.311468, 315.846909, 309.935974, 309.644428],
+            "Overflash Flow (sm3/hr)": [112.534613, 84.297085, 108.441318, 83.480187, 75.153248, 72.742261],
+            "Stripping Steam Crude (kg/hr)": [22500.00681, 21997.97298, 20500.00752, 17499.93900, 15374.18660, 15500.07968],
+            "Stripping Steam Lt Dsl (kg/hr)": [1199.998023, 2150.015468, 1092.001106, 1450.004393, 1209.127726, 999.992125],
+            "Stripping Steam Hy Dsl (kg/hr)": [350.000781, 449.999825, 300.000070, 299.998833, 299.997682, 300.005886],
+            "LPG Yield (sm3/hr)": [15.947474, 17.298028, 13.077076, 14.602799, 15.209619, 12.659119],
+            "Naphtha Yield (sm3/hr)": [265.677473, 258.468001, 214.393525, 193.099725, 142.734633, 107.830417],
+            "Kerosene Yield (sm3/hr)": [240.600844, 240.853982, 204.836227, 182.649030, 128.097892, 111.528736],
+            "Lt Diesel Yield (sm3/hr)": [199.046858, 200.494803, 185.356238, 161.409235, 134.923256, 104.804903],
+            "Hy Diesel Yield (sm3/hr)": [55.000065, 67.000061, 19.999953, 29.999795, 19.999647, 25.000539],
+            "AR Yield (sm3/hr)": [618.384680, 601.209910, 541.306900, 500.192468, 443.915024, 358.720975],
+            "Desalted Crude Salt (HEM)": [0.8, 0.5, 0.68, 0.55, 0.45, 0.6],
+            "Desalted Crude BS&W": [1.4, 1, 0.7, 0.6, 0.5, 0.5]
+        }
+    },
+    "KEC_NoHD": {
+        // Headers: 200k, 195k, 180k, 160k, 150k, 120k, 105k
+        "Feed_KBPD": [200000, 195000, 180000, 160000, 150000, 120000, 105000],
+        "Feed_SM3":  [1326.665770, 1300.330711, 1203.853597, 1060.675869, 979.945902, 789.698034, 689.369306],
+        "params": {
+            "Slops (sm3/hr)": [48.770918, 25.815910, 3.369333, 34.193014, 24.563925, -0.000034, 0],
+            "Wild Naphtha (sm3/hr)": [0, 6.994196, 29.999339, 8.176711, 0, 27.788769, 11.949116],
+            "Heater Feed Rate (sm3/hr)": [1220.015141, 1200.050845, 1080.752131, 960.000343, 897.706573, 673.760775, 660.007333],
+            "Washwater V02 (%)": [49.617067, 51.998990, 44.600203, 45.500153, 37.066188, 31.500001, 27.000130],
+            "Washwater E01 (%)": [16.484832, 20.000046, 14.879918, 14.499957, 12.354265, 10.499899, 9.000030],
+            "V-0001 Inlet Temp (°C)": [146.665188, 150.847228, 150.296401, 150.579288, 149.567070, 149.586517, 147.525039],
+            "Heater Outlet Temp (°C)": [371.014224, 368.614128, 370.984514, 370.989238, 370.969086, 367.967278, 370.999405],
+            "Column Top Temp (°C)": [110.999493, 111.064275, 111.994962, 110.001584, 112.006682, 112.372707, 111.004945],
+            "Top Pump Around Flow (sm3/hr)": [1669.997348, 1345.207320, 1430.676293, 1390.934046, 1191.471068, 1058.259181, 1169.998537],
+            "Middle Pump Around Flow (sm3/hr)": [1179.996850, 1245.006896, 1039.967719, 891.921102, 869.929079, 797.894907, 682.475838],
+            "Bottom Pump Around Flow (sm3/hr)": [965.250684, 1044.785903, 790.002041, 769.827005, 665.708445, 619.851047, 540.532563],
+            "Column Bottom Temp (°C)": [344.147505, 341.408622, 344.405668, 342.606878, 344.537056, 339.186472, 336.106998],
+            "Kerosene Draw Temp (°C)": [175.944510, 176.413905, 174.759358, 174.546043, 179.063797, 173.149789, 179.142053],
+            "Light Diesel Draw Temp (°C)": [264.793613, 268.831874, 264.291523, 262.167494, 265.945805, 259.855820, 260.615236],
+            "Heavy Diesel Draw Temp (°C)": [24.478103, 43.450284, 53.254840, 48.610318, 32.793678, 44.222756, 22.258982],
+            "Overflash Flow (sm3/hr)": [33.402631, 0.051297, 151.870660, 126.486954, 85.359962, 67.733986, 86.904739],
+            "Stripping Steam Crude (kg/hr)": [23893.36317, 23944.07031, 19996.91552, 20522.97428, 17341.41886, 14314.21937, 15248.32316],
+            "Stripping Steam Lt Dsl (kg/hr)": [1299.999724, 2300.010083, 1099.999757, 1199.996982, 941.246794, 2035.484927, 1000.003069],
+            "Stripping Steam Hy Dsl (kg/hr)": [26.980369, 104.927043, -12.5, -12.5, 82.855854, 127.904122, 35.043547],
+            "LPG Yield (sm3/hr)": [17.887519, 2.022554, 12.637458, 11.607528, 12.487324, 0.805911, 12.540890],
+            "Naphtha Yield (sm3/hr)": [267.374981, 224.874870, 234.723972, 186.989147, 183.037636, 137.916538, 111.686369],
+            "Kerosene Yield (sm3/hr)": [242.992334, 228.087809, 204.410033, 166.528148, 168.541565, 103.649302, 110.894654],
+            "Lt Diesel Yield (sm3/hr)": [207.755144, 198.113320, 195.029307, 174.241976, 157.885787, 133.730979, 110.301087],
+            "Hy Diesel Yield (sm3/hr)": [0, 0, 0, 0, 0, 0, 0],
+            "AR Yield (sm3/hr)": [651.603972, 679.761030, 577.646316, 541.286012, 479.130860, 390.099116, 376.705517],
+            "Desalted Crude Salt (HEM)": [0.65, 0.6, 0.6, 0.7, 1, 0.6, 0.6],
+            "Desalted Crude BS&W": [1.3, 0.6, 0.8, 0.7, 0.55, 0.5, 0.5]
+        }
+    },
+    "KEC_Naphtha": {
+        "Feed_KBPD": [205000],
+        "Feed_SM3": [1367.703151],
+        "params": {
+            "Slops (sm3/hr)": [10.614249],
+            "Wild Naphtha (sm3/hr)": [20.393633],
+            "Heater Feed Rate (sm3/hr)": [1200.022677],
+            "Washwater V02 (%)": [53.500179],
+            "Washwater E01 (%)": [17.799735],
+            "V-0001 Inlet Temp (°C)": [149.995921],
+            "Heater Outlet Temp (°C)": [371.020905],
+            "Column Top Temp (°C)": [115.074789],
+            "Top Pump Around Flow (sm3/hr)": [1621.018401],
+            "Middle Pump Around Flow (sm3/hr)": [1260.993308],
+            "Bottom Pump Around Flow (sm3/hr)": [900.985698],
+            "Column Bottom Temp (°C)": [343.486954],
+            "Kerosene Draw Temp (°C)": [177.223190],
+            "Light Diesel Draw Temp (°C)": [269.625598],
+            "Heavy Diesel Draw Temp (°C)": [65.624719],
+            "Overflash Flow (sm3/hr)": [99.171286],
+            "Stripping Steam Crude (kg/hr)": [24500.05986],
+            "Stripping Steam Lt Dsl (kg/hr)": [930.011236],
+            "Stripping Steam Hy Dsl (kg/hr)": [0],
+            "LPG Yield (sm3/hr)": [10.288969],
+            "Naphtha Yield (sm3/hr)": [248.520862],
+            "Kerosene Yield (sm3/hr)": [226.914996],
+            "Lt Diesel Yield (sm3/hr)": [222.002610],
+            "Hy Diesel Yield (sm3/hr)": [0],
+            "AR Yield (sm3/hr)": [653.560812],
+            "Desalted Crude Salt (HEM)": [0.7],
+            "Desalted Crude BS&W": [1]
+        }
+    },
+    "KSRC": {
+        "Feed_KBPD": [120000],
+        "Feed_SM3": [809.863103],
+        "params": {
+            "Slops (sm3/hr)": [7.521918],
+            "Wild Naphtha (sm3/hr)": [3.579922],
+            "Heater Feed Rate (sm3/hr)": [949.973276],
+            "Washwater V02 (%)": [72.000312],
+            "Washwater E01 (%)": [24.000058],
+            "V-0001 Inlet Temp (°C)": [149.692527],
+            "Heater Outlet Temp (°C)": [369.997150],
+            "Column Top Temp (°C)": [112.989089],
+            "Top Pump Around Flow (sm3/hr)": [1270.001067],
+            "Middle Pump Around Flow (sm3/hr)": [861.819298],
+            "Bottom Pump Around Flow (sm3/hr)": [532.311104],
+            "Column Bottom Temp (°C)": [348.056451],
+            "Kerosene Draw Temp (°C)": [188.511539],
+            "Light Diesel Draw Temp (°C)": [261.719373],
+            "Heavy Diesel Draw Temp (°C)": [25.061364],
+            "Overflash Flow (sm3/hr)": [61.646291],
+            "Stripping Steam Crude (kg/hr)": [9649.90263],
+            "Stripping Steam Lt Dsl (kg/hr)": [2500.002529],
+            "Stripping Steam Hy Dsl (kg/hr)": [109.079161],
+            "LPG Yield (sm3/hr)": [-0.037783],
+            "Naphtha Yield (sm3/hr)": [128.037217],
+            "Kerosene Yield (sm3/hr)": [46.745708],
+            "Lt Diesel Yield (sm3/hr)": [142.979582],
+            "Hy Diesel Yield (sm3/hr)": [0],
+            "AR Yield (sm3/hr)": [532.775482],
+            "Desalted Crude Salt (HEM)": [0.4],
+            "Desalted Crude BS&W": [0.7]
+        }
+    },
+    "KMHC": {
+        "Feed_KBPD": [200000, 120000],
+        "Feed_SM3": [1312.020979, 810.733411],
+        "params": {
+            "Slops (sm3/hr)": [24.850349, 0],
+            "Wild Naphtha (sm3/hr)": [1.725803, 3.137898],
+            "Heater Feed Rate (sm3/hr)": [1199.929299, 734.770115],
+            "Washwater V02 (%)": [51.999320, 51.178091],
+            "Washwater E01 (%)": [19.999990, 17.059160],
+            "V-0001 Inlet Temp (°C)": [150.884693, 144.685066],
+            "Heater Outlet Temp (°C)": [369.097458, 370.332906],
+            "Column Top Temp (°C)": [111.672249, 112.423154],
+            "Top Pump Around Flow (sm3/hr)": [1339.418869, 1269.554105],
+            "Middle Pump Around Flow (sm3/hr)": [1242.739371, 623.277421],
+            "Bottom Pump Around Flow (sm3/hr)": [1037.706358, 547.622083],
+            "Column Bottom Temp (°C)": [341.987645, 347.716296],
+            "Kerosene Draw Temp (°C)": [177.004133, 178.676232],
+            "Light Diesel Draw Temp (°C)": [269.210917, 259.177570],
+            "Heavy Diesel Draw Temp (°C)": [42.920285, 22.597720],
+            "Overflash Flow (sm3/hr)": [0.159672, 97.306475],
+            "Stripping Steam Crude (kg/hr)": [23972.13801, 15123.41389],
+            "Stripping Steam Lt Dsl (kg/hr)": [2340.485514, 1775.675436],
+            "Stripping Steam Hy Dsl (kg/hr)": [107.976042, 108.444705],
+            "LPG Yield (sm3/hr)": [3.111010, 3.561126],
+            "Naphtha Yield (sm3/hr)": [222.702894, 130.035674],
+            "Kerosene Yield (sm3/hr)": [224.611557, 105.778024],
+            "Lt Diesel Yield (sm3/hr)": [197.625965, 128.290127],
+            "Hy Diesel Yield (sm3/hr)": [0, 0],
+            "AR Yield (sm3/hr)": [680.007124, 424.495410],
+            "Desalted Crude Salt (HEM)": [0.6, 1.1],
+            "Desalted Crude BS&W": [0.6, 1]
+        }
+    }
+};
+
+/**
+ * Main Calculation Function
+ */
+function updateDashboard() {
+    const caseType = document.getElementById('caseSelect').value;
+    const unitType = document.getElementById('unitSelect').value;
+    let inputFeed = parseFloat(document.getElementById('feedInput').value);
+
+    const data = DB[caseType];
+    const feedsKBPD = data.Feed_KBPD;
+    const feedsSM3 = data.Feed_SM3;
+
+    let targetFeed = inputFeed;
+    let refArray = [];
+    let otherArray = [];
+    
+    // Determine which array to use for search based on unit
+    if (unitType === 'KBPD') {
+        refArray = feedsKBPD;
+        otherArray = feedsSM3;
+    } else {
+        refArray = feedsSM3;
+        otherArray = feedsKBPD;
     }
 
-    // --- DATA STRUCTURE (STRICTLY MAPPED FROM CSV FILES) ---
-    const DB = {
-        "KEC": {
-            "Max Kero (with Heavy Diesel)": {
-                feedsKBPD: [205, 200, 175, 155, 130, 105],
-                feedsSM3: [1342, 1321, 1159.4, 1031.3, 851.6, 696.4],
-                params: {
-                    "Slops": {u: "sm3/h", v: [36.0, 33.0, 29.5, 41.1, 3.3, 0.0]},
-                    "Wild Naphtha": {u: "sm3/h", v: [10.0, 9.1, 26.8, 10.2, 6.6, 10.0]},
-                    "Heater Feed Rate": {u: "sm3/h", v: [1230.0, 1220.0, 1055.9, 970.0, 804.7, 660.0]},
-                    "Washwater to Desalter V02": {u: "sm3/h", v: [50.2, 53.0, 45.5, 41.1, 34.0, 27.0]},
-                    "Washwater to E01": {u: "sm3/h", v: [16.7, 18.0, 15.0, 13.5, 12.0, 9.0]},
-                    "V-0001 Inlet Temperature": {u: "°C", v: [149.3, 148.8, 150.0, 148.0, 148.8, 147.3]},
-                    "V-0002 Inlet Temperature": {u: "°C", v: [148.4, 147.9, 149.2, 147.1, 147.9, 146.4]},
-                    "E-10 Outlet Temperature": {u: "°C", v: [199.9, 201.9, 200.1, 198.2, 199.6, 202.7]},
-                    "Heater Outlet Temperature": {u: "°C", v: [371.0, 370.8, 370.9, 371.0, 370.3, 371.0]},
-                    "Column Top Temperature": {u: "°C", v: [112.0, 112.0, 112.0, 111.0, 111.0, 111.0]},
-                    "Top Column Pressure": {u: "barg", v: [1.03, 1.03, 1.03, 1.02, 1.03, 1.0]},
-                    "Top Pump Around Flow": {u: "sm3/h", v: [1620.6, 1550.0, 1385.0, 1360.0, 1160.0, 1170.0]},
-                    "Top Pump Around Draw Temperature": {u: "°C", v: [126.9, 126.3, 127.6, 125.9, 127.4, 126.9]},
-                    "Top Pump Around Return Temperature": {u: "°C", v: [103.2, 105.1, 104.8, 105.1, 106.5, 106.8]},
-                    "Middle Pump Around Flow": {u: "sm3/h", v: [1186.0, 1124.0, 1015.0, 890.0, 765.6, 685.0]},
-                    "Middle Pump Around Draw Temperature": {u: "°C", v: [219.0, 215.9, 216.8, 213.5, 208.1, 208.1]},
-                    "Middle Pump Around Return Temperature": {u: "°C", v: [164.6, 158.3, 163.9, 157.6, 154.2, 160.4]},
-                    "Bottom Pump Around Flow": {u: "sm3/h", v: [900.0, 1002.0, 775.0, 780.0, 700.0, 541.0]},
-                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [291.1, 291.3, 295.6, 292.1, 287.3, 286.9]},
-                    "Bottom Pump Around Return Temperature": {u: "°C", v: [243.9, 246.2, 249.1, 248.3, 248.5, 246.2]},
-                    "Column Bottom Temperature": {u: "°C", v: [347.6, 348.5, 345.4, 347.4, 344.0, 341.9]},
-                    "Kerosene Draw Temperature": {u: "°C", v: [178.3, 176.1, 178.7, 176.3, 176.8, 178.8]},
-                    "Kerosene Reboiler Temperature": {u: "°C", v: [215.6, 215.5, 215.3, 216.0, 217.4, 218.3]},
-                    "Light Diesel Draw Temperature": {u: "°C", v: [264.0, 261.9, 265.8, 261.1, 259.2, 259.5]},
-                    "Heavy Diesel Draw Temperature": {u: "°C", v: [318.3, 319.9, 317.3, 315.8, 309.9, 309.6]},
-                    "Overflash Flow": {u: "sm3/h", v: [112.5, 84.3, 108.4, 83.5, 75.2, 72.7]},
-                    "Stripping Steam Temperature": {u: "°C", v: [274.9, 284.9, 289.9, 289.7, 283.6, 274.2]},
-                    "Stripping Steam (Crude)": {u: "kg/hr", v: [22500.0, 21998.0, 20500.0, 17500.0, 15374.0, 15500.0]},
-                    "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [1300.0, 2300.0, 1100.0, 1200.0, 941.0, 2035.0]},
-                    "Stripping Steam (Heavy Diesel)": {u: "kg/hr", v: [350.0, 450.0, 300.0, 300.0, 300.0, 300.0]},
-                    "Stabilizer Feed Temperature": {u: "°C", v: [101.9, 103.9, 102.5, 105.6, 108.1, 110.3]},
-                    "Stabilizer Reboiler Inlet Temperature": {u: "°C", v: [147.1, 147.8, 149.3, 150.7, 153.3, 155.5]},
-                    "Stabilizer Reboiler Outlet Temperature": {u: "°C", v: [159.9, 158.4, 159.1, 158.1, 159.1, 159.9]},
-                    "Stabilizer Reflux Flow": {u: "sm3/h", v: [34.9, 29.7, 31.5, 25.8, 21.1, 21.0]},
-                    "Bottom Pump Around to Reboiler Inlet": {u: "°C", v: [235.0, 218.5, 227.3, 220.6, 217.7, 216.5]},
-                    "Bottom Pump Around to Reboiler Flow": {u: "sm3/h", v: [900.0, 1002.0, 775.0, 780.0, 700.0, 541.0]},
-                    "AR Product Temperature": {u: "°C", v: [170.0, 164.2, 170.3, 161.3, 166.1, 156.6]}
-                },
-                yields: {
-                    "LPG": [15.9, 17.3, 13.1, 14.6, 15.2, 12.7],
-                    "Naphtha": [265.7, 258.5, 214.4, 193.1, 142.7, 107.8],
-                    "Kerosene": [240.6, 240.9, 204.8, 182.6, 128.1, 111.5],
-                    "Light Diesel": [199.0, 200.5, 185.4, 161.4, 134.9, 104.8],
-                    "Heavy Diesel": [55.0, 67.0, 20.0, 30.0, 20.0, 25.0],
-                    "Atmospheric Residue (AR)": [618.4, 601.2, 541.3, 500.2, 443.9, 358.7]
-                },
-                quality: {
-                    "Desalted Crude": { "Salt HEM": {u: "PTB", v: [0.8, 0.5, 0.68, 0.55, 0.45, 0.6]}, "BS&W": {u: "%", v: [1.4, 1.0, 0.7, 0.6, 0.5, 0.5]} },
-                    "Desalter Effluent": { "pH": {u: "pH", v: [5.0, 7.6, 6.0, 5.8, 7.0, 5.5]} },
-                    "SSW": { "pH": {u: "pH", v: [8.5, 9.0, 9.57, 8.7, 9.0, 7.8]} },
-                    "Naphtha": { "RVP": {u: "psi", v: [8.8, 9.1, 8.35, 8.9, 8.76, 8.8]}, "T95": {u: "°C", v: [141.0, 140.0, 143.0, 139.0, 143.0, 143.0]} },
-                    "Kerosene": { "Freeze Point": {u: "°C", v: [-48.0, -51.0, -50.0, -51.0, -54.0, -52.0]}, "T95": {u: "°C", v: [245.0, 240.0, 245.0, 239.0, 232.0, 237.0]} },
-                    "Diesel": { "T95": {u: "°C", v: [348.0, 356.0, 339.0, 340.0, 320.0, 324.0]}, "Cloud Point": {u: "°C", v: [-2.0, -1.0, -6.0, -5.5, -12.0, -9.0]} },
-                    "AR": { "API": {u: "API", v: [13.0, 13.0, 12.6, 12.9, 12.5, 13.0]}, "Sulfur": {u: "wt%", v: [5.0, 4.59, 4.5, 4.6, 4.5, 4.4]} }
-                }
-            },
-            "Max Kero (No Heavy Diesel)": {
-                feedsKBPD: [200, 195, 180, 160, 150, 120, 105],
-                feedsSM3: [1326.7, 1300.3, 1203.9, 1060.7, 979.9, 789.7, 689.4],
-                params: {
-                    "Slops": {u: "sm3/h", v: [48.8, 25.8, 3.4, 34.2, 24.6, 0.0, 0.0]},
-                    "Wild Naphtha": {u: "sm3/h", v: [0.0, 7.0, 30.0, 8.2, 0.0, 27.8, 11.9]},
-                    "Heater Feed Rate": {u: "sm3/h", v: [1220.0, 1200.1, 1080.8, 960.0, 897.7, 673.8, 660.0]},
-                    "Washwater to Desalter V02": {u: "sm3/h", v: [49.6, 52.0, 44.6, 45.5, 37.1, 31.5, 27.0]},
-                    "Washwater to E01": {u: "sm3/h", v: [16.5, 20.0, 14.9, 14.5, 12.4, 10.5, 9.0]},
-                    "V-0001 Inlet Temperature": {u: "°C", v: [146.7, 150.8, 150.3, 150.6, 149.6, 149.6, 147.5]},
-                    "V-0002 Inlet Temperature": {u: "°C", v: [145.8, 150.2, 149.4, 149.5, 148.6, 148.6, 146.6]},
-                    "E-10 Outlet Temperature": {u: "°C", v: [200.0, 207.3, 194.0, 25.9, 194.8, 206.2, 201.9]},
-                    "Heater Outlet Temperature": {u: "°C", v: [371.0, 368.6, 371.0, 371.0, 371.0, 368.0, 371.0]},
-                    "Column Top Temperature": {u: "°C", v: [111.0, 111.1, 112.0, 110.0, 112.0, 112.4, 111.0]},
-                    "Top Column Pressure": {u: "barg", v: [1.03, 1.04, 1.03, 1.03, 1.03, 0.97, 1.0]},
-                    "Top Pump Around Flow": {u: "sm3/h", v: [1670.0, 1345.0, 1430.0, 1391.0, 1191.0, 1058.0, 1170.0]},
-                    "Top Pump Around Draw Temperature": {u: "°C", v: [125.1, 127.0, 126.6, 125.6, 129.4, 124.3, 126.9]},
-                    "Top Pump Around Return Temperature": {u: "°C", v: [104.4, 106.4, 101.1, 107.4, 104.4, 103.1, 107.6]},
-                    "Middle Pump Around Flow": {u: "sm3/h", v: [1180.0, 1245.0, 1040.0, 892.0, 870.0, 798.0, 682.0]},
-                    "Middle Pump Around Draw Temperature": {u: "°C", v: [216.8, 227.2, 216.0, 214.2, 217.4, 205.6, 208.2]},
-                    "Middle Pump Around Return Temperature": {u: "°C", v: [157.1, 157.1, 167.0, 167.4, 165.9, 162.6, 157.9]},
-                    "Bottom Pump Around Flow": {u: "sm3/h", v: [965.0, 1045.0, 790.0, 770.0, 666.0, 620.0, 540.0]},
-                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [290.8, 290.0, 297.0, 293.9, 295.8, 287.7, 287.6]},
-                    "Bottom Pump Around Return Temperature": {u: "°C", v: [246.1, 263.3, 250.9, 250.4, 251.5, 258.1, 245.8]},
-                    "Column Bottom Temperature": {u: "°C", v: [344.1, 341.4, 344.4, 342.6, 344.5, 339.2, 336.1]},
-                    "Kerosene Draw Temperature": {u: "°C", v: [175.9, 176.4, 174.8, 174.5, 179.1, 173.1, 179.1]},
-                    "Kerosene Reboiler Temperature": {u: "°C", v: [215.0, 217.6, 213.9, 215.5, 215.8, 217.6, 217.2]},
-                    "Light Diesel Draw Temperature": {u: "°C", v: [264.8, 268.8, 264.3, 262.2, 265.9, 259.9, 260.6]},
-                    "Heavy Diesel Draw Temperature": {u: "°C", v: [24.5, 43.5, 53.3, 48.6, 32.8, 44.2, 22.3]},
-                    "Overflash Flow": {u: "sm3/h", v: [33.4, 0.05, 151.9, 126.5, 85.4, 67.7, 86.9]},
-                    "Stripping Steam Temperature": {u: "°C", v: [274.9, 267.8, 287.5, 279.6, 281.4, 265.1, 273.3]},
-                    "Stripping Steam (Crude)": {u: "kg/hr", v: [23893.0, 23944.0, 19997.0, 20523.0, 17341.0, 14314.0, 15248.0]},
-                    "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [1300.0, 2300.0, 1100.0, 1200.0, 941.0, 2035.0, 1000.0]},
-                    "Stripping Steam (Heavy Diesel)": {u: "kg/hr", v: [27.0, 105.0, -12.5, -12.5, 83.0, 128.0, 35.0]},
-                    "Stabilizer Feed Temperature": {u: "°C", v: [104.5, 111.6, 117.8, 115.0, 106.4, 128.4, 110.5]},
-                    "Stabilizer Reboiler Inlet Temperature": {u: "°C", v: [147.5, 154.2, 150.2, 151.0, 151.1, 161.6, 155.7]},
-                    "Stabilizer Reboiler Outlet Temperature": {u: "°C", v: [159.3, 215.3, 159.7, 158.6, 157.9, 166.4, 160.1]},
-                    "Stabilizer Reflux Flow": {u: "sm3/h", v: [29.5, 13.1, 36.5, 27.2, 23.0, 15.7, 22.1]},
-                    "Bottom Pump Around to Reboiler Inlet": {u: "°C", v: [227.9, 263.8, 209.2, 206.5, 226.4, 199.8, 216.0]},
-                    "Bottom Pump Around to Reboiler Flow": {u: "sm3/h", v: [965.0, 569.0, 440.0, 369.0, 666.0, 462.0, 541.0]},
-                    "AR Product Temperature": {u: "°C", v: [168.3, 170.0, 176.4, 157.0, 170.0, 169.3, 155.9]}
-                },
-                yields: {
-                    "LPG": [17.9, 2.0, 12.6, 11.6, 12.5, 0.8, 12.5],
-                    "Naphtha": [267.4, 224.9, 234.7, 187.0, 183.0, 137.9, 111.7],
-                    "Kerosene": [243.0, 228.1, 204.4, 166.5, 168.5, 103.6, 110.9],
-                    "Light Diesel": [207.8, 198.1, 195.0, 174.2, 157.9, 133.7, 110.3],
-                    "Heavy Diesel": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
-                    "Atmospheric Residue (AR)": [651.6, 679.8, 577.6, 541.3, 479.1, 390.1, 376.7]
-                },
-                quality: {
-                    "Desalted Crude": { "Salt HEM": {u: "PTB", v: [0.65, 0.6, 0.6, 0.7, 1.0, 0.6, 0.6]}, "BS&W": {u: "%", v: [1.3, 0.6, 0.8, 0.7, 0.55, 0.5, 0.5]} },
-                    "Desalter Effluent": { "pH": {u: "pH", v: [5.0, 7.6, 6.0, 5.8, 7.0, 5.5]} },
-                    "SSW": { "pH": {u: "pH", v: [8.5, 8.0, 8.1, 9.0, 9.4, 8.5, 7.5]} },
-                    "Naphtha": { "RVP": {u: "psi", v: [9.16, 9.1, 8.9, 8.45, 8.51, 8.0, 8.65]}, "T95": {u: "°C", v: [143.0, 147.0, 144.0, 142.0, 140.0, 145.0, 143.0]} },
-                    "Kerosene": { "Freeze Point": {u: "°C", v: [-48.0, -49.0, -48.0, -52.0, -51.0, -56.0, -52.0]}, "T95": {u: "°C", v: [245.0, 252.0, 247.0, 240.0, 245.0, 231.0, 238.0]} },
-                    "Diesel": { "T95": {u: "°C", v: [331.0, 325.0, 334.0, 327.0, 336.0, 324.0, 311.0]}, "Cloud Point": {u: "°C", v: [-6.0, -9.0, -6.0, -9.0, -6.0, -11.0, -13.0]} },
-                    "AR": { "API": {u: "API", v: [12.6, 13.1, 12.9, 13.0, 12.9, 13.0, 14.0]}, "Sulfur": {u: "wt%", v: [4.6, 4.4, 4.66, 4.8, 4.4, 4.3, 4.38]} }
-                }
-            },
-            "Max Naphtha Mode": {
-                feedsKBPD: [205],
-                feedsSM3: [1341.9],
-                params: {
-                    "Slops": {u: "sm3/h", v: [36.0]},
-                    "Wild Naphtha": {u: "sm3/h", v: [10.0]},
-                    "Heater Feed Rate": {u: "sm3/h", v: [1230.0]},
-                    "Washwater to Desalter V02": {u: "sm3/h", v: [50.2]},
-                    "Washwater to E01": {u: "sm3/h", v: [16.7]},
-                    "V-0001 Inlet Temperature": {u: "°C", v: [149.3]},
-                    "V-0002 Inlet Temperature": {u: "°C", v: [148.4]},
-                    "E-10 Outlet Temperature": {u: "°C", v: [199.9]},
-                    "Heater Outlet Temperature": {u: "°C", v: [371.0]},
-                    "Column Top Temperature": {u: "°C", v: [115.1]},
-                    "Top Column Pressure": {u: "barg", v: [1.00]},
-                    "Top Pump Around Flow": {u: "sm3/h", v: [1621.0]},
-                    "Top Pump Around Draw Temperature": {u: "°C", v: [126.9]},
-                    "Top Pump Around Return Temperature": {u: "°C", v: [103.2]},
-                    "Middle Pump Around Flow": {u: "sm3/h", v: [1261.0]},
-                    "Middle Pump Around Draw Temperature": {u: "°C", v: [219.0]},
-                    "Middle Pump Around Return Temperature": {u: "°C", v: [164.6]},
-                    "Bottom Pump Around Flow": {u: "sm3/h", v: [901.0]},
-                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [291.1]},
-                    "Bottom Pump Around Return Temperature": {u: "°C", v: [243.9]},
-                    "Column Bottom Temperature": {u: "°C", v: [343.5]},
-                    "Kerosene Draw Temperature": {u: "°C", v: [177.2]},
-                    "Kerosene Reboiler Temperature": {u: "°C", v: [215.6]},
-                    "Light Diesel Draw Temperature": {u: "°C", v: [264.0]},
-                    "Heavy Diesel Draw Temperature": {u: "°C", v: [318.3]},
-                    "Overflash Flow": {u: "sm3/h", v: [112.5]},
-                    "Stripping Steam Temperature": {u: "°C", v: [274.9]},
-                    "Stripping Steam (Crude)": {u: "kg/hr", v: [24500.0]},
-                    "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [930.0]},
-                    "Stripping Steam (Heavy Diesel)": {u: "kg/hr", v: [0.0]},
-                    "Stabilizer Feed Temperature": {u: "°C", v: [101.9]},
-                    "Stabilizer Reboiler Inlet Temperature": {u: "°C", v: [147.1]},
-                    "Stabilizer Reboiler Outlet Temperature": {u: "°C", v: [159.9]},
-                    "Stabilizer Reflux Flow": {u: "sm3/h", v: [34.9]},
-                    "Bottom Pump Around to Reboiler Inlet": {u: "°C", v: [235.0]},
-                    "Bottom Pump Around to Reboiler Flow": {u: "sm3/h", v: [900.0]},
-                    "AR Product Temperature": {u: "°C", v: [170.0]}
-                },
-                yields: {
-                    "LPG": [10.3],
-                    "Naphtha": [248.5],
-                    "Kerosene": [226.9],
-                    "Light Diesel": [222.0],
-                    "Heavy Diesel": [0.0],
-                    "Atmospheric Residue (AR)": [653.6]
-                },
-                quality: { 
-                    "Desalted Crude": { "Salt HEM": {u:"PTB", v:[0.7]}, "BS&W": {u:"%", v:[1.0]} },
-                    "Desalter Effluent": { "pH": {u: "pH", v: [5.0]} },
-                    "SSW": { "pH": {u: "pH", v: [8.5]} },
-                    "Naphtha": { "RVP": {u:"psi", v:[8.5]}, "T95": {u: "°C", v: [141.0]} },
-                    "Kerosene": { "Freeze Point": {u:"°C", v:[-49.0]}, "T95": {u: "°C", v: [245.0]} },
-                    "Diesel": { "T95": {u: "°C", v: [348.0]}, "Cloud Point": {u:"°C", v:[-6.0]} },
-                    "AR": { "API": {u: "API", v: [13.0]}, "Sulfur": {u:"wt%", v:[4.44]} }
-                }
-            }
-        },
-        "KSRC": {
-            "Base Case": {
-                feedsKBPD: [120],
-                feedsSM3: [795.0],
-                params: {
-                    "Slops": {u: "sm3/h", v: [0.0]},
-                    "Wild Naphtha": {u: "sm3/h", v: [0.0]},
-                    "Heater Feed Rate": {u: "sm3/h", v: [660.0]},
-                    "Washwater to Desalter V02": {u: "sm3/h", v: [27.0]},
-                    "Washwater to E01": {u: "sm3/h", v: [9.0]},
-                    "V-0001 Inlet Temperature": {u: "°C", v: [147.3]},
-                    "V-0002 Inlet Temperature": {u: "°C", v: [146.4]},
-                    "E-10 Outlet Temperature": {u: "°C", v: [202.7]},
-                    "Heater Outlet Temperature": {u: "°C", v: [370.0]},
-                    "Column Top Temperature": {u: "°C", v: [113.0]},
-                    "Top Column Pressure": {u: "barg", v: [1.0]},
-                    "Top Pump Around Flow": {u: "sm3/h", v: [1270.0]},
-                    "Top Pump Around Draw Temperature": {u: "°C", v: [124.9]},
-                    "Top Pump Around Return Temperature": {u: "°C", v: [105.2]},
-                    "Middle Pump Around Flow": {u: "sm3/h", v: [862.0]},
-                    "Middle Pump Around Draw Temperature": {u: "°C", v: [213.0]},
-                    "Middle Pump Around Return Temperature": {u: "°C", v: [161.3]},
-                    "Bottom Pump Around Flow": {u: "sm3/h", v: [532.0]},
-                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [288.4]},
-                    "Bottom Pump Around Return Temperature": {u: "°C", v: [246.2]},
-                    "Column Bottom Temperature": {u: "°C", v: [348.1]},
-                    "Kerosene Draw Temperature": {u: "°C", v: [188.5]},
-                    "Kerosene Reboiler Temperature": {u: "°C", v: [225.5]},
-                    "Light Diesel Draw Temperature": {u: "°C", v: [268.8]},
-                    "Heavy Diesel Draw Temperature": {u: "°C", v: [318.0]},
-                    "Overflash Flow": {u: "sm3/h", v: [72.7]},
-                    "Stripping Steam Temperature": {u: "°C", v: [274.2]},
-                    "Stripping Steam (Crude)": {u: "kg/hr", v: [9650.0]},
-                    "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [2500.0]},
-                    "Stripping Steam (Heavy Diesel)": {u: "kg/hr", v: [109.0]},
-                    "Stabilizer Feed Temperature": {u: "°C", v: [110.3]},
-                    "Stabilizer Reboiler Inlet Temperature": {u: "°C", v: [155.5]},
-                    "Stabilizer Reboiler Outlet Temperature": {u: "°C", v: [159.9]},
-                    "Stabilizer Reflux Flow": {u: "sm3/h", v: [21.0]},
-                    "Bottom Pump Around to Reboiler Inlet": {u: "°C", v: [216.5]},
-                    "Bottom Pump Around to Reboiler Flow": {u: "sm3/h", v: [541.0]},
-                    "AR Product Temperature": {u: "°C", v: [156.6]}
-                },
-                yields: {
-                    "LPG": [0.0],
-                    "Naphtha": [128.0],
-                    "Kerosene": [46.7],
-                    "Light Diesel": [143.0],
-                    "Heavy Diesel": [0.0],
-                    "Atmospheric Residue (AR)": [532.8]
-                },
-                quality: {
-                    "Desalted Crude": { "Salt HEM": {u: "PTB", v: [0.4]}, "BS&W": {u: "%", v: [0.7]} },
-                    "Desalter Effluent": { "pH": {u: "pH", v: [5.5]} },
-                    "SSW": { "pH": {u: "pH", v: [7.8]} },
-                    "Naphtha": { "RVP": {u: "psi", v: [7.25]}, "T95": {u: "°C", v: [143.0]} },
-                    "Kerosene": { "Freeze Point": {u: "°C", v: [-81.0]}, "T95": {u: "°C", v: [237.0]} },
-                    "Diesel": { "T95": {u: "°C", v: [324.0]}, "Cloud Point": {u: "°C", v: [-36.0]} },
-                    "AR": { "API": {u: "API", v: [13.0]}, "Sulfur": {u: "wt%", v: [5.78]} }
-                }
-            }
-        },
-        "KMHC": {
-            "Base Case": {
-                feedsKBPD: [200, 120],
-                feedsSM3: [1340.0, 800.0],
-                params: {
-                    "Slops": {u: "sm3/h", v: [36.0, 36.0]},
-                    "Wild Naphtha": {u: "sm3/h", v: [10.0, 10.0]},
-                    "Heater Feed Rate": {u: "sm3/h", v: [1230.0, 660.0]},
-                    "Washwater to Desalter V02": {u: "sm3/h", v: [50.2, 50.2]},
-                    "Washwater to E01": {u: "sm3/h", v: [16.7, 16.7]},
-                    "V-0001 Inlet Temperature": {u: "°C", v: [149.3, 149.3]},
-                    "V-0002 Inlet Temperature": {u: "°C", v: [148.4, 148.4]},
-                    "E-10 Outlet Temperature": {u: "°C", v: [199.9, 199.9]},
-                    "Heater Outlet Temperature": {u: "°C", v: [369.1, 370.3]},
-                    "Column Top Temperature": {u: "°C", v: [111.7, 112.4]},
-                    "Top Column Pressure": {u: "barg", v: [1.01, 1.00]},
-                    "Top Pump Around Flow": {u: "sm3/h", v: [1339, 1270]},
-                    "Top Pump Around Draw Temperature": {u: "°C", v: [126.9, 126.9]},
-                    "Top Pump Around Return Temperature": {u: "°C", v: [103.2, 103.2]},
-                    "Middle Pump Around Flow": {u: "sm3/h", v: [1243, 623]},
-                    "Middle Pump Around Draw Temperature": {u: "°C", v: [219.0, 219.0]},
-                    "Middle Pump Around Return Temperature": {u: "°C", v: [164.6, 164.6]},
-                    "Bottom Pump Around Flow": {u: "sm3/h", v: [1038, 548]},
-                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [291.1, 291.1]},
-                    "Bottom Pump Around Return Temperature": {u: "°C", v: [243.9, 243.9]},
-                    "Column Bottom Temperature": {u: "°C", v: [342.0, 347.7]},
-                    "Kerosene Draw Temperature": {u: "°C", v: [177.0, 178.7]},
-                    "Kerosene Reboiler Temperature": {u: "°C", v: [215.6, 215.6]},
-                    "Light Diesel Draw Temperature": {u: "°C", v: [264.0, 264.0]},
-                    "Heavy Diesel Draw Temperature": {u: "°C", v: [318.3, 318.3]},
-                    "Overflash Flow": {u: "sm3/h", v: [112.5, 112.5]},
-                    "Stripping Steam Temperature": {u: "°C", v: [274.9, 274.9]},
-                    "Stripping Steam (Crude)": {u: "kg/hr", v: [23972, 15123]},
-                    "Stripping Steam (Light Diesel)": {u: "kg/hr", v: [2340, 1775]},
-                    "Stripping Steam (Heavy Diesel)": {u: "kg/hr", v: [108, 108]},
-                    "Stabilizer Feed Temperature": {u: "°C", v: [101.9, 101.9]},
-                    "Stabilizer Reboiler Inlet Temperature": {u: "°C", v: [147.1, 147.1]},
-                    "Stabilizer Reboiler Outlet Temperature": {u: "°C", v: [159.9, 159.9]},
-                    "Stabilizer Reflux Flow": {u: "sm3/h", v: [34.9, 34.9]},
-                    "Bottom Pump Around to Reboiler Inlet": {u: "°C", v: [235.0, 235.0]},
-                    "Bottom Pump Around to Reboiler Flow": {u: "sm3/h", v: [900.0, 900.0]},
-                    "AR Product Temperature": {u: "°C", v: [170.0, 170.0]}
-                },
-                yields: { 
-                    "LPG": [3.1, 3.6], 
-                    "Naphtha": [222.7, 130.0], 
-                    "Kerosene": [224.6, 105.8], 
-                    "Light Diesel": [197.6, 128.3], 
-                    "Heavy Diesel": [0, 0], 
-                    "Atmospheric Residue (AR)": [680.0, 424.5] 
-                },
-                quality: { 
-                    "Desalted Crude": { "Salt HEM": {u:"PTB", v:[0.6, 1.1]}, "BS&W": {u:"%", v:[0.6, 1.0]} },
-                    "Desalter Effluent": { "pH": {u: "pH", v: [5.0, 5.0]} },
-                    "SSW": { "pH": {u: "pH", v: [8.5, 8.5]} },
-                    "Naphtha": { "RVP": {u:"psi", v:[9.0, 8.1]}, "T95": {u: "°C", v: [141.0, 141.0]} },
-                    "Kerosene": { "Freeze Point": {u:"°C", v:[-49, -48]}, "T95": {u: "°C", v: [245.0, 245.0]} },
-                    "Diesel": { "T95": {u: "°C", v: [348.0, 348.0]}, "Cloud Point": {u:"°C", v:[-9, -7]} },
-                    "AR": { "API": {u: "API", v: [13.0, 13.0]}, "Sulfur": {u:"wt%", v:[4.46, 4.92]} }
-                }
+    // Single point case (KSRC, KEC Naphtha)
+    if (refArray.length === 1) {
+        renderTables(data, 0, 0, 0, unitType, inputFeed, otherArray[0]);
+        return;
+    }
+
+    // Find interpolation interval
+    // Note: Arrays are descending (High -> Low) usually, but we need to handle generic.
+    // Check direction
+    const isDescending = refArray[0] > refArray[refArray.length - 1];
+    
+    let idx = -1;
+    
+    if (isDescending) {
+        // Find i such that refArray[i] >= target >= refArray[i+1]
+        for (let i = 0; i < refArray.length - 1; i++) {
+            if (targetFeed <= refArray[i] && targetFeed >= refArray[i+1]) {
+                idx = i;
+                break;
             }
         }
-    };
-
-    const MODE_LABELS = {
-        "Max Kero (with Heavy Diesel)": { en: "with Heavy Diesel", ar: "مع ديزل ثقيل" },
-        "Max Kero (No Heavy Diesel)": { en: "no Heavy Diesel", ar: "بدون ديزل ثقيل" },
-        "Max Naphtha Mode": { en: "Naphtha Mode", ar: "وضع النافثا" },
-        "Base Case": { en: "Base Case", ar: "الحالة الأساسية" }
-    };
-
-    const STRINGS = {
-        en: {
-            mainTitle: "Crude Distillation Unit", subTitle: "Operational Parameters",
-            oilType: "Oil Type", opMode: "Operating Mode", inputUnit: "Input Unit", feedRate: "Feed Rate",
-            calcBtn: "Calculate", opParams: "Operational Parameters", paramName: "Parameter Name", value: "Value",
-            prodYields: "Production Yields", product: "Product", prodQuality: "Quality Specifications", 
-            stream: "Category", property: "Parameter", limit: "Value",
-            notesTitle: "General Notes & Guidelines", range: "Range: ", fixed: "Fixed: ",
-            
-            qNote1: "If SSW pH goes below 8, switchover to LP Condensate processing.",
-            qNote2: "If Desalter Effluent pH goes below 4.5, Contact U35 to optimize Caustic Injection.",
-
-            note1: "The above parameters based on previous performance with maximum yields + stable operations.. However, a variation is acceptable if the column profile is being maintained. Further fine tuning may be required in order to optimize the yields further. Minor adjustments can be done as needed. However, for any major deviation from the above, prior discussion with process engineer is recommended.",
-            note2: "Above are general guidelines, however desalter process parameters & chemical dosage shared through NALCO group to be followed.",
-            note3: "To be optimized depending on Diesel Cloud Point, On Spec -7 ° C winter and 4 °C summer.",
-            
-            alertMsg: "Value out of operational range"
-        },
-        ar: {
-            mainTitle: "وحدة تكرير النفط الخام", subTitle: "معايير التشغيل",
-            oilType: "نوع النفط", opMode: "وضع التشغيل", inputUnit: "وحدة الإدخال", feedRate: "كمية التكرير",
-            calcBtn: "احسب", opParams: "معايير التشغيل", paramName: "المعيار", value: "القيمة",
-            prodYields: "كميات الإنتاج", product: "المنتج", prodQuality: "مواصفات الجودة", 
-            stream: "الفئة", property: "المعيار", limit: "القيمة",
-            notesTitle: "ملاحظات وإرشادات عامة", range: "النطاق: ", fixed: "قيمة ثابتة: ",
-            
-            qNote1: "إذا انخفضت درجة حموضة الماء منزوع الحمضية عن 8، يجب التحويل إلى ماء الضغط المنخفض المكثف.",
-            qNote2: "إذا انخفضت درجة حمضية مياه صرف نزع الأملاح عن 4.5، تواصل مع U35 لتحسين حقن رماد الصودا.",
-
-            note1: "تستند المعايير أعلاه إلى قيم أداء فعلي سابق مع أقصى إنتاجية + عمليات مستقرة، التباين في القيم مقبول إذا تم الحفاظ على السلم الحراري لعمود تكرير النفط الخام، قد يلزم إجراء مزيد من الضبط الدقيق لتحسين الإنتاجية بشكل أكبر، كما يمكن إجراء تعديلات طفيفة حسب الحاجة، مع ذلك يُنصح بمناقشة أي انحراف كبير عن القيم أعلاه مع مهندس العمليات مسبقًا.",
-            note2: "ما ورد أعلاه إرشادات عامة، ومع ذلك يجب اتباع معايير عملية إزالة الأملاح والجرعات الكيميائية المشاركة من قبل مجموعة NALCO.",
-            note3: "يجب تعديل معايير التشغيل بناءً على نقطة التغييم للديزل (Cloud Point): المواصفات -7 °C شتاءً و 4 °C صيفاً.",
-            
-            alertMsg: "القيمة خارج نطاق التشغيل المسموح"
-        }
-    };
-
-    let curLang = 'en';
-
-    document.addEventListener('DOMContentLoaded', () => {
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-             const newTheme = event.matches ? 'dark' : 'light';
-             document.documentElement.setAttribute('data-theme', newTheme);
-        });
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-        }
-
-        const savedLang = localStorage.getItem('refinery-lang');
-        if (savedLang) curLang = savedLang;
-
-        const oilSelect = document.getElementById('oilTypeSelect');
-        if (oilSelect) {
-            for (let type in DB) {
-                let opt = document.createElement('option');
-                opt.value = type; opt.text = type;
-                oilSelect.add(opt);
-            }
-            applyLanguageUI();
-            updateModes(false); 
-        }
+        // Clamping if out of bounds
+        if (targetFeed > refArray[0]) idx = 0; // Use max
+        if (targetFeed < refArray[refArray.length - 1]) idx = refArray.length - 2; // Use min
         
-        // UI Logic Listeners
-        const feedInput = document.getElementById("feedInput");
-        if (feedInput) {
-            // On typing -> Hide Results & Alert
-            feedInput.addEventListener("input", resetUI);
-            
-            feedInput.addEventListener("keypress", function(event) {
-              if (event.key === "Enter") {
-                event.preventDefault();
-                calculateResults();
-              }
-            });
-        }
-    });
+        // If not found in loop (should be caught by clamping, but safety check)
+        if (idx === -1) idx = 0;
 
-    function resetUI() {
-        document.getElementById('results-row').style.display = 'none';
-        document.getElementById('rangeAlert').style.display = 'none';
-    }
-
-    function handleModeChange() {
-        resetUI(); // Hide results on mode change
-        updatePlaceholder();
-    }
-
-    function updateModes(preserveSelection = true) {
-        const oilType = document.getElementById('oilTypeSelect').value;
-        const modeSelect = document.getElementById('modeSelect');
-        const currentVal = modeSelect.value;
-        modeSelect.innerHTML = "";
-        
-        if (DB[oilType]) {
-            for (let mode in DB[oilType]) {
-                let opt = document.createElement('option');
-                opt.value = mode;
-                if (MODE_LABELS[mode]) {
-                    opt.text = MODE_LABELS[mode][curLang];
-                } else {
-                    opt.text = mode;
-                }
-                modeSelect.add(opt);
-            }
-            if (preserveSelection && currentVal && Array.from(modeSelect.options).some(o => o.value === currentVal)) {
-                modeSelect.value = currentVal;
-            }
-            handleModeChange();
-        }
-    }
-
-    function updatePlaceholder() {
-        const oilType = document.getElementById('oilTypeSelect').value;
-        const mode = document.getElementById('modeSelect').value;
-        const unit = document.getElementById('unitSelect').value;
-        const feedInput = document.getElementById('feedInput');
-        
-        if (DB[oilType] && DB[oilType][mode]) {
-            const data = DB[oilType][mode];
-            let feeds = (unit === 'KBPD') ? data.feedsKBPD : data.feedsSM3;
-            let min = Math.min(...feeds);
-            let max = Math.max(...feeds);
-            
-            if (min === max) {
-                let text = (curLang === 'en' ? STRINGS.en.fixed : STRINGS.ar.fixed) + min;
-                feedInput.placeholder = text;
-                feedInput.value = min;
-                feedInput.disabled = true;
-                // Auto calc only if fixed
-                calculateResults();
-            } else {
-                let text = (curLang === 'en' ? STRINGS.en.range : STRINGS.ar.range) + `${min} - ${max}`;
-                feedInput.placeholder = text;
-                feedInput.disabled = false;
-                feedInput.value = "";
+    } else {
+        // Ascending Logic (just in case future data changes)
+        for (let i = 0; i < refArray.length - 1; i++) {
+            if (targetFeed >= refArray[i] && targetFeed <= refArray[i+1]) {
+                idx = i;
+                break;
             }
         }
+        if (targetFeed < refArray[0]) idx = 0;
+        if (targetFeed > refArray[refArray.length - 1]) idx = refArray.length - 2;
     }
 
-    function lerp(x, x0, x1, y0, y1) {
-        return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
+    // Calculate Interpolation Factor (t)
+    // Formula: Val = y1 + (x - x1) * (y2 - y1) / (x2 - x1)
+    const x1 = refArray[idx];
+    const x2 = refArray[idx + 1];
+    
+    // Avoid division by zero
+    let t = 0;
+    if (x2 !== x1) {
+        t = (targetFeed - x1) / (x2 - x1);
     }
 
-    function getInterpolatedValue(inputVal, refArray, valArray) {
-        if (refArray.length === 1) return valArray[0];
-        let points = refArray.map((f, i) => ({f: f, v: valArray[i]})).sort((a, b) => a.f - b.f);
-        if (inputVal <= points[0].f) return points[0].v;
-        if (inputVal >= points[points.length-1].f) return points[points.length-1].v;
+    // Calculate the 'Other Unit' feed value
+    const otherFeedVal = otherArray[idx] + t * (otherArray[idx+1] - otherArray[idx]);
 
-        for (let i = 0; i < points.length - 1; i++) {
-            if (inputVal >= points[i].f && inputVal <= points[i+1].f) {
-                return lerp(inputVal, points[i].f, points[i+1].f, points[i].v, points[i+1].v);
-            }
-        }
-        return 0;
+    renderTables(data, idx, idx+1, t, unitType, targetFeed, otherFeedVal);
+}
+
+function renderTables(data, i1, i2, t, inputUnit, inputVal, convertedVal) {
+    const mainTable = document.getElementById('mainParamsTable');
+    const tempTable = document.getElementById('tempPressTable');
+    const yieldTable = document.getElementById('yieldsTable');
+    const qualityTable = document.getElementById('qualityTable');
+
+    mainTable.innerHTML = '';
+    tempTable.innerHTML = '';
+    yieldTable.innerHTML = '';
+    qualityTable.innerHTML = '';
+
+    // Helper to add row
+    function addRow(table, label, val, unit) {
+        const row = table.insertRow();
+        row.insertCell(0).innerText = label;
+        const valCell = row.insertCell(1);
+        valCell.className = 'value';
+        valCell.innerText = val.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        const unitCell = row.insertCell(2);
+        unitCell.className = 'unit';
+        unitCell.innerText = unit;
     }
 
-    function calculateResults() {
-        const oilType = document.getElementById('oilTypeSelect').value;
-        const mode = document.getElementById('modeSelect').value;
-        const unit = document.getElementById('unitSelect').value;
-        const feedInput = document.getElementById('feedInput');
-        const alertBox = document.getElementById('rangeAlert');
-        const alertMsg = document.getElementById('rangeMsg');
-        const resultRow = document.getElementById('results-row');
+    // 1. Add Feed Rows explicitly
+    let valKBPD = (inputUnit === 'KBPD') ? inputVal : convertedVal;
+    let valSM3 = (inputUnit === 'sm3hr') ? inputVal : convertedVal;
+    
+    addRow(mainTable, "Feed Rate (KBPD)", valKBPD, "KBPD");
+    addRow(mainTable, "Crude Feed (Tank)", valSM3, "sm3/hr");
 
-        let rawVal = feedInput.value;
-        let rawInput = parseLocaleNumber(rawVal);
-
-        if (isNaN(rawInput) || rawVal.trim() === "") {
-             return; // Do nothing
-        }
-
-        const data = DB[oilType][mode];
-        let feeds = (unit === 'KBPD') ? data.feedsKBPD : data.feedsSM3;
-        let min = Math.min(...feeds);
-        let max = Math.max(...feeds);
-
-        // --- VALIDATION CHECK ---
-        if (rawInput < min || rawInput > max) {
-            // Show Error, Hide Results
-            resultRow.style.display = 'none';
-            alertBox.style.display = 'flex';
-            let msgBase = STRINGS[curLang].alertMsg;
-            alertMsg.innerText = `${msgBase} (${min} - ${max})`;
-            return; // Stop calculation
-        }
-
-        // If valid -> Hide Alert, Show Results
-        alertBox.style.display = 'none';
-        resultRow.style.display = 'flex';
-
-        let referenceFeeds, interpolatedKBPD, interpolatedSM3;
-        
-        if (unit === 'KBPD') {
-            referenceFeeds = data.feedsKBPD;
-            interpolatedSM3 = getInterpolatedValue(rawInput, referenceFeeds, data.feedsSM3);
-            interpolatedKBPD = rawInput;
+    // 2. Iterate all params and categorize
+    for (const [key, values] of Object.entries(data.params)) {
+        let calculatedValue = 0;
+        if (values.length === 1) {
+            calculatedValue = values[0]; // Constant
         } else {
-            referenceFeeds = data.feedsSM3;
-            interpolatedKBPD = getInterpolatedValue(rawInput, referenceFeeds, data.feedsKBPD);
-            interpolatedSM3 = rawInput;
+            const v1 = values[i1];
+            const v2 = values[i2];
+            calculatedValue = v1 + t * (v2 - v1);
         }
 
-        let displayFeed = "";
-        if (unit === 'KBPD') {
-             displayFeed = `${rawInput} KBPD (${interpolatedSM3.toFixed(1)} sm3/h)`;
+        // Clean Unit from Key
+        let displayLabel = key.split('(')[0].trim();
+        let displayUnit = "";
+        if (key.includes('(')) {
+            displayUnit = key.split('(')[1].replace(')', '');
+        }
+
+        // Categorize
+        if (key.includes('Yield')) {
+            addRow(yieldTable, displayLabel, calculatedValue, displayUnit);
+        } else if (key.includes('Temp') || key.includes('Press')) {
+            addRow(tempTable, displayLabel, calculatedValue, displayUnit);
+        } else if (key.includes('Salt') || key.includes('BS&W') || key.includes('pH')) {
+            addRow(qualityTable, displayLabel, calculatedValue, displayUnit);
         } else {
-             displayFeed = `${rawInput} sm3/h (${interpolatedKBPD.toFixed(1)} KBPD)`;
+            addRow(mainTable, displayLabel, calculatedValue, displayUnit);
         }
-        document.getElementById('feed-display-badge').innerText = displayFeed;
-
-        let paramHTML = "";
-        let crudeFeedVal, crudeFeedUnit;
-        if (unit === 'KBPD') {
-             crudeFeedVal = interpolatedSM3; 
-             crudeFeedUnit = "sm3/h";
-        } else {
-             crudeFeedVal = interpolatedKBPD;
-             crudeFeedUnit = "KBPD";
-        }
-        paramHTML += `<tr><td>Crude Feed (Tank)</td><td class="text-end val-display">${crudeFeedVal.toLocaleString(undefined, {maximumFractionDigits: 1})}<span class="unit-small">${crudeFeedUnit}</span></td></tr>`;
-
-        for (let key in data.params) {
-            let item = data.params[key];
-            let val = getInterpolatedValue(rawInput, referenceFeeds, item.v);
-            let display = val.toLocaleString(undefined, {maximumFractionDigits: 1});
-            paramHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}<span class="unit-small">${item.u}</span></td></tr>`;
-        }
-        document.getElementById('params-body').innerHTML = paramHTML;
-
-        let yieldHTML = "";
-        for (let key in data.yields) {
-            let val = getInterpolatedValue(rawInput, referenceFeeds, data.yields[key]);
-            let display = val.toLocaleString(undefined, {maximumFractionDigits: 1});
-            yieldHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}</td></tr>`;
-        }
-        document.getElementById('yields-body').innerHTML = yieldHTML;
-
-        let qualHTML = "";
-        for (let groupName in data.quality) {
-            let groupData = data.quality[groupName];
-            let subKeys = Object.keys(groupData);
-            subKeys.forEach((subKey, index) => {
-                let item = groupData[subKey];
-                let val = getInterpolatedValue(rawInput, referenceFeeds, item.v);
-                let display = (subKey.includes("Point") || subKey.includes("T95")) ? val.toFixed(0) : val.toFixed(2);
-                qualHTML += "<tr>";
-                if (index === 0) qualHTML += `<td class="group-cell" rowspan="${subKeys.length}">${groupName}</td>`;
-                qualHTML += `<td>${subKey}</td>`;
-                qualHTML += `<td class="text-end val-display">${display}<span class="unit-small">${item.u}</span></td>`;
-                qualHTML += "</tr>";
-            });
-        }
-        document.getElementById('quality-body').innerHTML = qualHTML;
-        renderQualityNotes();
     }
+}
 
-    function renderQualityNotes() {
-        const langObj = STRINGS[curLang];
-        const list = document.getElementById('quality-notes-list');
-        const area = document.getElementById('quality-notes-area');
-        list.innerHTML = `
-            <li><i class='bi bi-exclamation-triangle-fill text-warning'></i> ${langObj.qNote1}</li>
-            <li><i class='bi bi-exclamation-triangle-fill text-warning'></i> ${langObj.qNote2}</li>
-        `;
-        area.style.display = 'block';
-    }
+// Initial Run
+updateDashboard();
 
-    function updateStaticNotes() {
-        const footerList = document.getElementById('footer-static-notes');
-        footerList.innerHTML = `
-            <li>${STRINGS[curLang].note1}</li>
-            <li>${STRINGS[curLang].note2}</li>
-            <li>${STRINGS[curLang].note3}</li>
-        `;
-    }
-
-    function toggleThemeManual() {
-        const html = document.documentElement;
-        const icon = document.getElementById('theme-icon');
-        const isDark = html.getAttribute('data-theme') === 'dark';
-        html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-        icon.className = isDark ? "bi bi-sun-fill" : "bi bi-moon-stars-fill";
-    }
-
-    function toggleLanguage() {
-        curLang = curLang === 'en' ? 'ar' : 'en';
-        localStorage.setItem('refinery-lang', curLang);
-        applyLanguageUI();
-    }
-
-    function applyLanguageUI() {
-        document.body.dir = curLang === 'ar' ? 'rtl' : 'ltr';
-        const container = document.getElementById('lang-switch');
-        const optEn = document.getElementById('opt-en');
-        const optAr = document.getElementById('opt-ar');
-        if (curLang === 'ar') {
-            container.classList.add('ar-active');
-            optAr.classList.add('active');
-            optEn.classList.remove('active');
-        } else {
-            container.classList.remove('ar-active');
-            optEn.classList.add('active');
-            optAr.classList.remove('active');
-        }
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            let key = el.getAttribute('data-i18n');
-            if (STRINGS[curLang][key]) el.innerText = STRINGS[curLang][key];
-        });
-        updateModes(true);
-        updatePlaceholder();
-        renderQualityNotes(); 
-        updateStaticNotes();
-    }
-
-    window.onload = () => {}; 
 </script>
 
 </body>
