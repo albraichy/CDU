@@ -555,18 +555,20 @@
         return parseFloat(englishDigits);
     }
 
-    // --- DATA STRUCTURE (EXACT MAPPING FROM EXCEL) ---
+    // --- DATA STRUCTURE ---
+    // NOTE: feedsSM3 arrays are rounded to 1 decimal place (or integer) to match "external" numbers
+    // Washwater units changed to sm3/h
     const DB = {
         "KEC": {
             "Max Kero (with Heavy Diesel)": {
                 feedsKBPD: [205, 200, 175, 155, 130, 105],
-                feedsSM3:  [1341.95, 1321.03, 1159.37, 1031.27, 851.62, 696.44],
+                feedsSM3:  [1342.0, 1321.0, 1159.4, 1031.3, 851.6, 696.4],
                 params: {
                     "Slops": {u: "sm3/h", v: [36.10, 33.01, 29.54, 41.12, 3.25, 0]},
                     "Wild Naphtha": {u: "sm3/h", v: [10.00, 9.09, 26.76, 10.24, 6.60, 9.96]},
                     "Heater Feed Rate": {u: "sm3/h", v: [1230.00, 1220.00, 1055.92, 969.97, 804.68, 659.99]},
-                    "Washwater to Desalter V02": {u: "%", v: [50.22, 53.00, 45.46, 41.07, 33.99, 26.99]},
-                    "Washwater to E01": {u: "%", v: [16.74, 17.99, 14.99, 13.53, 11.99, 9.00]},
+                    "Washwater to Desalter V02": {u: "sm3/h", v: [50.22, 53.00, 45.46, 41.07, 33.99, 26.99]},
+                    "Washwater to E01": {u: "sm3/h", v: [16.74, 17.99, 14.99, 13.53, 11.99, 9.00]},
                     "V-0001 Inlet Temperature": {u: "°C", v: [149.30, 148.76, 150.03, 147.98, 148.78, 147.32]},
                     "V-0002 Inlet Temperature": {u: "°C", v: [148.42, 147.88, 149.21, 147.07, 147.87, 146.37]},
                     "E-10 Outlet Temperature": {u: "°C", v: [199.91, 201.91, 200.09, 198.24, 199.56, 202.71]},
@@ -620,13 +622,13 @@
             },
             "Max Kero (No Heavy Diesel)": {
                 feedsKBPD: [200, 195, 180, 160, 150, 120, 105],
-                feedsSM3: [1326.66, 1300.33, 1203.85, 1060.67, 979.94, 789.69, 689.36],
+                feedsSM3: [1326.7, 1300.3, 1203.9, 1060.7, 979.9, 789.7, 689.4],
                 params: {
                     "Slops": {u: "sm3/h", v: [48.77, 25.81, 3.36, 34.19, 24.56, 0, 0]},
                     "Wild Naphtha": {u: "sm3/h", v: [0, 6.99, 29.99, 8.17, 0, 27.78, 11.94]},
                     "Heater Feed Rate": {u: "sm3/h", v: [1220.01, 1200.05, 1080.75, 960.00, 897.70, 673.76, 660.00]},
-                    "Washwater to Desalter V02": {u: "%", v: [49.61, 51.99, 44.60, 45.50, 37.06, 31.50, 27.00]},
-                    "Washwater to E01": {u: "%", v: [16.48, 20.00, 14.87, 14.49, 12.35, 10.49, 9.00]},
+                    "Washwater to Desalter V02": {u: "sm3/h", v: [49.61, 51.99, 44.60, 45.50, 37.06, 31.50, 27.00]},
+                    "Washwater to E01": {u: "sm3/h", v: [16.48, 20.00, 14.87, 14.49, 12.35, 10.49, 9.00]},
                     "V-0001 Inlet Temperature": {u: "°C", v: [146.66, 150.84, 150.29, 150.57, 149.56, 149.58, 147.52]},
                     "V-0002 Inlet Temperature": {u: "°C", v: [145.81, 150.24, 149.36, 149.54, 148.57, 148.57, 146.55]},
                     "E-10 Outlet Temperature": {u: "°C", v: [199.97, 207.30, 193.97, 25.88, 194.77, 206.21, 201.89]},
@@ -680,13 +682,13 @@
             },
              "Max Naphtha Mode": {
                 feedsKBPD: [205],
-                feedsSM3: [1367.70],
+                feedsSM3: [1367.7],
                 params: {
                     "Slops": {u: "sm3/h", v: [10.61]},
                     "Wild Naphtha": {u: "sm3/h", v: [20.39]},
                     "Heater Feed Rate": {u: "sm3/h", v: [1200.02]},
-                    "Washwater to Desalter V02": {u: "%", v: [53.50]},
-                    "Washwater to E01": {u: "%", v: [17.79]},
+                    "Washwater to Desalter V02": {u: "sm3/h", v: [53.50]},
+                    "Washwater to E01": {u: "sm3/h", v: [17.79]},
                     "V-0001 Inlet Temperature": {u: "°C", v: [149.99]},
                     "V-0002 Inlet Temperature": {u: "°C", v: [149.08]},
                     "E-10 Outlet Temperature": {u: "°C", v: [200.59]},
@@ -735,7 +737,7 @@
         "KSRC": {
             "Base Case": {
                 feedsKBPD: [120],
-                feedsSM3: [809.86],
+                feedsSM3: [809.9],
                 params: {
                     "Slops": {u: "sm3/h", v: [7.52]},
                     "Wild Naphtha": {u: "sm3/h", v: [3.57]},
@@ -788,7 +790,7 @@
         "KMHC": {
             "Base Case": {
                 feedsKBPD: [200, 120],
-                feedsSM3: [1312.02, 810.73],
+                feedsSM3: [1312.0, 810.7],
                 params: {
                     "Slops": {u: "sm3/h", v: [24.85, 0]},
                     "Wild Naphtha": {u: "sm3/h", v: [1.72, 3.13]},
