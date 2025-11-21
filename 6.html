@@ -556,8 +556,8 @@
     }
 
     // --- DATA STRUCTURE ---
-    // NOTE: feedsSM3 arrays are rounded to 1 decimal place (or integer) to match "external" numbers
-    // Washwater units changed to sm3/h
+    // NOTE: feedsSM3 arrays are rounded to match external Excel display for proper input ranges.
+    // Washwater units updated to sm3/h for ALL modes.
     const DB = {
         "KEC": {
             "Max Kero (with Heavy Diesel)": {
@@ -742,8 +742,8 @@
                     "Slops": {u: "sm3/h", v: [7.52]},
                     "Wild Naphtha": {u: "sm3/h", v: [3.57]},
                     "Heater Feed Rate": {u: "sm3/h", v: [949.97]},
-                    "Washwater to Desalter V02": {u: "%", v: [72.00]},
-                    "Washwater to E01": {u: "%", v: [24.00]},
+                    "Washwater to Desalter V02": {u: "sm3/h", v: [72.00]},
+                    "Washwater to E01": {u: "sm3/h", v: [24.00]},
                     "V-0001 Inlet Temperature": {u: "°C", v: [149.69]},
                     "V-0002 Inlet Temperature": {u: "°C", v: [145.96]},
                     "E-10 Outlet Temperature": {u: "°C", v: [200.53]},
@@ -795,8 +795,8 @@
                     "Slops": {u: "sm3/h", v: [24.85, 0]},
                     "Wild Naphtha": {u: "sm3/h", v: [1.72, 3.13]},
                     "Heater Feed Rate": {u: "sm3/h", v: [1199.92, 734.77]},
-                    "Washwater to Desalter V02": {u: "%", v: [51.99, 51.17]},
-                    "Washwater to E01": {u: "%", v: [19.99, 17.05]},
+                    "Washwater to Desalter V02": {u: "sm3/h", v: [51.99, 51.17]},
+                    "Washwater to E01": {u: "sm3/h", v: [19.99, 17.05]},
                     "V-0001 Inlet Temperature": {u: "°C", v: [150.88, 144.68]},
                     "V-0002 Inlet Temperature": {u: "°C", v: [150.27, 143.69]},
                     "E-10 Outlet Temperature": {u: "°C", v: [188.79, 201.09]},
