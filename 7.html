@@ -322,7 +322,16 @@
             border-inline-end: 2px solid var(--border-color);
         }
         [data-theme="dark"] .group-cell { color: var(--kipic-green); }
-        .val-display { font-family: 'Roboto Mono', monospace; font-weight: 600; }
+        
+        /* VALUE DISPLAY FIX */
+        .val-display { 
+            font-family: 'Roboto Mono', monospace; 
+            font-weight: 600;
+            /* Force LTR to keep negative signs correct and units to the right */
+            direction: ltr; 
+            unicode-bidi: isolate;
+        }
+        
         .unit-small { font-size: 0.8em; color: var(--text-muted); margin-inline-start: 6px; font-weight: 400; }
 
         /* --- FOOTER & ALERTS --- */
@@ -487,7 +496,7 @@
                             <thead>
                                 <tr>
                                     <th data-i18n="product">Product</th>
-                                    <th class="text-end">Flow (sm3/h)</th>
+                                    <th class="text-end" data-i18n="flowHeader">Flow (sm3/h)</th>
                                 </tr>
                             </thead>
                             <tbody id="yields-body"></tbody>
@@ -555,7 +564,9 @@
         return parseFloat(englishDigits);
     }
 
-    // --- DATA STRUCTURE (CORRECTED) ---
+    // --- DATA STRUCTURE ---
+    // NOTE: feedsSM3 arrays are rounded to match external Excel display for proper input ranges.
+    // Washwater units updated to sm3/h for ALL modes.
     const DB = {
         "KEC": {
             "Max Kero (with Heavy Diesel)": {
@@ -670,7 +681,7 @@
                 },
                 quality: {
                     "Desalted Crude": { "Salt HEM": {u: "PTB", v: [0.65, 0.6, 0.6, 0.7, 1.0, 0.6, 0.6]}, "BS&W": {u: "%", v: [1.3, 0.6, 0.8, 0.7, 0.55, 0.5, 0.5]} },
-                    "Desalter Effluent": { "pH": {u: "pH", v: [5.0, 5.0, 5.0, 7.0, 4.88, 5.4, 5.45]} },
+                    "Desalter Effluent": { "pH": {u: "pH", v: [5.0, 5.0, 5.0, 7.0, 4.9, 5.4, 5.45]} },
                     "SSW": { "pH": {u: "pH", v: [8.5, 8, 8.1, 9, 9.4, 8.5, 7.5]} },
                     "Naphtha": { "RVP": {u: "psi", v: [9.16, 9.1, 8.9, 8.45, 8.51, 8, 8.65]}, "T95": {u: "°C", v: [143, 147, 144, 142, 140, 145, 143]} },
                     "Kerosene": { "Freeze Point": {u: "°C", v: [-48, -49, -48, -52, -51, -56, -52]}, "T95": {u: "°C", v: [245, 252, 247, 240, 245, 231, 238]} },
@@ -858,6 +869,8 @@
             stream: "Category", property: "Parameter", limit: "Value",
             notesTitle: "General Notes & Guidelines", range: "Range: ", fixed: "Fixed: ",
             
+            flowHeader: "Flow (sm3/h)",
+
             qNote1: "If SSW pH goes below 8, switchover to LP Condensate processing.",
             qNote2: "If Desalter Effluent pH goes below 4.5, Contact U35 to optimize Caustic Injection.",
 
@@ -875,6 +888,8 @@
             stream: "الفئة", property: "المعيار", limit: "القيمة",
             notesTitle: "ملاحظات وإرشادات عامة", range: "النطاق: ", fixed: "قيمة ثابتة: ",
             
+            flowHeader: "التيار (sm3/h)",
+
             qNote1: "ذا انخفضت درجة حموضة الماء منزوع الحمضية عن 8، يجب التحويل إلى ماء الضغط المنخفض المكثف.",
             qNote2: "إذا انخفضت درجة حمضية مياه صرف نزع الأملاح عن 4.5، تواصل مع U35 لتحسين حقن رماد الصودا.",
 
@@ -973,14 +988,14 @@
             let max = Math.max(...feeds);
             
             if (min === max) {
-                let text = (curLang === 'en' ? STRINGS.en.fixed : STRINGS.ar.fixed) + min;
+                let text = (curLang === 'en' ? STRINGS.en.fixed : STRINGS.ar.fixed) + min.toFixed(0);
                 feedInput.placeholder = text;
-                feedInput.value = min;
+                feedInput.value = min.toFixed(0);
                 feedInput.disabled = true;
                 // Auto calc only if fixed
                 calculateResults();
             } else {
-                let text = (curLang === 'en' ? STRINGS.en.range : STRINGS.ar.range) + `${min} - ${max}`;
+                let text = (curLang === 'en' ? STRINGS.en.range : STRINGS.ar.range) + `${min.toFixed(0)} - ${max.toFixed(0)}`;
                 feedInput.placeholder = text;
                 feedInput.disabled = false;
                 feedInput.value = "";
@@ -1038,7 +1053,7 @@
             resultRow.style.display = 'none';
             alertBox.style.display = 'flex';
             let msgBase = STRINGS[curLang].alertMsg;
-            alertMsg.innerText = `${msgBase} (${min} - ${max})`;
+            alertMsg.innerText = `${msgBase} (${min.toFixed(0)} - ${max.toFixed(0)})`;
             return; // Stop calculation
         }
 
@@ -1081,7 +1096,7 @@
             let item = data.params[key];
             let val = getInterpolatedValue(rawInput, referenceFeeds, item.v);
             
-            // Rounding Logic for Params
+            // --- ROUNDING LOGIC (PER REQUEST) ---
             let display;
             if (key === "Top Column Pressure") {
                 display = val.toFixed(2);
@@ -1096,7 +1111,7 @@
         let yieldHTML = "";
         for (let key in data.yields) {
             let val = getInterpolatedValue(rawInput, referenceFeeds, data.yields[key]);
-            // Rounding Logic for Yields -> Integer
+            // --- ROUNDING LOGIC: Integer ---
             let display = val.toFixed(0);
             yieldHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}</td></tr>`;
         }
@@ -1110,7 +1125,7 @@
                 let item = groupData[subKey];
                 let val = getInterpolatedValue(rawInput, referenceFeeds, item.v);
                 
-                // Rounding Logic for Quality -> 1 decimal
+                // --- ROUNDING LOGIC: 1 Decimal ---
                 let display = val.toFixed(1);
                 
                 qualHTML += "<tr>";
@@ -1172,14 +1187,53 @@
             optEn.classList.add('active');
             optAr.classList.remove('active');
         }
+        
+        // --- PERSISTENCE FIX: Don't let updateModes reset the UI ---
+        // We update the dropdowns, but we manually handle the result visibility below
+        updateModes(true, false); 
+
         document.querySelectorAll('[data-i18n]').forEach(el => {
             let key = el.getAttribute('data-i18n');
             if (STRINGS[curLang][key]) el.innerText = STRINGS[curLang][key];
         });
-        updateModes(true);
+        
         updatePlaceholder();
         renderQualityNotes(); 
         updateStaticNotes();
+
+        // If there's a value in the input, re-calculate to update the result text (headers etc)
+        const feedInput = document.getElementById('feedInput');
+        if (feedInput && feedInput.value.trim() !== "") {
+             calculateResults();
+        }
+    }
+    
+    // Modified to allow skipping the handler trigger (for language switching)
+    function updateModes(preserveSelection = true, triggerHandler = true) {
+        const oilType = document.getElementById('oilTypeSelect').value;
+        const modeSelect = document.getElementById('modeSelect');
+        const currentVal = modeSelect.value;
+        modeSelect.innerHTML = "";
+        
+        if (DB[oilType]) {
+            for (let mode in DB[oilType]) {
+                let opt = document.createElement('option');
+                opt.value = mode;
+                if (MODE_LABELS[mode]) {
+                    opt.text = MODE_LABELS[mode][curLang];
+                } else {
+                    opt.text = mode;
+                }
+                modeSelect.add(opt);
+            }
+            if (preserveSelection && currentVal && Array.from(modeSelect.options).some(o => o.value === currentVal)) {
+                modeSelect.value = currentVal;
+            }
+            
+            if (triggerHandler) {
+                handleModeChange();
+            }
+        }
     }
 
     window.onload = () => {}; 
