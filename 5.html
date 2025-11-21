@@ -31,7 +31,7 @@
             --input-bg: #ffffff;
             --footer-bg: #e9ecef;
             
-            /* Badge Colors (Solid Blue in Light) */
+            /* Badge Colors */
             --badge-bg: var(--kipic-navy);
             --badge-text: #ffffff;
             --badge-border: var(--kipic-navy);
@@ -64,7 +64,7 @@
             --kipic-navy: #0d1b2a; 
             --kipic-green: #7bc938;
             
-            /* Badge Colors (Solid Green in Dark) */
+            /* Badge Colors */
             --badge-bg: var(--kipic-green);
             --badge-text: #000000;
             --badge-border: var(--kipic-green);
@@ -230,56 +230,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* --- DESKTOP VIEW --- */
-        @media (min-width: 769px) {
-            .collapse-icon { display: none !important; }
-            .card-header-custom { cursor: default !important; pointer-events: none; }
-            .collapse { display: block !important; height: auto !important; visibility: visible !important; }
-            /* Enable pointer events for header badge/controls */
-            .card-header-custom .header-actions { pointer-events: auto; } 
-        }
-
-        /* --- MOBILE VIEW --- */
-        @media (max-width: 768px) {
-            .main-header { padding: 1rem 1.2rem; }
-            .header-title-main { font-size: 1.3rem; }
-            .header-subtitle { font-size: 0.9rem; }
-            
-            /* Hide Theme Toggle on Mobile */
-            #theme-toggle-btn { display: none !important; }
-            .header-controls { position: static; transform: none; margin-top: 10px; justify-content: center; }
-            
-            .card { margin-bottom: 12px; }
-            .card-body { padding: 0; }
-            
-            .table td, .table th { padding: 8px 10px; font-size: 0.8rem; }
-            .val-display { font-size: 0.85rem; }
-            
-            .card-header-custom { cursor: pointer; padding: 10px 15px; flex-wrap: wrap; gap: 8px; }
-            .card-title-text { font-size: 0.95rem; }
-            
-            .feed-badge { font-size: 0.75rem; padding: 3px 8px; margin-top: 2px; }
-            
-            .header-actions {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                width: 100%;
-                margin-top: 5px;
-            }
-            
-            .collapse-icon {
-                transition: transform 0.3s ease;
-                color: var(--arrow-color);
-                font-size: 1rem;
-                font-weight: bold;
-                display: block;
-            }
-            [dir="ltr"] .collapse-icon { transform: rotate(-90deg); }
-            [dir="rtl"] .collapse-icon { transform: rotate(90deg); }
-            .card-header-custom[aria-expanded="true"] .collapse-icon { transform: rotate(0deg) !important; }
-        }
-
         /* --- INPUTS --- */
         .form-label { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
         
@@ -396,6 +346,34 @@
         }
         .footer-notes li { margin-bottom: 8px; padding-inline-start: 15px; position: relative; line-height: 1.5; }
         .footer-notes li::before { content: "•"; color: var(--kipic-green); font-weight: bold; position: absolute; inset-inline-start: 0; }
+        
+        /* Media Queries */
+        @media (min-width: 769px) {
+            .collapse-icon { display: none !important; }
+            .card-header-custom { cursor: default !important; pointer-events: none; }
+            .collapse { display: block !important; height: auto !important; visibility: visible !important; }
+            .card-header-custom .header-actions { pointer-events: auto; } 
+        }
+
+        @media (max-width: 768px) {
+            .main-header { padding: 1rem 1.2rem; }
+            .header-title-main { font-size: 1.3rem; }
+            .header-subtitle { font-size: 0.9rem; }
+            #theme-toggle-btn { display: none !important; }
+            .header-controls { position: static; transform: none; margin-top: 10px; justify-content: center; }
+            .card { margin-bottom: 12px; }
+            .card-body { padding: 0; }
+            .table td, .table th { padding: 8px 10px; font-size: 0.8rem; }
+            .val-display { font-size: 0.85rem; }
+            .card-header-custom { cursor: pointer; padding: 10px 15px; flex-wrap: wrap; gap: 8px; }
+            .card-title-text { font-size: 0.95rem; }
+            .feed-badge { font-size: 0.75rem; padding: 3px 8px; margin-top: 2px; }
+            .header-actions { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 5px; }
+            .collapse-icon { transition: transform 0.3s ease; color: var(--arrow-color); font-size: 1rem; font-weight: bold; display: block; }
+            [dir="ltr"] .collapse-icon { transform: rotate(-90deg); }
+            [dir="rtl"] .collapse-icon { transform: rotate(90deg); }
+            .card-header-custom[aria-expanded="true"] .collapse-icon { transform: rotate(0deg) !important; }
+        }
     </style>
 </head>
 <body>
@@ -436,7 +414,7 @@
             </div>
             <div class="col-md-2">
                 <label class="form-label" data-i18n="inputUnit">Unit</label>
-                <select class="form-select" id="unitSelect" onchange="updatePlaceholder();">
+                <select class="form-select" id="unitSelect" onchange="handleModeChange();">
                     <option value="KBPD">KBPD</option>
                     <option value="sm3hr">sm3/h</option>
                 </select>
@@ -578,7 +556,6 @@
     }
 
     // --- DATA STRUCTURE (EXACT MAPPING) ---
-    // Note: feedsKBPD and feedsSM3 correspond index-by-index from the Excel sheet.
     const DB = {
         "KEC": {
             "Max Kero (with Heavy Diesel)": {
@@ -852,25 +829,29 @@
             updateModes(false); 
         }
         
-        // Input Listener for Validation
+        // UI Logic Listeners
         const feedInput = document.getElementById("feedInput");
         if (feedInput) {
-            feedInput.addEventListener("input", validateInput);
+            // On typing -> Hide Results & Alert
+            feedInput.addEventListener("input", resetUI);
+            
             feedInput.addEventListener("keypress", function(event) {
               if (event.key === "Enter") {
                 event.preventDefault();
-                // Only calc if not disabled
-                if(!document.getElementById('calcBtn').disabled) {
-                    calculateResults();
-                }
+                calculateResults();
               }
             });
         }
     });
 
+    function resetUI() {
+        document.getElementById('results-row').style.display = 'none';
+        document.getElementById('rangeAlert').style.display = 'none';
+    }
+
     function handleModeChange() {
+        resetUI(); // Hide results on mode change
         updatePlaceholder();
-        validateInput(); // Re-validate on mode change
     }
 
     function updateModes(preserveSelection = true) {
@@ -914,63 +895,13 @@
                 feedInput.placeholder = text;
                 feedInput.value = min;
                 feedInput.disabled = true;
-                // Auto calc only if valid
+                // Auto calc only if fixed
                 calculateResults();
             } else {
                 let text = (curLang === 'en' ? STRINGS.en.range : STRINGS.ar.range) + `${min} - ${max}`;
                 feedInput.placeholder = text;
                 feedInput.disabled = false;
                 feedInput.value = "";
-                
-                // Reset UI on unit change
-                document.getElementById('results-row').style.display = 'none';
-                document.getElementById('rangeAlert').style.display = 'none';
-                document.getElementById('calcBtn').disabled = true; // Disable until typed
-            }
-        }
-        validateInput();
-    }
-
-    // --- NEW VALIDATION FUNCTION ---
-    function validateInput() {
-        const oilType = document.getElementById('oilTypeSelect').value;
-        const mode = document.getElementById('modeSelect').value;
-        const unit = document.getElementById('unitSelect').value;
-        const feedInput = document.getElementById('feedInput');
-        const calcBtn = document.getElementById('calcBtn');
-        const alertBox = document.getElementById('rangeAlert');
-        const alertMsg = document.getElementById('rangeMsg');
-        
-        if(feedInput.disabled) {
-             alertBox.style.display = 'none';
-             calcBtn.disabled = false;
-             return;
-        }
-
-        let val = parseLocaleNumber(feedInput.value);
-        
-        if (isNaN(val) || feedInput.value.trim() === "") {
-            alertBox.style.display = 'none';
-            calcBtn.disabled = true;
-            return;
-        }
-
-        if (DB[oilType] && DB[oilType][mode]) {
-            const data = DB[oilType][mode];
-            let feeds = (unit === 'KBPD') ? data.feedsKBPD : data.feedsSM3;
-            let min = Math.min(...feeds);
-            let max = Math.max(...feeds);
-
-            if (val < min || val > max) {
-                // SHOW ERROR
-                alertBox.style.display = 'flex';
-                let msgBase = STRINGS[curLang].alertMsg;
-                alertMsg.innerText = `${msgBase} (${min} - ${max})`;
-                calcBtn.disabled = true;
-            } else {
-                // HIDE ERROR
-                alertBox.style.display = 'none';
-                calcBtn.disabled = false;
             }
         }
     }
@@ -994,18 +925,40 @@
     }
 
     function calculateResults() {
-        const calcBtn = document.getElementById('calcBtn');
-        if (calcBtn.disabled) return;
-
-        document.getElementById('results-row').style.display = 'flex';
-
         const oilType = document.getElementById('oilTypeSelect').value;
         const mode = document.getElementById('modeSelect').value;
         const unit = document.getElementById('unitSelect').value;
-        let rawVal = document.getElementById('feedInput').value;
+        const feedInput = document.getElementById('feedInput');
+        const alertBox = document.getElementById('rangeAlert');
+        const alertMsg = document.getElementById('rangeMsg');
+        const resultRow = document.getElementById('results-row');
+
+        let rawVal = feedInput.value;
         let rawInput = parseLocaleNumber(rawVal);
-        
+
+        if (isNaN(rawInput) || rawVal.trim() === "") {
+             return; // Do nothing
+        }
+
         const data = DB[oilType][mode];
+        let feeds = (unit === 'KBPD') ? data.feedsKBPD : data.feedsSM3;
+        let min = Math.min(...feeds);
+        let max = Math.max(...feeds);
+
+        // --- VALIDATION CHECK ---
+        if (rawInput < min || rawInput > max) {
+            // Show Error, Hide Results
+            resultRow.style.display = 'none';
+            alertBox.style.display = 'flex';
+            let msgBase = STRINGS[curLang].alertMsg;
+            alertMsg.innerText = `${msgBase} (${min} - ${max})`;
+            return; // Stop calculation
+        }
+
+        // If valid -> Hide Alert, Show Results
+        alertBox.style.display = 'none';
+        resultRow.style.display = 'flex';
+
         let referenceFeeds, interpolatedKBPD, interpolatedSM3;
         
         if (unit === 'KBPD') {
