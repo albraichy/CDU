@@ -1,3 +1,538 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CDU Parameters Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- KIPIC BRAND THEME --- */
+        :root {
+            --kipic-navy: #002F6C;       
+            --kipic-green: #6FAE27;      
+            --kipic-gradient: linear-gradient(135deg, var(--kipic-navy) 60%, #004494 100%);
+            --operator-blue: #004e92;    
+
+            /* Light Mode */
+            --bg-body: #f3f5f8;
+            --bg-card: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #6c757d;
+            --border-color: #e9ecef;
+            --header-text: #ffffff;
+            --table-head-bg: #f1f3f5;    
+            --table-head-text: #495057;
+            --table-stripe: #f8f9fa;
+            --table-row-bg: #ffffff;     
+            --input-bg: #ffffff;
+            --footer-bg: #e9ecef;
+            
+            /* Badge Colors (Solid Blue in Light) */
+            --badge-bg: var(--kipic-navy);
+            --badge-text: #ffffff;
+            --badge-border: var(--kipic-navy);
+            
+            --arrow-color: var(--kipic-navy);
+            --placeholder-color: #adb5bd;
+        }
+
+        [data-theme="dark"] {
+            /* Dark Mode */
+            --bg-body: #121212;
+            --bg-card: #1e1e24;
+            --text-main: #e0e0e0;
+            --text-muted: #b0b0b0;
+            --border-color: #343a40;
+            --header-text: #e0e0e0;
+            
+            /* Dark Tables */
+            --table-head-bg: #0d1b2a;    
+            --table-head-text: #ced4da;
+            --table-row-bg: #151a21;     
+            --table-stripe: #1c232b;     
+            
+            --input-bg: #2b2b36;
+            --footer-bg: #1a1a1a;
+            --kipic-navy: #0d1b2a; 
+            --kipic-green: #7bc938;
+            
+            /* Badge Colors (Solid Green in Dark) */
+            --badge-bg: var(--kipic-green);
+            --badge-text: #000000;
+            --badge-border: var(--kipic-green);
+            
+            --arrow-color: var(--kipic-green);
+            --placeholder-color: #6c757d;
+        }
+
+        body {
+            font-family: 'Roboto', 'Tajawal', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s ease;
+        }
+
+        /* --- HEADER --- */
+        .main-header {
+            background: var(--kipic-gradient);
+            color: var(--header-text);
+            padding: 1.5rem 2rem;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            text-align: center;
+            border-bottom: 4px solid var(--kipic-green); 
+        }
+
+        .header-title-main {
+            font-weight: 800;
+            font-size: 1.8rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .header-subtitle {
+            font-weight: 400;
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 4px;
+            color: #d1e7dd; 
+        }
+
+        /* Fixed LTR for Controls */
+        .header-controls {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            inset-inline-end: 25px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            direction: ltr !important; 
+        }
+
+        .icon-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.25);
+            color: #fff;
+            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover { background: var(--kipic-green); border-color: var(--kipic-green); }
+
+        /* Language Switch */
+        .lang-switch-container {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 2px;
+            display: flex;
+            position: relative;
+            cursor: pointer;
+            width: 76px;
+            height: 34px;
+        }
+        
+        .lang-option {
+            flex: 1;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            z-index: 2;
+            line-height: 28px;
+            color: rgba(255, 255, 255, 0.6);
+            transition: color 0.3s;
+        }
+        .lang-option.active { color: #fff; }
+
+        .lang-slider {
+            position: absolute;
+            top: 2px;
+            bottom: 2px;
+            left: 2px;
+            width: 50%;
+            background: var(--kipic-green);
+            border-radius: 16px;
+            transition: transform 0.3s ease;
+            z-index: 1;
+        }
+        
+        .lang-switch-container.ar-active .lang-slider {
+            transform: translateX(92%);
+        }
+
+        /* --- CARDS & COLLAPSE --- */
+        .card {
+            background-color: var(--bg-card);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+            overflow: hidden;
+            border-top: 3px solid var(--kipic-navy); 
+            transition: border-color 0.3s ease;
+        }
+        
+        [data-theme="dark"] .card { border-top-color: var(--kipic-green) !important; }
+        
+        .card-header-custom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: transparent;
+        }
+
+        .card-title-text {
+            color: var(--kipic-navy);
+            font-weight: 700;
+            margin: 0;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        [data-theme="dark"] .card-title-text { color: var(--kipic-green); }
+
+        /* --- FEED BADGE --- */
+        .feed-badge {
+            background-color: var(--badge-bg);
+            border: 1px solid var(--badge-border);
+            color: var(--badge-text);
+            padding: 5px 16px;
+            border-radius: 6px;
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 700;
+            font-size: 0.9rem;
+            direction: ltr;
+            white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* --- DESKTOP VIEW --- */
+        @media (min-width: 769px) {
+            .collapse-icon { display: none !important; }
+            .card-header-custom { cursor: default !important; pointer-events: none; }
+            .collapse { display: block !important; height: auto !important; visibility: visible !important; }
+            /* Enable pointer events for header badge/controls */
+            .card-header-custom .header-actions { pointer-events: auto; } 
+        }
+
+        /* --- MOBILE VIEW --- */
+        @media (max-width: 768px) {
+            .main-header { padding: 1rem 1.2rem; }
+            .header-title-main { font-size: 1.3rem; }
+            .header-subtitle { font-size: 0.9rem; }
+            
+            /* Hide Theme Toggle on Mobile */
+            #theme-toggle-btn { display: none !important; }
+            .header-controls { position: static; transform: none; margin-top: 10px; justify-content: center; }
+            
+            .card { margin-bottom: 12px; }
+            .card-body { padding: 0; }
+            
+            .table td, .table th { padding: 8px 10px; font-size: 0.8rem; }
+            .val-display { font-size: 0.85rem; }
+            
+            .card-header-custom { cursor: pointer; padding: 10px 15px; flex-wrap: wrap; gap: 8px; }
+            .card-title-text { font-size: 0.95rem; }
+            
+            .feed-badge { font-size: 0.75rem; padding: 3px 8px; margin-top: 2px; }
+            
+            .header-actions {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                margin-top: 5px;
+            }
+            
+            .collapse-icon {
+                transition: transform 0.3s ease;
+                color: var(--arrow-color);
+                font-size: 1rem;
+                font-weight: bold;
+                display: block;
+            }
+            [dir="ltr"] .collapse-icon { transform: rotate(-90deg); }
+            [dir="rtl"] .collapse-icon { transform: rotate(90deg); }
+            .card-header-custom[aria-expanded="true"] .collapse-icon { transform: rotate(0deg) !important; }
+        }
+
+        /* --- INPUTS --- */
+        .form-label { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+        
+        .form-control, .form-select {
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            height: 38px;
+        }
+        
+        .form-control::placeholder { 
+            color: var(--placeholder-color) !important; 
+            opacity: 1 !important; 
+        }
+        
+        /* Style for Disabled Input to look clean but clearly locked */
+        .form-control:disabled {
+            background-color: rgba(0,0,0,0.05);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            border-color: var(--border-color);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--kipic-green);
+            box-shadow: 0 0 0 3px rgba(111, 174, 39, 0.15);
+        }
+        
+        [dir="rtl"] .form-select { background-position: left 0.75rem center; padding-right: 0.75rem; padding-left: 2.25rem; }
+
+        .btn-calc-custom {
+            background-color: var(--operator-blue);
+            border-color: var(--operator-blue);
+            color: #ffffff;
+            transition: all 0.3s ease;
+            padding-top: 0; padding-bottom: 0;
+            height: 38px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-calc-custom:hover { background-color: #003d73; border-color: #003d73; color: #ffffff; }
+
+        /* --- TABLES --- */
+        .table { margin-bottom: 0; border-color: var(--border-color); color: var(--text-main); }
+        .table thead th {
+            background-color: var(--table-head-bg);
+            color: var(--table-head-text);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding: 10px 15px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        [data-theme="dark"] .table thead th { border-bottom-color: #495057; }
+        .table td {
+            background-color: var(--table-row-bg);
+            padding: 8px 15px;
+            vertical-align: middle;
+            border-color: var(--border-color);
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+        .table-hover tbody tr:hover td { background-color: var(--table-stripe); }
+        .group-cell {
+            background-color: var(--table-head-bg) !important;
+            color: var(--kipic-navy);
+            font-weight: 700;
+            border-inline-end: 2px solid var(--border-color);
+        }
+        [data-theme="dark"] .group-cell { color: var(--kipic-green); }
+        .val-display { font-family: 'Roboto Mono', monospace; font-weight: 600; }
+        .unit-small { font-size: 0.8em; color: var(--text-muted); margin-inline-start: 6px; font-weight: 400; }
+
+        /* --- FOOTER & ALERTS --- */
+        .quality-alert {
+            background-color: rgba(255, 193, 7, 0.1);
+            border-inline-start: 4px solid #ffc107;
+            padding: 10px 15px;
+            font-size: 0.8rem;
+            color: var(--text-main);
+            border-top: 1px solid var(--border-color);
+        }
+        .quality-alert ul, .footer-notes ul { list-style: none; padding-left: 0; margin: 0; }
+        
+        .site-footer {
+            margin-top: auto;
+            background-color: var(--footer-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 20px 0;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .footer-notes li { margin-bottom: 8px; padding-inline-start: 15px; position: relative; line-height: 1.5; }
+        .footer-notes li::before { content: "•"; color: var(--kipic-green); font-weight: bold; position: absolute; inset-inline-start: 0; }
+    </style>
+</head>
+<body>
+
+<header class="main-header">
+    <div class="container-fluid p-0">
+        <div class="row align-items-center justify-content-center position-relative">
+            <div class="col-12 text-center">
+                <div class="header-title-main" data-i18n="mainTitle">Crude Distillation Unit</div>
+                <div class="header-subtitle" data-i18n="subTitle">Operational Parameters</div>
+            </div>
+            <div class="header-controls">
+                <button class="icon-btn" id="theme-toggle-btn" onclick="toggleThemeManual()" title="Switch Theme">
+                    <i class="bi bi-sun-fill" id="theme-icon"></i>
+                </button>
+                
+                <div class="lang-switch-container" id="lang-switch" onclick="toggleLanguage()">
+                    <div class="lang-slider"></div>
+                    <span class="lang-option active" id="opt-en">EN</span>
+                    <span class="lang-option" id="opt-ar">AR</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container py-4 py-md-5">
+    
+    <div class="card p-3 p-md-4">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label" data-i18n="oilType">Oil Type</label>
+                <select class="form-select" id="oilTypeSelect" onchange="updateModes()"></select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" data-i18n="opMode">Operating Mode</label>
+                <select class="form-select" id="modeSelect" onchange="handleModeChange()"></select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" data-i18n="inputUnit">Unit</label>
+                <select class="form-select" id="unitSelect" onchange="updatePlaceholder();">
+                    <option value="KBPD">KBPD</option>
+                    <option value="sm3hr">sm3/h</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" data-i18n="feedRate">Feed Rate</label>
+                <div class="d-flex gap-2">
+                    <form onsubmit="event.preventDefault(); calculateResults();" class="d-flex gap-2 w-100">
+                        <input type="text" class="form-control" id="feedInput" placeholder="Range..." inputmode="decimal" enterkeyhint="go">
+                        <button type="button" class="btn btn-calc-custom px-4" onclick="calculateResults()" data-i18n="calcBtn">
+                            Calculate
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 g-md-4" id="results-row" style="display: none;">
+        
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseParams" aria-expanded="false">
+                    <h5 class="card-title-text">
+                        <i class="bi bi-speedometer2"></i>
+                        <span data-i18n="opParams">Operational Parameters</span>
+                    </h5>
+                    <div class="header-actions">
+                        <div id="feed-display-badge" class="feed-badge">--</div>
+                        <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                </div>
+                <div id="collapseParams" class="collapse">
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="paramName">Parameter Name</th>
+                                    <th class="text-end" data-i18n="value">Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="params-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            
+            <div class="card mb-3 mb-md-4">
+                <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseYields" aria-expanded="false">
+                    <div class="header-actions d-flex w-100 justify-content-between align-items-center">
+                         <h5 class="card-title-text">
+                            <i class="bi bi-graph-up-arrow"></i>
+                            <span data-i18n="prodYields">Production Yields</span>
+                        </h5>
+                        <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                </div>
+                <div id="collapseYields" class="collapse">
+                    <div class="card-body p-0">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="product">Product</th>
+                                    <th class="text-end">Flow (sm3/h)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="yields-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-0">
+                <div class="card-header-custom collapsed" data-bs-toggle="collapse" data-bs-target="#collapseQuality" aria-expanded="false">
+                    <div class="header-actions d-flex w-100 justify-content-between align-items-center">
+                        <h5 class="card-title-text">
+                            <i class="bi bi-clipboard-check"></i>
+                            <span data-i18n="prodQuality">Quality Specifications</span>
+                        </h5>
+                        <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                </div>
+                <div id="collapseQuality" class="collapse">
+                    <div class="card-body p-0 table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="stream">Stream</th>
+                                    <th data-i18n="property">Property</th>
+                                    <th class="text-end" data-i18n="limit">Limit/Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="quality-body"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="quality-alert" id="quality-notes-area" style="display: none;">
+                        <ul id="quality-notes-list"></ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<footer class="site-footer">
+    <div class="container">
+        <h6 class="fw-bold mb-3 text-uppercase" style="color: var(--text-main);">
+            <i class="bi bi-info-circle-fill me-2"></i><span data-i18n="notesTitle">General Notes & Guidelines</span>
+        </h6>
+        <div class="footer-notes">
+            <ul id="footer-static-notes">
+                <li data-i18n="note1"></li>
+                <li data-i18n="note2"></li>
+                <li data-i18n="note3"></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+
 <script>
     const CONVERSION_FACTOR = 6.624; 
 
@@ -624,3 +1159,6 @@
         updateStaticNotes();
     };
 </script>
+
+</body>
+</html>
