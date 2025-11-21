@@ -1046,14 +1046,17 @@
         let min = Math.min(...feeds);
         let max = Math.max(...feeds);
 
-        // --- VALIDATION CHECK ---
-        // Allow small floating point tolerance
-        if (min !== max && (rawInput < min || rawInput > max)) {
+        // --- VALIDATION CHECK FIX ---
+        // We round the limits to match the display (Integer) so 696 is valid even if raw is 696.4
+        let limitMin = parseFloat(min.toFixed(0));
+        let limitMax = parseFloat(max.toFixed(0));
+
+        if (limitMin !== limitMax && (rawInput < limitMin || rawInput > limitMax)) {
             // Show Error, Hide Results
             resultRow.style.display = 'none';
             alertBox.style.display = 'flex';
             let msgBase = STRINGS[curLang].alertMsg;
-            alertMsg.innerText = `${msgBase} (${min.toFixed(0)} - ${max.toFixed(0)})`;
+            alertMsg.innerText = `${msgBase} (${limitMin} - ${limitMax})`;
             return; // Stop calculation
         }
 
