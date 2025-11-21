@@ -776,7 +776,7 @@
                         "Bottom Pump Around to Reboiler Flow": {u: "sm3/h", v: [239.3]},
                         "AR Product Temperature": {u: "°C", v: [174.9]}
                     },
-                    yields: { "LPG": [0], "Naphtha": [128.0], "Kerosene": [46.7], "Light Diesel": [143.0], "Heavy Diesel": [0], "AR": [532.8] },
+                    yields: { "LPG": [0], "Naphtha": [128.0], "Kerosene": [46.7], "Light Diesel": [143.0], "Heavy Diesel": [0], "AR": [532.7] },
                     quality: { 
                         "Desalted Crude": { "Salt HEM": {u:"PTB", v:[0.4]}, "BS&W": {u:"%", v:[0.7]} },
                         "Naphtha": { "RVP": {u:"psi", v:[7.25]}, "T95": {u:"°C", v:[146]} },
@@ -1061,9 +1061,9 @@
 
         let displayFeed = "";
         if (unit === 'KBPD') {
-             displayFeed = `${rawInput} KBPD (${interpolatedSM3.toFixed(1)} sm3/h)`;
+             displayFeed = `${rawInput} KBPD (${interpolatedSM3.toFixed(0)} sm3/h)`;
         } else {
-             displayFeed = `${rawInput} sm3/h (${interpolatedKBPD.toFixed(1)} KBPD)`;
+             displayFeed = `${rawInput} sm3/h (${interpolatedKBPD.toFixed(0)} KBPD)`;
         }
         document.getElementById('feed-display-badge').innerText = displayFeed;
 
@@ -1076,12 +1076,12 @@
              crudeFeedVal = interpolatedKBPD;
              crudeFeedUnit = "KBPD";
         }
-        paramHTML += `<tr><td>Crude Feed (Tank)</td><td class="text-end val-display">${crudeFeedVal.toLocaleString(undefined, {maximumFractionDigits: 1})}<span class="unit-small">${crudeFeedUnit}</span></td></tr>`;
+        paramHTML += `<tr><td>Crude Feed (Tank)</td><td class="text-end val-display">${crudeFeedVal.toLocaleString(undefined, {maximumFractionDigits: 0})}<span class="unit-small">${crudeFeedUnit}</span></td></tr>`;
 
         for (let key in data.params) {
             let item = data.params[key];
             let val = getInterpolatedValue(rawInput, referenceFeeds, item.v);
-            let display = val.toLocaleString(undefined, {maximumFractionDigits: 2}); // Increased precision slightly
+            let display = val.toLocaleString(undefined, {maximumFractionDigits: 0}); 
             paramHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}<span class="unit-small">${item.u}</span></td></tr>`;
         }
         document.getElementById('params-body').innerHTML = paramHTML;
@@ -1089,7 +1089,7 @@
         let yieldHTML = "";
         for (let key in data.yields) {
             let val = getInterpolatedValue(rawInput, referenceFeeds, data.yields[key]);
-            let display = val.toLocaleString(undefined, {maximumFractionDigits: 1});
+            let display = val.toLocaleString(undefined, {maximumFractionDigits: 0});
             yieldHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}</td></tr>`;
         }
         document.getElementById('yields-body').innerHTML = yieldHTML;
@@ -1101,7 +1101,7 @@
             subKeys.forEach((subKey, index) => {
                 let item = groupData[subKey];
                 let val = getInterpolatedValue(rawInput, referenceFeeds, item.v);
-                let display = (subKey.includes("Point") || subKey.includes("T95")) ? val.toFixed(0) : val.toFixed(2);
+                let display = val.toFixed(0);
                 qualHTML += "<tr>";
                 if (index === 0) qualHTML += `<td class="group-cell" rowspan="${subKeys.length}">${groupName}</td>`;
                 qualHTML += `<td>${subKey}</td>`;
