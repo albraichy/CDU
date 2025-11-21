@@ -546,14 +546,291 @@
 </footer>
 
 <script>
+    // --- HELPER: Parse English or Arabic Numerals ---
     function parseLocaleNumber(stringNumber) {
         if (!stringNumber) return NaN;
         stringNumber = stringNumber.toString();
-        var englishDigits = stringNumber.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+        var englishDigits = stringNumber
+            .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
         return parseFloat(englishDigits);
     }
 
-    const DB = {"KEC": {"Max Kero (with Heavy Diesel)": {"feedsKBPD": [205.0, 200.0, 175.0, 155.0, 130.0, 105.0], "feedsSM3": [1341.9519906991015, 1321.0339481278247, 1159.3778479113676, 1031.2746367761451, 851.6218257187099, 696.4408009817741], "params": {"Slops": {"u": "sm3/hr", "v": [36.106372400964375, 33.01500671009513, 29.540890555840832, 41.1279424513405, 3.2538785737245624, 0.0]}, "Heater Feed Rate": {"u": "sm3/hr", "v": [1230.0000827936572, 1220.0013407428762, 1055.9230886106352, 969.9728933970076, 804.682980458502, 659.9950907318339]}, "V-0001 inlet temperature(2)": {"u": "\u00b0C", "v": [149.3021382252652, 148.7697595317853, 150.0368559313578, 147.98933710019796, 148.78177460293938, 147.3237432219905]}, "V-0002 inlet temperature (2)": {"u": "\u00b0C", "v": [148.42951669895965, 147.88848158904568, 149.21536815582792, 147.07394956496535, 147.87847260414298, 146.37256668667098]}, "E-10 Exchanger Outlet Temp to Preflash Drum (3)": {"u": "\u00b0C", "v": [199.9115436784616, 201.9109345105061, 200.0953570096452, 198.24433320205176, 199.56738539102767, 202.71973171766527]}, "Heater Outlet Temperature": {"u": "\u00b0C", "v": [370.99642991236624, 370.8273854703354, 370.92971996004735, 370.96126388574714, 370.3293320437139, 370.9905262337916]}, "Column Top Temperature": {"u": "\u00b0C", "v": [111.99785881377076, 111.99951522475568, 111.99858204432874, 111.00352864733304, 111.00718234735174, 111.00217803867405]}, "Top Column Pressure": {"u": "barg", "v": [1.0299931644692828, 1.0300171988776283, 1.02999003981724, 1.02089658506043, 1.029998215321392, 1.0000193726012463]}, "Top Pump Around Flow": {"u": "sm3/hr", "v": [1620.595919960428, 1549.9881528803514, 1385.0060405137608, 1359.9975008789756, 1159.9843597069482, 1169.9993375747897]}, "Top Pump Around\u00a0Draw Temperature": {"u": "\u00b0C", "v": [126.93519474216976, 126.33558487822312, 127.59564121549106, 125.91805130128036, 127.36385157322482, 126.89568808043516]}, "Top Pump Around\u00a0Return Temperature": {"u": "\u00b0C", "v": [103.24263828391337, 105.12036245676288, 104.82623993646564, 105.13450175535807, 106.47960985078856, 106.84177824938054]}, "Middle Pump Around Flow": {"u": "sm3/hr", "v": [1185.990900792182, 1123.9981581333907, 1015.0050634941762, 890.0017668141902, 765.5925219344177, 685.0031907105076]}, "Middle Pump\u00a0Around Draw Temperature": {"u": "\u00b0C", "v": [219.02215497138505, 215.88620519859836, 216.82386323474745, 213.4920103708906, 208.10006082852647, 208.10900558822425]}, "Middle Pump Around Return Temperature": {"u": "\u00b0C", "v": [164.63982512972655, 158.25625757049855, 163.87272718157018, 157.60205113898093, 154.22156512291966, 160.38132803780664]}, "Bottom Pump Around Flow": {"u": "sm3/hr", "v": [899.9989431923293, 1001.9956207193144, 775.0021370137543, 780.0018668586182, 700.0052215003551, 540.9960980716511]}, "Bottom Pump Around Draw Temperature": {"u": "\u00b0C", "v": [291.11824574815165, 291.30348391093344, 295.5871025981597, 292.1265332588039, 287.32370878133975, 286.9409565291385]}, "Bottom Pump Around Return Temperature": {"u": "\u00b0C", "v": [243.9396220372964, 246.22255832801875, 249.14418845040515, 248.29363142876443, 248.48520819819527, 246.15096909972448]}, "Column Bottom Temperature": {"u": "\u00b0C", "v": [347.594398306238, 348.5249145409229, 345.4163726903528, 347.38862372311564, 344.03934343915114, 341.8624583026653]}, "Kerosene Draw Temperature": {"u": "\u00b0C", "v": [178.34523153485733, 176.07339860068396, 178.74347097729907, 176.29206487970774, 176.82398324069095, 178.84312663211426]}, "Kerosene Reboiler Temperature": {"u": "\u00b0C", "v": [215.57326914246252, 215.52050213275825, 215.341764240568, 216.0254105971836, 217.4247560091905, 218.32859234739377]}, "Light Diesel Draw Temperature": {"u": "\u00b0C", "v": [263.99540837480816, 261.8921987867065, 265.781791251047, 261.12776698212946, 259.2095217837796, 259.49857272694635]}, "Heavy Diesel Draw Temperature": {"u": "\u00b0C", "v": [318.31595016301003, 319.896707741954, 317.31146824428043, 315.84690940947775, 309.93597444665033, 309.64442822185526]}, "Overflash flow": {"u": "sm3/hr", "v": [112.53461344222438, 84.29708475372398, 108.44131809168157, 83.4801866492497, 75.1532478096637, 72.74226060539013]}, "Stripping Steam Temperature": {"u": "\u00b0C", "v": [274.88494410446776, 284.94577549647744, 289.92573947482634, 289.65501036540684, 283.59019148468184, 274.20680920831035]}, "Stripping steam to crude column": {"u": "kg/hr", "v": [22500.006813236727, 21997.9729834528, 20500.00752155669, 17499.939000302402, 15374.186599139844, 15500.079683945472]}, "Stripping Steam to Light Diesel Stripper (3)": {"u": "kg/hr", "v": [1199.998022696528, 2150.0154684561307, 1092.0011057611785, 1450.004393311984, 1209.1277264444034, 999.9921245096928]}, "Stripping Steam to Heavy Diesel Stripper (3)": {"u": "kg/hr", "v": [350.0007811362264, 449.9998249568162, 300.0000703112909, 299.99883345897285, 299.9976822846311, 300.00588646791164]}, "Stabilizer feed temperature": {"u": "\u00b0C", "v": [101.85311446813412, 103.87557525252828, 102.48947194417336, 105.57693893668642, 108.12068248262948, 110.27472838979648]}, "Stabilizer reboiler inlet temperature": {"u": "\u00b0C", "v": [147.1379390651417, 147.80817082476537, 149.2896572633768, 150.67223319959163, 153.29005881956525, 155.48760247191376]}, "Stabilizer Reboiler outlet temperature": {"u": "\u00b0C", "v": [159.86244804721372, 158.41391677010355, 159.06536969623824, 158.09013009229594, 159.1017798249035, 159.9483040808068]}, "Stabilizer reflux flow": {"u": "sm3/hr", "v": [34.8613995004393, 29.670744536510465, 31.5440171875673, 25.80789203273945, 21.149761526099752, 20.955262606549763]}, "BPA to reboiler inlet temperature": {"u": "\u00b0C", "v": [234.95731364409747, 218.54447695619564, 227.2822126988009, 220.6442639915797, 217.67510445799985, 216.5171704785573]}, "BPA to reboiler flow": {"u": "sm3/hr", "v": [899.9989431923293, 1001.9956207193144, 775.0021370137543, 780.0018668586182, 700.0052215003551, 540.9960980716511]}, "AR product temp. to ARDS": {"u": "\u00b0C", "v": [169.9567215761779, 164.17219142305942, 170.3026247902522, 161.28832944536902, 166.09090053680094, 156.55973268455682]}}, "yields": {"Atmospheric Residue (AR)": [169.9567215761779, 164.17219142305942, 170.3026247902522, 161.28832944536902, 166.09090053680094, 156.55973268455682], "3) To be optimized depending on Diesel Cloud Point, On Spec -7 \u00b0 C winter and 4 \u00b0C summer": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}, "quality": {"Misc": {"Wild Naphtha": {"u": "sm3/hr", "v": [10.001415559365752, 9.099248971433923, 26.76691902730262, 10.24218750669149, 6.6014266830369195, 9.96249643128361]}, "Washwater flow to Desalter V02 (75% of total) (2)": {"u": "%", "v": [50.22765201618804, 53.00001907492396, 45.46843345432144, 41.07463843079356, 33.99996599976357, 26.999822038578376]}, "Washwater flow to Desalter E01 crude side (25% of total) (2)": {"u": "%", "v": [16.743041199940688, 17.99991622590287, 14.99211264561089, 13.537255140326147, 11.999145756820464, 9.000259074280077]}}}}, "Max Kero (No Heavy Diesel)": {"feedsKBPD": [200.0, 195.0, 180.0, 160.0, 150.0, 120.0, 105.0], "feedsSM3": [1326.665769800077, 1300.3307112648197, 1203.8535965660396, 1060.6758689600829, 979.9459024149606, 789.698034457327, 689.3693056205894], "params": {"Slops": {"u": "sm3/hr", "v": [48.77091775497264, 25.81590950583866, 3.3693326564450934, 34.19301377072369, 24.56392490415853, -3.413282593271132e-05, 0.0]}, "Heater Feed Rate": {"u": "sm3/hr", "v": [1220.015140901163, 1200.0508450448249, 1080.7521314772896, 960.0003431931304, 897.7065725815881, 673.7607745416568, 660.0073327241947]}, "V-0001 inlet temperature(2)": {"u": "\u00b0C", "v": [146.66518802330174, 150.8472282183614, 150.29640104402137, 150.57928791769731, 149.56706980356506, 149.58651692593216, 147.52503861023956]}, "V-0002 inlet temperature (2)": {"u": "\u00b0C", "v": [145.81825406434126, 150.24374635201912, 149.36527672882167, 149.5484953303123, 148.57830331443984, 148.57102027909193, 146.55753059703517]}, "E-10 Exchanger Outlet Temp to Preflash Drum (3)": {"u": "\u00b0C", "v": [199.9734885210547, 207.30281711950147, 193.97607009550435, 25.884165498146302, 194.77551797631804, 206.2184855858064, 201.899544436706]}, "Heater Outlet Temperature": {"u": "\u00b0C", "v": [371.01422428485427, 368.6141280549404, 370.984514365194, 370.9892377486112, 370.969085759944, 367.96727773776246, 370.9994048148632]}, "Column Top Temperature": {"u": "\u00b0C", "v": [110.99949252644517, 111.06427503336712, 111.99496202456488, 110.00158372608162, 112.0066818014204, 112.3727071015146, 111.00494519263746]}, "Top Column Pressure": {"u": "barg", "v": [1.029581494004017, 1.040705108118273, 1.0300112930256813, 1.0300011509779508, 1.0299955033961, 0.9728110378977026, 1.000001602199548]}, "Top Pump Around Flow": {"u": "sm3/hr", "v": [1669.9973482203463, 1345.2073202621723, 1430.676293159545, 1390.934046346302, 1191.4710684820643, 1058.259181222851, 1169.9985365470072]}, "Top Pump Around\u00a0Draw Temperature": {"u": "\u00b0C", "v": [125.10912932098908, 127.03653582452122, 126.61313358626022, 125.61287057722797, 129.4394995964127, 124.31317596661096, 126.87437448707162]}, "Top Pump Around\u00a0Return Temperature": {"u": "\u00b0C", "v": [104.43131268193824, 106.3678574259798, 101.12906347720391, 107.40759498715738, 104.3880818033315, 103.1071598426964, 107.56957367161618]}, "Middle Pump Around Flow": {"u": "sm3/hr", "v": [1179.9968503085674, 1245.0068955253143, 1039.9677185000442, 891.9211024969777, 869.9290794397302, 797.894907302974, 682.4758384767808]}, "Middle Pump\u00a0Around Draw Temperature": {"u": "\u00b0C", "v": [216.82024412311463, 227.2419613360422, 216.03616681062903, 214.1600561841272, 217.41901127015691, 205.5810914924351, 208.20437513316608]}, "Middle Pump Around Return Temperature": {"u": "\u00b0C", "v": [157.1399689804659, 157.06796077334204, 167.01299324475465, 167.3925338587196, 165.9157995596995, 162.63031341005012, 157.92409436531096]}, "Bottom Pump Around Flow": {"u": "sm3/hr", "v": [965.2506843275053, 1044.79, 790.0, 769.83, 665.71, 619.85, 540.53]}, "Bottom Pump Around Draw Temperature": {"u": "\u00b0C", "v": [290.83, 290.01, 296.97, 293.87, 295.85, 287.69, 287.65]}, "Bottom Pump Around Return Temperature": {"u": "\u00b0C", "v": [246.1, 263.3, 250.91, 250.4, 251.45, 258.06, 245.75]}, "Column Bottom Temperature": {"u": "\u00b0C", "v": [344.15, 341.41, 344.41, 342.61, 344.54, 339.19, 336.11]}, "Kerosene Draw Temperature": {"u": "\u00b0C", "v": [175.94, 176.41, 174.76, 174.55, 179.06, 173.15, 179.14]}, "Kerosene Reboiler Temperature": {"u": "\u00b0C", "v": [214.95, 217.57, 213.95, 215.5, 215.83, 217.56, 217.22]}, "Light Diesel Draw Temperature": {"u": "\u00b0C", "v": [264.79, 268.83, 264.29, 262.17, 265.95, 259.86, 260.62]}, "Heavy Diesel Draw Temperature": {"u": "\u00b0C", "v": [24.48, 43.45, 53.25, 48.61, 32.79, 44.22, 22.26]}, "Overflash flow": {"u": "sm3/hr", "v": [33.4, 0.05, 151.87, 126.49, 85.36, 67.73, 86.9]}, "Stripping Steam Temperature": {"u": "\u00b0C", "v": [274.94, 267.77, 287.51, 279.57, 281.45, 265.13, 273.31]}, "Stripping steam to crude column": {"u": "kg/hr", "v": [23893.36, 23944.07, 19996.92, 20522.97, 17341.42, 14314.22, 15248.32]}, "Stripping Steam to Light Diesel Stripper (3)": {"u": "kg/hr", "v": [1300.0, 2300.01, 1100.0, 1200.0, 941.25, 2035.48, 1000.0]}, "Stripping Steam to Heavy Diesel Stripper (3)": {"u": "kg/hr", "v": [26.98, 104.93, -12.5, -12.5, 82.86, 127.9, 35.04]}, "Stabilizer feed temperature": {"u": "\u00b0C", "v": [104.46, 111.59, 117.79, 115.04, 106.39, 128.42, 110.46]}, "Stabilizer reboiler inlet temperature": {"u": "\u00b0C", "v": [147.47, 154.2, 150.23, 151.0, 151.06, 161.63, 155.69]}, "Stabilizer Reboiler outlet temperature": {"u": "\u00b0C", "v": [159.32, 215.26, 159.7, 158.58, 157.93, 166.4, 160.14]}, "Stabilizer reflux flow": {"u": "sm3/hr", "v": [29.48, 13.06, 36.5, 27.24, 23.01, 15.72, 22.11]}, "BPA to reboiler inlet temperature": {"u": "\u00b0C", "v": [227.91, 263.78, 209.23, 206.46, 226.39, 199.78, 215.95]}, "BPA to reboiler flow": {"u": "sm3/hr", "v": [965.25, 568.56, 440.16, 368.59, 665.71, 462.3, 540.53]}, "AR product temp. to ARDS": {"u": "\u00b0C", "v": [168.26, 169.99, 176.44, 157.0, 170.0, 169.31, 155.92]}}, "yields": {"Atmospheric Residue (AR)": [168.26, 169.99, 176.44, 157.0, 170.0, 169.31, 155.92]}, "quality": {"Misc": {"Wild Naphtha": {"u": "sm3/hr", "v": [0.0, 6.99, 30.0, 8.18, 0.0, 27.79, 11.95]}, "Washwater flow to Desalter V02 (75% of total) (2)": {"u": "%", "v": [49.62, 52.0, 44.6, 45.5, 37.07, 31.5, 27.0]}, "Washwater flow to Desalter E01 crude side (25% of total) (2)": {"u": "%", "v": [16.48, 20.0, 14.88, 14.5, 12.35, 10.5, 9.0]}}}}, "Max Naphtha Mode": {"feedsKBPD": [205.0], "feedsSM3": [1367.7], "params": {"Slops": {"u": "sm3/hr", "v": [10.61]}, "Heater Feed Rate": {"u": "sm3/hr", "v": [1200.02]}, "V-0001 inlet temperature(2)": {"u": "\u00b0C", "v": [150.0]}, "V-0002 inlet temperature (2)": {"u": "\u00b0C", "v": [149.09]}, "E-10 Exchanger Outlet Temp to Preflash Drum (3)": {"u": "\u00b0C", "v": [200.6]}, "Heater Outlet Temperature": {"u": "\u00b0C", "v": [371.02]}, "Column Top Temperature": {"u": "\u00b0C", "v": [115.07]}, "Top Column Pressure": {"u": "barg", "v": [1.0]}, "Top Pump Around Flow": {"u": "sm3/hr", "v": [1621.02]}, "Top Pump Around\u00a0Draw Temperature": {"u": "\u00b0C", "v": [128.48]}, "Top Pump Around\u00a0Return Temperature": {"u": "\u00b0C", "v": [106.31]}, "Middle Pump Around Flow": {"u": "sm3/hr", "v": [1260.99]}, "Middle Pump\u00a0Around Draw Temperature": {"u": "\u00b0C", "v": [219.18]}, "Middle Pump Around Return Temperature": {"u": "\u00b0C", "v": [168.13]}, "Bottom Pump Around Flow": {"u": "sm3/hr", "v": [900.99]}, "Bottom Pump Around Draw Temperature": {"u": "\u00b0C", "v": [295.6]}, "Bottom Pump Around Return Temperature": {"u": "\u00b0C", "v": [256.62]}, "Column Bottom Temperature": {"u": "\u00b0C", "v": [343.49]}, "Kerosene Draw Temperature": {"u": "\u00b0C", "v": [177.22]}, "Kerosene Reboiler Temperature": {"u": "\u00b0C", "v": [215.41]}, "Light Diesel Draw Temperature": {"u": "\u00b0C", "v": [269.63]}, "Heavy Diesel Draw Temperature": {"u": "\u00b0C", "v": [65.62]}, "Overflash flow": {"u": "sm3/hr", "v": [99.17]}, "Stripping Steam Temperature": {"u": "\u00b0C", "v": [288.17]}, "Stripping steam to crude column": {"u": "kg/hr", "v": [24500.06]}, "Stripping Steam to Light Diesel Stripper": {"u": "kg/hr", "v": [930.01]}, "Stripping Steam to Heavy Diesel Stripper": {"u": "kg/hr", "v": [0.0]}, "Stabilizer feed temperature": {"u": "\u00b0C", "v": [116.99]}, "Stabilizer reboiler inlet temperature": {"u": "\u00b0C", "v": [149.84]}, "Stabilizer Reboiler outlet temperature": {"u": "\u00b0C", "v": [160.72]}, "Stabilizer reflux flow": {"u": "sm3/hr", "v": [31.57]}, "BPA to reboiler inlet temperature": {"u": "\u00b0C", "v": [219.54]}, "BPA to reboiler flow": {"u": "sm3/hr", "v": [400.19]}, "AR product temp. to ARDS": {"u": "\u00b0C", "v": [171.04]}}, "yields": {"Atmospheric Residue (AR)": [171.04]}, "quality": {"Misc": {"Wild Naphtha": {"u": "sm3/hr", "v": [20.39]}, "Washwater flow to Desalter V02 (75% of total) (2)": {"u": "%", "v": [53.5]}, "Washwater flow to Desalter E01 crude side (25% of total) (2)": {"u": "%", "v": [17.8]}}}}}, "KSRC": {"Base Case": {"feedsKBPD": [120.0], "feedsSM3": [809.86], "params": {"Slops": {"u": "sm3/hr", "v": [7.52]}, "Heater Feed Rate": {"u": "sm3/hr", "v": [949.97]}, "V-0001 inlet temperature(2)": {"u": "\u00b0C", "v": [149.69]}, "V-0002 inlet temperature (2)": {"u": "\u00b0C", "v": [145.97]}, "E-10 Exchanger Outlet Temp to Preflash Drum (3)": {"u": "\u00b0C", "v": [200.54]}, "Heater Outlet Temperature": {"u": "\u00b0C", "v": [370.0]}, "Column Top Temperature": {"u": "\u00b0C", "v": [112.99]}, "Top Column Pressure": {"u": "barg", "v": [1.0]}, "Top Pump Around Flow": {"u": "sm3/hr", "v": [1270.0]}, "Top Pump Around\u00a0Draw Temperature": {"u": "\u00b0C", "v": [133.76]}, "Top Pump Around\u00a0Return Temperature": {"u": "\u00b0C", "v": [109.29]}, "Middle Pump Around Flow": {"u": "sm3/hr", "v": [861.82]}, "Middle Pump\u00a0Around Draw Temperature": {"u": "\u00b0C", "v": [221.88]}, "Middle Pump Around Return Temperature": {"u": "\u00b0C", "v": [165.98]}, "Bottom Pump Around Flow": {"u": "sm3/hr", "v": [532.31]}, "Bottom Pump Around Draw Temperature": {"u": "\u00b0C", "v": [292.06]}, "Bottom Pump Around Return Temperature": {"u": "\u00b0C", "v": [256.26]}, "Column Bottom Temperature": {"u": "\u00b0C", "v": [348.06]}, "Kerosene Draw Temperature": {"u": "\u00b0C", "v": [188.51]}, "Kerosene Reboiler Temperature": {"u": "\u00b0C", "v": [219.52]}, "Light Diesel Draw Temperature": {"u": "\u00b0C", "v": [261.72]}, "Heavy Diesel Draw Temperature": {"u": "\u00b0C", "v": [25.06]}, "Overflash flow": {"u": "sm3/hr", "v": [61.65]}, "Stripping Steam Temperature": {"u": "\u00b0C", "v": [302.55]}, "Stripping steam to crude column": {"u": "kg/hr", "v": [9649.9]}, "Stripping Steam to Light Diesel Stripper": {"u": "kg/hr", "v": [2500.0]}, "Stripping Steam to Heavy Diesel Stripper": {"u": "kg/hr", "v": [109.08]}, "Stabilizer feed temperature": {"u": "\u00b0C", "v": [110.81]}, "Stabilizer reboiler inlet temperature": {"u": "\u00b0C", "v": [174.7]}, "Stabilizer Reboiler outlet temperature": {"u": "\u00b0C", "v": [186.8]}, "Stabilizer reflux flow": {"u": "sm3/hr", "v": [0.0]}, "BPA to reboiler inlet temperature": {"u": "\u00b0C", "v": [212.76]}, "BPA to reboiler flow": {"u": "sm3/hr", "v": [239.25]}, "AR product temp. to ARDS": {"u": "\u00b0C", "v": [174.85]}}, "yields": {"Atmospheric Residue (AR)": [174.85]}, "quality": {"Misc": {"Wild Naphtha": {"u": "sm3/hr", "v": [3.58]}, "Washwater flow to Desalter V02 (75% of total) (2)": {"u": "%", "v": [72.0]}, "Washwater flow to Desalter E01 crude side (25% of total) (2)": {"u": "%", "v": [24.0]}}}}}, "KMHC": {"Base Case": {"feedsKBPD": [200.0, 120.0], "feedsSM3": [1312.02, 810.73], "params": {"Slops": {"u": "sm3/hr", "v": [24.85, 0.0]}, "Heater Feed Rate": {"u": "sm3/hr", "v": [1199.93, 734.77]}, "V-0001 inlet temperature(2)": {"u": "\u00b0C", "v": [150.88, 144.69]}, "V-0002 inlet temperature (2)": {"u": "\u00b0C", "v": [150.28, 143.7]}, "E-10 Exchanger Outlet Temp to Preflash Drum (3)": {"u": "\u00b0C", "v": [188.79, 201.1]}, "Heater Outlet Temperature": {"u": "\u00b0C", "v": [369.1, 370.33]}, "Column Top Temperature": {"u": "\u00b0C", "v": [111.67, 112.42]}, "Top Column Pressure": {"u": "barg", "v": [1.01, 1.0]}, "Top Pump Around Flow": {"u": "sm3/hr", "v": [1339.42, 1269.55]}, "Top Pump Around\u00a0Draw Temperature": {"u": "\u00b0C", "v": [127.61, 128.92]}, "Top Pump Around\u00a0Return Temperature": {"u": "\u00b0C", "v": [107.28, 109.35]}, "Middle Pump Around Flow": {"u": "sm3/hr", "v": [1242.74, 623.28]}, "Middle Pump\u00a0Around Draw Temperature": {"u": "\u00b0C", "v": [227.21, 216.38]}, "Middle Pump Around Return Temperature": {"u": "\u00b0C", "v": [156.46, 170.14]}, "Bottom Pump Around Flow": {"u": "sm3/hr", "v": [1037.71, 547.62]}, "Bottom Pump Around Draw Temperature": {"u": "\u00b0C", "v": [290.75, 292.64]}, "Bottom Pump Around Return Temperature": {"u": "\u00b0C", "v": [263.58, 250.83]}, "Column Bottom Temperature": {"u": "\u00b0C", "v": [341.99, 347.72]}, "Kerosene Draw Temperature": {"u": "\u00b0C", "v": [177.0, 178.68]}, "Kerosene Reboiler Temperature": {"u": "\u00b0C", "v": [217.61, 219.63]}, "Light Diesel Draw Temperature": {"u": "\u00b0C", "v": [269.21, 259.18]}, "Heavy Diesel Draw Temperature": {"u": "\u00b0C", "v": [42.92, 22.6]}, "Overflash flow": {"u": "sm3/hr", "v": [0.16, 97.31]}, "Stripping Steam Temperature": {"u": "\u00b0C", "v": [268.08, 265.44]}, "Stripping steam to crude column": {"u": "kg/hr", "v": [23972.14, 15123.41]}, "Stripping Steam to Light Diesel Stripper": {"u": "kg/hr", "v": [2340.49, 1775.68]}, "Stripping Steam to Heavy Diesel Stripper": {"u": "kg/hr", "v": [107.98, 108.44]}, "Stabilizer feed temperature": {"u": "\u00b0C", "v": [111.88, 115.99]}, "Stabilizer reboiler inlet temperature": {"u": "\u00b0C", "v": [154.43, 168.94]}, "Stabilizer Reboiler outlet temperature": {"u": "\u00b0C", "v": [214.54, 200.65]}, "Stabilizer reflux flow": {"u": "sm3/hr", "v": [17.47, 2.01]}, "BPA to reboiler inlet temperature": {"u": "\u00b0C", "v": [263.93, 245.57]}, "BPA to reboiler flow": {"u": "sm3/hr", "v": [561.67, 402.56]}, "AR product temp. to ARDS": {"u": "\u00b0C", "v": [168.7, 161.21]}}, "yields": {"Atmospheric Residue (AR)": [168.7, 161.21]}, "quality": {"Misc": {"Wild Naphtha": {"u": "sm3/hr", "v": [1.73, 3.14]}, "Washwater flow to Desalter V02 (75% of total) (2)": {"u": "%", "v": [52.0, 51.18]}, "Washwater flow to Desalter E01 crude side (25% of total) (2)": {"u": "%", "v": [20.0, 17.06]}}}}}};
+    // --- DATA STRUCTURE (EXACT MAPPING) ---
+    const DB = {
+        "KEC": {
+            "Max Kero (with Heavy Diesel)": {
+                feedsKBPD: [205, 200, 175, 155, 130, 105],
+                feedsSM3:  [1341.95, 1321.03, 1159.38, 1031.27, 851.62, 696.44],
+                params: {
+                    "Slops": {u: "sm3/hr", v: [36.11, 33.02, 29.54, 41.13, 3.25, 0.0]},
+                    "Wild Naphtha": {u: "sm3/hr", v: [10.00, 9.10, 26.77, 10.24, 6.60, 9.96]},
+                    "Heater Feed Rate": {u: "sm3/hr", v: [1230.0, 1220.0, 1055.92, 969.97, 804.68, 660.0]},
+                    "Washwater to Desalter V02 (75% of total) (2)": {u: "%", v: [50.23, 53.0, 45.47, 41.07, 34.0, 27.0]},
+                    "Washwater to E01": {u: "%", v: [16.74, 18.0, 14.99, 13.54, 12.0, 9.0]},
+                    "V-0001 inlet temperature(2)": {u: "°C", v: [149.3, 148.77, 150.04, 147.99, 148.78, 147.32]},
+                    "V-0002 inlet temperature (2)": {u: "°C", v: [148.43, 147.89, 149.22, 147.07, 147.88, 146.37]},
+                    "E-10 Exchanger Outlet Temp to Preflash Drum (3)": {u: "°C", v: [199.91, 201.91, 200.1, 198.24, 199.57, 202.72]},
+                    "Heater Outlet Temperature": {u: "°C", v: [371.0, 370.83, 370.93, 370.96, 370.33, 370.99]},
+                    "Column Top Temperature": {u: "°C", v: [112.0, 112.0, 112.0, 111.0, 111.01, 111.0]},
+                    "Top Column Pressure": {u: "barg", v: [1.03, 1.03, 1.03, 1.02, 1.03, 1.0]},
+                    "Top Pump Around Flow": {u: "sm3/hr", v: [1620.6, 1549.99, 1385.01, 1360.0, 1159.98, 1170.0]},
+                    "Top Pump Around Draw Temperature": {u: "°C", v: [126.94, 126.34, 127.6, 125.92, 127.36, 126.9]},
+                    "Top Pump Around Return Temperature": {u: "°C", v: [103.24, 105.12, 104.83, 105.13, 106.48, 106.84]},
+                    "Middle Pump Around Flow": {u: "sm3/hr", v: [1185.99, 1124.0, 1015.01, 890.0, 765.59, 685.0]},
+                    "Middle Pump Around Draw Temperature": {u: "°C", v: [219.02, 215.89, 216.82, 213.49, 208.1, 208.11]},
+                    "Middle Pump Around Return Temperature": {u: "°C", v: [164.64, 158.26, 163.87, 157.6, 154.22, 160.38]},
+                    "Bottom Pump Around Flow": {u: "sm3/hr", v: [900.0, 1002.0, 775.0, 780.0, 700.01, 541.0]},
+                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [291.12, 291.3, 295.59, 292.13, 287.32, 286.94]},
+                    "Bottom Pump Around Return Temperature": {u: "°C", v: [243.94, 246.22, 249.14, 248.29, 248.49, 246.15]},
+                    "Column Bottom Temperature": {u: "°C", v: [347.59, 348.52, 345.42, 347.39, 344.04, 341.86]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [178.35, 176.07, 178.74, 176.29, 176.82, 178.84]},
+                    "Kerosene Reboiler Temperature": {u: "°C", v: [215.57, 215.52, 215.34, 216.03, 217.42, 218.33]},
+                    "Light Diesel Draw Temperature": {u: "°C", v: [264.0, 261.89, 265.78, 261.13, 259.21, 259.5]},
+                    "Heavy Diesel Draw Temperature": {u: "°C", v: [318.32, 319.9, 317.31, 315.85, 309.94, 309.64]},
+                    "Overflash flow": {u: "sm3/hr", v: [112.53, 84.3, 108.44, 83.48, 75.15, 72.74]},
+                    "Stripping Steam Temperature": {u: "°C", v: [274.88, 284.95, 289.93, 289.66, 283.59, 274.21]},
+                    "Stripping steam to crude column": {u: "kg/hr", v: [22500.01, 21997.97, 20500.01, 17499.94, 15374.19, 15500.08]},
+                    "Stripping Steam to Light Diesel Stripper (3)": {u: "kg/hr", v: [1200.0, 2150.02, 1092.0, 1450.0, 1209.13, 999.99]},
+                    "Stripping Steam to Heavy Diesel Stripper (3)": {u: "kg/hr", v: [350.0, 450.0, 300.0, 300.0, 300.0, 300.01]},
+                    "Stabilizer feed temperature": {u: "°C", v: [101.85, 103.88, 102.49, 105.58, 108.12, 110.27]},
+                    "Stabilizer reboiler inlet temperature": {u: "°C", v: [147.14, 147.81, 149.29, 150.67, 153.29, 155.49]},
+                    "Stabilizer Reboiler outlet temperature": {u: "°C", v: [159.86, 158.41, 159.07, 158.09, 159.1, 159.95]},
+                    "Stabilizer reflux flow": {u: "sm3/hr", v: [34.86, 29.67, 31.54, 25.81, 21.15, 20.96]},
+                    "BPA to reboiler inlet temperature": {u: "°C", v: [234.96, 218.54, 227.28, 220.64, 217.68, 216.52]},
+                    "BPA to reboiler flow": {u: "sm3/hr", v: [900.0, 1002.0, 775.0, 780.0, 700.01, 541.0]},
+                    "AR product temp. to ARDS": {u: "°C", v: [169.96, 164.17, 170.3, 161.29, 166.09, 156.56]}
+                },
+                yields: {
+                    "Wild Naphtha": [10.0, 9.1, 26.77, 10.24, 6.6, 9.96],
+                    "Kerosene": [215.57, 215.52, 215.34, 216.03, 217.42, 218.33],
+                    "Atmospheric Residue (AR)": [169.96, 164.17, 170.3, 161.29, 166.09, 156.56]
+                },
+                quality: {
+                    "Desalted Crude": {"Salt HEM": {u:"PTB", v:[0.8, 0.5, 0.68, 0.55, 0.45, 0.6]}, "BS&W": {u:"%", v:[1.4, 1.0, 0.7, 0.6, 0.5, 0.5]}},
+                    "Desalter Effluent": {"pH": {u:"pH", v:[5.0, 7.6, 6.0, 5.8, 7.0, 5.5]}},
+                    "SSW": {"pH": {u:"pH", v:[8.5, 9.0, 9.57, 8.7, 9.0, 7.8]}},
+                    "Naphtha": {"RVP": {u:"psi", v:[8.8, 9.1, 8.35, 8.9, 8.76, 8.8]}, "T95": {u:"°C", v:[141, 140, 143, 139, 143, 143]}},
+                    "Kerosene": {"Freeze Point": {u:"°C", v:[-48, -51, -50, -51, -54, -52]}, "T95": {u:"°C", v:[245, 240, 245, 239, 232, 237]}},
+                    "Diesel": {"T95": {u:"°C", v:[348, 356, 339, 340, 320, 324]}, "Cloud Point": {u:"°C", v:[-2, -1, -6, -5.5, -12, -9]}},
+                    "AR": {"API": {u:"API", v:[13.0, 13.0, 12.6, 12.9, 12.5, 13.0]}, "Sulfur": {u:"wt%", v:[5.0, 4.59, 4.5, 4.6, 4.5, 4.4]}}
+                }
+            },
+            "Max Kero (No Heavy Diesel)": {
+                feedsKBPD: [200, 195, 180, 160, 150, 120, 105],
+                feedsSM3: [1326.67, 1300.33, 1203.85, 1060.68, 979.95, 789.7, 689.37],
+                params: {
+                    "Slops": {u: "sm3/hr", v: [48.77, 25.82, 3.37, 34.19, 24.56, 0.0, 0.0]},
+                    "Wild Naphtha": {u: "sm3/hr", v: [0.0, 6.99, 30.0, 8.18, 0.0, 27.79, 11.95]},
+                    "Heater Feed Rate": {u: "sm3/hr", v: [1220.02, 1200.05, 1080.75, 960.0, 897.71, 673.76, 660.01]},
+                    "Washwater flow to Desalter V02 (75% of total) (2)": {u: "%", v: [49.62, 52.0, 44.6, 45.5, 37.07, 31.5, 27.0]},
+                    "Washwater flow to Desalter E01 crude side (25% of total) (2)": {u: "%", v: [16.48, 20.0, 14.88, 14.5, 12.35, 10.5, 9.0]},
+                    "V-0001 inlet temperature(2)": {u: "°C", v: [146.67, 150.85, 150.3, 150.58, 149.57, 149.59, 147.53]},
+                    "V-0002 inlet temperature (2)": {u: "°C", v: [145.82, 150.24, 149.37, 149.55, 148.58, 148.57, 146.56]},
+                    "E-10 Exchanger Outlet Temp to Preflash Drum (3)": {u: "°C", v: [199.97, 207.3, 193.98, 25.88, 194.78, 206.22, 201.9]},
+                    "Heater Outlet Temperature": {u: "°C", v: [371.01, 368.61, 370.98, 370.99, 370.97, 367.97, 371.0]},
+                    "Column Top Temperature": {u: "°C", v: [111.0, 111.06, 111.99, 110.0, 112.01, 112.37, 111.0]},
+                    "Top Column Pressure": {u: "barg", v: [1.03, 1.04, 1.03, 1.03, 1.03, 0.97, 1.0]},
+                    "Top Pump Around Flow": {u: "sm3/hr", v: [1670.0, 1345.21, 1430.68, 1390.93, 1191.47, 1058.26, 1170.0]},
+                    "Top Pump Around Draw Temperature": {u: "°C", v: [125.11, 127.04, 126.61, 125.61, 129.44, 124.31, 126.87]},
+                    "Top Pump Around Return Temperature": {u: "°C", v: [104.43, 106.37, 101.13, 107.41, 104.39, 103.11, 107.57]},
+                    "Middle Pump Around Flow": {u: "sm3/hr", v: [1180.0, 1245.01, 1039.97, 891.92, 869.93, 797.89, 682.48]},
+                    "Middle Pump Around Draw Temperature": {u: "°C", v: [216.82, 227.24, 216.04, 214.16, 217.42, 205.58, 208.2]},
+                    "Middle Pump Around Return Temperature": {u: "°C", v: [157.14, 157.07, 167.01, 167.39, 165.92, 162.63, 157.92]},
+                    "Bottom Pump Around Flow": {u: "sm3/hr", v: [965.25, 1044.79, 790.0, 769.83, 665.71, 619.85, 540.53]},
+                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [290.83, 290.01, 296.97, 293.87, 295.85, 287.69, 287.65]},
+                    "Bottom Pump Around Return Temperature": {u: "°C", v: [246.1, 263.3, 250.91, 250.4, 251.45, 258.06, 245.75]},
+                    "Column Bottom Temperature": {u: "°C", v: [344.15, 341.41, 344.41, 342.61, 344.54, 339.19, 336.11]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [175.94, 176.41, 174.76, 174.55, 179.06, 173.15, 179.14]},
+                    "Kerosene Reboiler Temperature": {u: "°C", v: [214.95, 217.57, 213.95, 215.5, 215.83, 217.56, 217.22]},
+                    "Light Diesel Draw Temperature": {u: "°C", v: [264.79, 268.83, 264.29, 262.17, 265.95, 259.86, 260.62]},
+                    "Heavy Diesel Draw Temperature": {u: "°C", v: [24.48, 43.45, 53.25, 48.61, 32.79, 44.22, 22.26]},
+                    "Overflash flow": {u: "sm3/hr", v: [33.4, 0.05, 151.87, 126.49, 85.36, 67.73, 86.9]},
+                    "Stripping Steam Temperature": {u: "°C", v: [274.94, 267.77, 287.51, 279.57, 281.45, 265.13, 273.31]},
+                    "Stripping steam to crude column": {u: "kg/hr", v: [23893.36, 23944.07, 19996.92, 20522.97, 17341.42, 14314.22, 15248.32]},
+                    "Stripping Steam to Light Diesel Stripper (3)": {u: "kg/hr", v: [1300.0, 2300.01, 1100.0, 1200.0, 941.25, 2035.48, 1000.0]},
+                    "Stripping Steam to Heavy Diesel Stripper (3)": {u: "kg/hr", v: [26.98, 104.93, -12.5, -12.5, 82.86, 127.9, 35.04]},
+                    "Stabilizer feed temperature": {u: "°C", v: [104.46, 111.59, 117.79, 115.04, 106.39, 128.42, 110.46]},
+                    "Stabilizer reboiler inlet temperature": {u: "°C", v: [147.47, 154.2, 150.23, 151.0, 151.06, 161.63, 155.69]},
+                    "Stabilizer Reboiler outlet temperature": {u: "°C", v: [159.32, 215.26, 159.7, 158.58, 157.93, 166.4, 160.14]},
+                    "Stabilizer reflux flow": {u: "sm3/hr", v: [29.48, 13.06, 36.5, 27.24, 23.01, 15.72, 22.11]},
+                    "BPA to reboiler inlet temperature": {u: "°C", v: [227.91, 263.78, 209.23, 206.46, 226.39, 199.78, 215.95]},
+                    "BPA to reboiler flow": {u: "sm3/hr", v: [965.25, 568.56, 440.16, 368.59, 665.71, 462.3, 540.53]},
+                    "AR product temp. to ARDS": {u: "°C", v: [168.26, 169.99, 176.44, 157.0, 170.0, 169.31, 155.92]}
+                },
+                yields: {
+                    "Wild Naphtha": [0.0, 6.99, 30.0, 8.18, 0.0, 27.79, 11.95],
+                    "Kerosene": [214.95, 217.57, 213.95, 215.5, 215.83, 217.56, 217.22],
+                    "Atmospheric Residue (AR)": [168.26, 169.99, 176.44, 157.0, 170.0, 169.31, 155.92]
+                },
+                quality: {
+                    "Desalted Crude": {"Salt HEM": {u:"PTB", v:[0.65, 0.6, 0.6, 0.7, 1.0, 0.6, 0.6]}, "BS&W": {u:"%", v:[1.3, 0.6, 0.8, 0.7, 0.55, 0.5, 0.5]}},
+                    "Desalter Effluent": {"pH": {u:"pH", v:[5.0, 7.6, 6.0, 5.8, 7.0, 5.5]}},
+                    "SSW": {"pH": {u:"pH", v:[8.5, 8, 8.1, 9, 9.4, 8.5, 7.5]}},
+                    "Naphtha": {"RVP": {u:"psi", v:[9.16, 9.1, 8.9, 8.45, 8.51, 8, 8.65]}, "T95": {u:"°C", v:[143, 147, 144, 142, 140, 145, 143]}},
+                    "Kerosene": {"Freeze Point": {u:"°C", v:[-48, -49, -48, -52, -51, -56, -52]}, "T95": {u:"°C", v:[245, 252, 247, 240, 245, 231, 238]}},
+                    "Diesel": {"T95": {u:"°C", v:[331, 325, 334, 327, 336, 324, 311]}, "Cloud Point": {u:"°C", v:[-6, -9, -6, -9, -6, -11, -13]}},
+                    "AR": {"API": {u:"API", v:[12.6, 13.1, 12.9, 13, 12.9, 13, 14]}, "Sulfur": {u:"wt%", v:[4.6, 4.4, 4.66, 4.8, 4.4, 4.3, 4.38]}}
+                }
+            },
+            "Max Naphtha Mode": {
+                feedsKBPD: [205],
+                feedsSM3: [1367.7],
+                params: {
+                    "Slops": {u: "sm3/hr", v: [10.61]},
+                    "Wild Naphtha": {u: "sm3/hr", v: [20.39]},
+                    "Heater Feed Rate": {u: "sm3/hr", v: [1200.02]},
+                    "Washwater flow to Desalter V02 (75% of total) (2)": {u: "%", v: [53.5]},
+                    "Washwater flow to Desalter E01 crude side (25% of total) (2)": {u: "%", v: [17.8]},
+                    "V-0001 inlet temperature(2)": {u: "°C", v: [150.0]},
+                    "V-0002 inlet temperature (2)": {u: "°C", v: [149.09]},
+                    "E-10 Exchanger Outlet Temp to Preflash Drum (3)": {u: "°C", v: [200.6]},
+                    "Heater Outlet Temperature": {u: "°C", v: [371.02]},
+                    "Column Top Temperature": {u: "°C", v: [115.07]},
+                    "Top Column Pressure": {u: "barg", v: [1.0]},
+                    "Top Pump Around Flow": {u: "sm3/hr", v: [1621.02]},
+                    "Top Pump Around Draw Temperature": {u: "°C", v: [128.48]},
+                    "Top Pump Around Return Temperature": {u: "°C", v: [106.31]},
+                    "Middle Pump Around Flow": {u: "sm3/hr", v: [1260.99]},
+                    "Middle Pump Around Draw Temperature": {u: "°C", v: [219.18]},
+                    "Middle Pump Around Return Temperature": {u: "°C", v: [168.13]},
+                    "Bottom Pump Around Flow": {u: "sm3/hr", v: [900.99]},
+                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [295.6]},
+                    "Bottom Pump Around Return Temperature": {u: "°C", v: [256.62]},
+                    "Column Bottom Temperature": {u: "°C", v: [343.49]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [177.22]},
+                    "Kerosene Reboiler Temperature": {u: "°C", v: [215.41]},
+                    "Light Diesel Draw Temperature": {u: "°C", v: [269.63]},
+                    "Heavy Diesel Draw Temperature": {u: "°C", v: [65.62]},
+                    "Overflash flow": {u: "sm3/hr", v: [99.17]},
+                    "Stripping Steam Temperature": {u: "°C", v: [288.17]},
+                    "Stripping steam to crude column": {u: "kg/hr", v: [24500.06]},
+                    "Stripping Steam to Light Diesel Stripper": {u: "kg/hr", v: [930.01]},
+                    "Stripping Steam to Heavy Diesel Stripper": {u: "kg/hr", v: [0.0]},
+                    "Stabilizer feed temperature": {u: "°C", v: [116.99]},
+                    "Stabilizer reboiler inlet temperature": {u: "°C", v: [149.84]},
+                    "Stabilizer Reboiler outlet temperature": {u: "°C", v: [160.72]},
+                    "Stabilizer reflux flow": {u: "sm3/hr", v: [31.57]},
+                    "BPA to reboiler inlet temperature": {u: "°C", v: [219.54]},
+                    "BPA to reboiler flow": {u: "sm3/hr", v: [400.19]},
+                    "AR product temp. to ARDS": {u: "°C", v: [171.04]}
+                },
+                yields: { "LPG": [10.3], "Naphtha": [248.5], "Kerosene": [226.9], "Light Diesel": [222.0], "Heavy Diesel": [0], "AR": [653.6] },
+                quality: { 
+                    "Desalted Crude": { "Salt HEM": {u:"PTB", v:[0.7]}, "BS&W": {u:"%", v:[1.0]} },
+                    "Naphtha": { "RVP": {u:"psi", v:[8.5]} },
+                    "Kerosene": { "Freeze Point": {u:"°C", v:[-49]} },
+                    "Diesel": { "Cloud Point": {u:"°C", v:[-6]} },
+                    "AR": { "Sulfur": {u:"wt%", v:[4.44]} }
+                }
+            }
+        },
+        "KSRC": {
+            "Base Case": {
+                feedsKBPD: [120],
+                feedsSM3: [809.9],
+                params: {
+                    "Slops": {u: "sm3/hr", v: [7.52]},
+                    "Wild Naphtha": {u: "sm3/hr", v: [3.58]},
+                    "Heater Feed Rate": {u: "sm3/hr", v: [949.97]},
+                    "Washwater flow to Desalter V02": {u: "%", v: [72.0]},
+                    "Washwater flow to Desalter E01 crude side": {u: "%", v: [24.0]},
+                    "V-0001 inlet temperature(2)": {u: "°C", v: [149.69]},
+                    "V-0002 inlet temperature (2)": {u: "°C", v: [145.97]},
+                    "E-10 Exchanger Outlet Temp to Preflash Drum (3)": {u: "°C", v: [200.54]},
+                    "Heater Outlet Temperature": {u: "°C", v: [370.0]},
+                    "Column Top Temperature": {u: "°C", v: [112.99]},
+                    "Top Column Pressure": {u: "barg", v: [1.0]},
+                    "Top Pump Around Flow": {u: "sm3/hr", v: [1270]},
+                    "Top Pump Around Draw Temperature": {u: "°C", v: [133.8]},
+                    "Top Pump Around Return Temperature": {u: "°C", v: [109.3]},
+                    "Middle Pump Around Flow": {u: "sm3/hr", v: [861.82]},
+                    "Middle Pump Around Draw Temperature": {u: "°C", v: [221.88]},
+                    "Middle Pump Around Return Temperature": {u: "°C", v: [165.98]},
+                    "Bottom Pump Around Flow": {u: "sm3/hr", v: [532.31]},
+                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [292.06]},
+                    "Bottom Pump Around Return Temperature": {u: "°C", v: [256.26]},
+                    "Column Bottom Temperature": {u: "°C", v: [348.06]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [188.51]},
+                    "Kerosene Reboiler Temperature": {u: "°C", v: [219.52]},
+                    "Light Diesel Draw Temperature": {u: "°C", v: [261.72]},
+                    "Heavy Diesel Draw Temperature": {u: "°C", v: [25.06]},
+                    "Overflash flow": {u: "sm3/hr", v: [61.65]},
+                    "Stripping Steam Temperature": {u: "°C", v: [302.55]},
+                    "Stripping steam to crude column": {u: "kg/hr", v: [9649.9]},
+                    "Stripping Steam to Light Diesel Stripper": {u: "kg/hr", v: [2500.0]},
+                    "Stripping Steam to Heavy Diesel Stripper": {u: "kg/hr", v: [109.08]},
+                    "Stabilizer feed temperature": {u: "°C", v: [110.81]},
+                    "Stabilizer reboiler inlet temperature": {u: "°C", v: [174.7]},
+                    "Stabilizer Reboiler outlet temperature": {u: "°C", v: [186.8]},
+                    "Stabilizer reflux flow": {u: "sm3/hr", v: [0.0]},
+                    "BPA to reboiler inlet temperature": {u: "°C", v: [212.76]},
+                    "BPA to reboiler flow": {u: "sm3/hr", v: [239.25]},
+                    "AR product temp. to ARDS": {u: "°C", v: [174.85]}
+                },
+                yields: { "LPG": [0], "Naphtha": [128.0], "Kerosene": [46.7], "Light Diesel": [143.0], "Heavy Diesel": [0], "AR": [532.8] },
+                quality: { 
+                    "Desalted Crude": { "Salt": {u:"PTB", v:[0.4]}, "BS&W": {u:"%", v:[0.7]} },
+                    "Naphtha": { "RVP": {u:"psi", v:[7.25]} },
+                    "Kerosene": { "Freeze Point": {u:"°C", v:[-81]} },
+                    "Diesel": { "Cloud Point": {u:"°C", v:[-36]} },
+                    "AR": { "Sulfur": {u:"wt%", v:[5.78]} }
+                }
+            }
+        },
+        "KMHC": {
+            "Base Case": {
+                feedsKBPD: [200, 120],
+                feedsSM3: [1312.02, 810.73],
+                params: {
+                    "Slops": {u: "sm3/hr", v: [24.85, 0.0]},
+                    "Wild Naphtha": {u: "sm3/hr", v: [1.73, 3.14]},
+                    "Heater Feed Rate": {u: "sm3/hr", v: [1199.93, 734.77]},
+                    "Washwater flow to Desalter V02": {u: "%", v: [52.0, 51.18]},
+                    "Washwater flow to Desalter E01 crude side": {u: "%", v: [20.0, 17.06]},
+                    "V-0001 inlet temperature(2)": {u: "°C", v: [150.88, 144.69]},
+                    "V-0002 inlet temperature (2)": {u: "°C", v: [150.28, 143.7]},
+                    "E-10 Exchanger Outlet Temp to Preflash Drum (3)": {u: "°C", v: [188.79, 201.1]},
+                    "Heater Outlet Temperature": {u: "°C", v: [369.1, 370.33]},
+                    "Column Top Temperature": {u: "°C", v: [111.67, 112.42]},
+                    "Top Column Pressure": {u: "barg", v: [1.01, 1.0]},
+                    "Top Pump Around Flow": {u: "sm3/hr", v: [1339.42, 1269.55]},
+                    "Top Pump Around Draw Temperature": {u: "°C", v: [127.61, 128.92]},
+                    "Top Pump Around Return Temperature": {u: "°C", v: [107.28, 109.35]},
+                    "Middle Pump Around Flow": {u: "sm3/hr", v: [1242.74, 623.28]},
+                    "Middle Pump Around Draw Temperature": {u: "°C", v: [227.21, 216.38]},
+                    "Middle Pump Around Return Temperature": {u: "°C", v: [156.46, 170.14]},
+                    "Bottom Pump Around Flow": {u: "sm3/hr", v: [1037.71, 547.62]},
+                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [290.75, 292.64]},
+                    "Bottom Pump Around Return Temperature": {u: "°C", v: [263.58, 250.83]},
+                    "Column Bottom Temperature": {u: "°C", v: [341.99, 347.72]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [177.0, 178.68]},
+                    "Kerosene Reboiler Temperature": {u: "°C", v: [217.61, 219.63]},
+                    "Light Diesel Draw Temperature": {u: "°C", v: [269.21, 259.18]},
+                    "Heavy Diesel Draw Temperature": {u: "°C", v: [42.92, 22.6]},
+                    "Overflash flow": {u: "sm3/hr", v: [0.16, 97.31]},
+                    "Stripping Steam Temperature": {u: "°C", v: [268.08, 265.44]},
+                    "Stripping steam to crude column": {u: "kg/hr", v: [23972.14, 15123.41]},
+                    "Stripping Steam to Light Diesel Stripper": {u: "kg/hr", v: [2340.49, 1775.68]},
+                    "Stripping Steam to Heavy Diesel Stripper": {u: "kg/hr", v: [107.98, 108.44]},
+                    "Stabilizer feed temperature": {u: "°C", v: [111.88, 115.99]},
+                    "Stabilizer reboiler inlet temperature": {u: "°C", v: [154.43, 168.94]},
+                    "Stabilizer Reboiler outlet temperature": {u: "°C", v: [214.54, 200.65]},
+                    "Stabilizer reflux flow": {u: "sm3/hr", v: [17.47, 2.01]},
+                    "BPA to reboiler inlet temperature": {u: "°C", v: [263.93, 245.57]},
+                    "BPA to reboiler flow": {u: "sm3/hr", v: [561.67, 402.56]},
+                    "AR product temp. to ARDS": {u: "°C", v: [168.7, 161.21]}
+                },
+                yields: { "LPG": [3.1, 3.6], "Naphtha": [222.7, 130.0], "Kerosene": [224.6, 105.8], "Light Diesel": [197.6, 128.3], "Heavy Diesel": [0, 0], "AR": [680.0, 424.5] },
+                quality: { 
+                    "Desalted Crude": { "Salt": {u:"PTB", v:[0.6, 1.1]}, "BS&W": {u:"%", v:[0.6, 1.0]} },
+                    "Naphtha": { "RVP": {u:"psi", v:[9.0, 8.1]} },
+                    "Kerosene": { "Freeze Point": {u:"°C", v:[-49, -48]} },
+                    "Diesel": { "Cloud Point": {u:"°C", v:[-9, -7]} },
+                    "AR": { "Sulfur": {u:"wt%", v:[4.46, 4.92]} }
+                }
+            }
+        }
+    };
 
     const MODE_LABELS = {
         "Max Kero (with Heavy Diesel)": { en: "with Heavy Diesel", ar: "مع ديزل ثقيل" },
