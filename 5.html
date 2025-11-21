@@ -1,0 +1,626 @@
+<script>
+    const CONVERSION_FACTOR = 6.624; 
+
+    // --- HELPER: Parse English or Arabic Numerals ---
+    function parseLocaleNumber(stringNumber) {
+        if (!stringNumber) return NaN;
+        stringNumber = stringNumber.toString();
+        var englishDigits = stringNumber
+            .replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d));
+        return parseFloat(englishDigits);
+    }
+
+    // --- DATA FROM EXCEL FILES ---
+    const DB = {
+        "KEC": {
+            "Max Kero (with Heavy Diesel)": {
+                // Source: Unit parameters at various feeds.xlsx - KEC Max. Kero with HD.csv
+                feeds: [205, 200, 175, 155, 130, 105],
+                params: {
+                    "Crude Feed (Tank)": {u: "sm3/h", v: [1341.952, 1321.034, 1159.378, 1031.275, 851.622, 696.441]},
+                    "Slops": {u: "sm3/h", v: [36.106, 33.015, 29.541, 41.128, 3.254, 0]},
+                    "Wild Naphtha": {u: "sm3/h", v: [10.001, 9.099, 26.767, 10.242, 6.601, 9.962]},
+                    "Heater Feed Rate": {u: "sm3/h", v: [1230.000, 1220.001, 1055.923, 969.973, 804.683, 659.995]},
+                    "Washwater flow to Desalter V02 (75%)": {u: "%", v: [50.23, 53.00, 45.47, 41.07, 34.00, 27.00]},
+                    "Washwater flow to Desalter E01 (25%)": {u: "%", v: [16.74, 18.00, 14.99, 13.54, 11.99, 9.00]},
+                    "V-0001 inlet temperature": {u: "°C", v: [149.3, 148.8, 150.0, 148.0, 148.8, 147.3]},
+                    "V-0002 inlet temperature": {u: "°C", v: [148.4, 147.9, 149.2, 147.1, 147.9, 146.4]},
+                    "E-10 Outlet Temp to Preflash Drum": {u: "°C", v: [199.9, 201.9, 200.1, 198.2, 199.6, 202.7]},
+                    "Heater Outlet Temperature": {u: "°C", v: [371.0, 370.8, 370.9, 371.0, 370.3, 371.0]},
+                    "Column Top Temperature": {u: "°C", v: [112.0, 112.0, 112.0, 111.0, 111.0, 111.0]},
+                    "Top Column Pressure": {u: "barg", v: [1.03, 1.03, 1.03, 1.02, 1.03, 1.00]},
+                    "Top Pump Around Flow": {u: "sm3/h", v: [1620.6, 1550.0, 1385.0, 1360.0, 1160.0, 1170.0]},
+                    "Top Pump Around Draw Temperature": {u: "°C", v: [126.9, 126.3, 127.6, 125.9, 127.4, 126.9]},
+                    "Top Pump Around Return Temperature": {u: "°C", v: [103.2, 105.1, 104.8, 105.1, 106.5, 106.8]},
+                    "Middle Pump Around Flow": {u: "sm3/h", v: [1186.0, 1124.0, 1015.0, 890.0, 765.6, 685.0]},
+                    "Middle Pump Around Draw Temperature": {u: "°C", v: [219.0, 215.9, 216.8, 213.5, 208.1, 208.1]},
+                    "Middle Pump Around Return Temperature": {u: "°C", v: [164.6, 158.3, 163.9, 157.6, 154.2, 160.4]},
+                    "Bottom Pump Around Flow": {u: "sm3/h", v: [900.0, 1002.0, 775.0, 780.0, 700.0, 541.0]},
+                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [291.1, 291.3, 295.6, 292.1, 287.3, 286.9]},
+                    "Bottom Pump Around Return Temperature": {u: "°C", v: [243.9, 246.2, 249.1, 248.3, 248.5, 246.2]},
+                    "Column Bottom Temperature": {u: "°C", v: [347.6, 348.5, 345.4, 347.4, 344.0, 341.9]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [178.3, 176.1, 178.7, 176.3, 176.8, 178.8]},
+                    "Kerosene Reboiler Temperature": {u: "°C", v: [215.6, 215.5, 215.3, 216.0, 217.4, 218.3]},
+                    "Light Diesel Draw Temperature": {u: "°C", v: [264.0, 261.9, 265.8, 261.1, 259.2, 259.5]},
+                    "Heavy Diesel Draw Temperature": {u: "°C", v: [318.3, 319.9, 317.3, 315.8, 309.9, 309.6]},
+                    "Overflash Flow": {u: "sm3/h", v: [112.5, 84.3, 108.4, 83.5, 75.2, 72.7]},
+                    "Stripping Steam Temperature": {u: "°C", v: [274.9, 284.9, 289.9, 289.7, 283.6, 274.2]},
+                    "Stripping steam to crude column": {u: "kg/hr", v: [22500, 21998, 20500, 17500, 15374, 15500]},
+                    "Stripping Steam to Light Diesel": {u: "kg/hr", v: [1200, 2150, 1092, 1450, 1209, 1000]},
+                    "Stripping Steam to Heavy Diesel": {u: "kg/hr", v: [350, 450, 300, 300, 300, 300]},
+                    "Stabilizer feed temperature": {u: "°C", v: [101.9, 103.9, 102.5, 105.6, 108.1, 110.3]},
+                    "Stabilizer reboiler inlet temperature": {u: "°C", v: [147.1, 147.8, 149.3, 150.7, 153.3, 155.5]},
+                    "Stabilizer Reboiler outlet temperature": {u: "°C", v: [159.9, 158.4, 159.1, 158.1, 159.1, 159.9]},
+                    "Stabilizer reflux flow": {u: "sm3/h", v: [34.9, 29.7, 31.5, 25.8, 21.1, 21.0]},
+                    "BPA to reboiler inlet temperature": {u: "°C", v: [235.0, 218.5, 227.3, 220.6, 217.7, 216.5]},
+                    "BPA to reboiler flow": {u: "sm3/h", v: [900.0, 1002.0, 775.0, 780.0, 700.0, 541.0]},
+                    "AR product temp. to ARDS": {u: "°C", v: [170.0, 164.2, 170.3, 161.3, 166.1, 156.6]}
+                },
+                yields: {
+                    "LPG": [15.95, 17.30, 13.08, 14.60, 15.21, 12.66],
+                    "Naphtha": [265.68, 258.47, 214.39, 193.10, 142.73, 107.83],
+                    "Kerosene": [240.60, 240.85, 204.84, 182.65, 128.10, 111.53],
+                    "Lt. Dsl": [199.05, 200.49, 185.36, 161.41, 134.92, 104.80],
+                    "Hy. Dsl": [55.00, 67.00, 20.00, 30.00, 20.00, 25.00],
+                    "AR": [618.38, 601.21, 541.31, 500.19, 443.92, 358.72]
+                },
+                quality: {
+                    "Desalted Crude": { "Salt HEM": {u: "PTB", v: [0.8, 0.5, 0.68, 0.55, 0.45, 0.6]}, "BS&W": {u: "%", v: [1.4, 1.0, 0.7, 0.6, 0.5, 0.5]} },
+                    "Desalter Effluent": { "pH": {u: "pH", v: [5.0, 7.6, 6.0, 5.8, 7.0, 5.5]} },
+                    "SSW": { "pH": {u: "pH", v: [8.5, 9.0, 9.57, 8.7, 9.0, 7.8]} },
+                    "Naphtha": { "RVP": {u: "psi", v: [8.8, 9.1, 8.35, 8.9, 8.76, 8.8]}, "T95": {u: "°C", v: [141, 140, 143, 139, 143, 143]} },
+                    "Kerosene": { "Freeze Point": {u: "°C", v: [-48, -51, -50, -51, -54, -52]}, "T95": {u: "°C", v: [245, 240, 245, 239, 232, 237]} },
+                    "Diesel": { "T95": {u: "°C", v: [348, 356, 339, 340, 320, 324]}, "Cloud Point": {u: "°C", v: [-2, -1, -6, -5.5, -12, -9]} },
+                    "AR": { "API": {u: "API", v: [13.0, 13.0, 12.6, 12.9, 12.5, 13.0]}, "Sulfur": {u: "wt%", v: [5.0, 4.59, 4.5, 4.6, 4.5, 4.4]} }
+                }
+            },
+            "Max Kero (No Heavy Diesel)": {
+                // Source: Unit parameters at various feeds.xlsx - KEC Max. Kero without HD .csv
+                feeds: [200, 195, 180, 160, 150, 120, 105],
+                params: {
+                    "Crude Feed (Tank)": {u: "sm3/h", v: [1326.67, 1300.33, 1203.85, 1060.68, 979.95, 789.70, 689.37]},
+                    "Slops": {u: "sm3/h", v: [48.77, 25.82, 3.37, 34.19, 24.56, 0, 0]},
+                    "Wild Naphtha": {u: "sm3/h", v: [0, 6.99, 29.99, 8.18, 0, 27.79, 11.95]},
+                    "Heater Feed Rate": {u: "sm3/h", v: [1220.02, 1200.05, 1080.75, 960.00, 897.71, 673.76, 660.01]},
+                    "Washwater flow to Desalter V02 (75%)": {u: "%", v: [49.62, 52.00, 44.60, 45.50, 37.07, 31.50, 27.00]},
+                    "Washwater flow to Desalter E01 (25%)": {u: "%", v: [16.48, 20.00, 14.88, 14.50, 12.35, 10.50, 9.00]},
+                    "V-0001 inlet temperature": {u: "°C", v: [146.7, 150.8, 150.3, 150.6, 149.6, 149.6, 147.5]},
+                    "V-0002 inlet temperature": {u: "°C", v: [145.8, 150.2, 149.4, 149.5, 148.6, 148.6, 146.6]},
+                    "E-10 Outlet Temp to Preflash Drum": {u: "°C", v: [199.9, 207.3, 194.0, 25.9, 194.8, 206.2, 201.9]},
+                    "Heater Outlet Temperature": {u: "°C", v: [371.0, 368.6, 371.0, 371.0, 371.0, 368.0, 371.0]},
+                    "Column Top Temperature": {u: "°C", v: [111.0, 111.1, 112.0, 110.0, 112.0, 112.4, 111.0]},
+                    "Top Column Pressure": {u: "barg", v: [1.03, 1.04, 1.03, 1.03, 1.03, 0.97, 1.00]},
+                    "Top Pump Around Flow": {u: "sm3/h", v: [1670.0, 1345.2, 1430.7, 1390.9, 1191.5, 1058.3, 1170.0]},
+                    "Top Pump Around Draw Temperature": {u: "°C", v: [125.1, 127.0, 126.6, 125.6, 129.4, 124.3, 126.9]},
+                    "Top Pump Around Return Temperature": {u: "°C", v: [104.4, 106.4, 101.1, 107.4, 104.4, 103.1, 107.6]},
+                    "Middle Pump Around Flow": {u: "sm3/h", v: [1180.0, 1245.0, 1040.0, 891.9, 869.9, 797.9, 682.5]},
+                    "Middle Pump Around Draw Temperature": {u: "°C", v: [216.8, 227.2, 216.0, 214.2, 217.4, 205.6, 208.2]},
+                    "Middle Pump Around Return Temperature": {u: "°C", v: [157.1, 157.1, 167.0, 167.4, 165.9, 162.6, 157.9]},
+                    "Bottom Pump Around Flow": {u: "sm3/h", v: [965.3, 1044.8, 790.0, 769.8, 665.7, 619.9, 540.5]},
+                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [290.8, 290.0, 297.0, 293.9, 295.8, 287.7, 287.6]},
+                    "Bottom Pump Around Return Temperature": {u: "°C", v: [246.1, 263.3, 250.9, 250.4, 251.5, 258.1, 245.8]},
+                    "Column Bottom Temperature": {u: "°C", v: [344.1, 341.4, 344.4, 342.6, 344.5, 339.2, 336.1]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [175.9, 176.4, 174.8, 174.5, 179.1, 173.1, 179.1]},
+                    "Kerosene Reboiler Temperature": {u: "°C", v: [215.0, 217.6, 213.9, 215.5, 215.8, 217.6, 217.2]},
+                    "Light Diesel Draw Temperature": {u: "°C", v: [264.8, 268.8, 264.3, 262.2, 265.9, 259.9, 260.6]},
+                    "Heavy Diesel Draw Temperature": {u: "°C", v: [24.5, 43.5, 53.3, 48.6, 32.8, 44.2, 22.3]},
+                    "Overflash Flow": {u: "sm3/h", v: [33.4, 0.05, 151.9, 126.5, 85.4, 67.7, 86.9]},
+                    "Stripping Steam Temperature": {u: "°C", v: [274.9, 267.8, 287.5, 279.6, 281.4, 265.1, 273.3]},
+                    "Stripping steam to crude column": {u: "kg/hr", v: [23893, 23944, 19997, 20523, 17341, 14314, 15248]},
+                    "Stripping Steam to Light Diesel": {u: "kg/hr", v: [1300, 2300, 1100, 1200, 941, 2035, 1000]},
+                    "Stripping Steam to Heavy Diesel": {u: "kg/hr", v: [27, 105, -12.5, -12.5, 83, 128, 35]},
+                    "Stabilizer feed temperature": {u: "°C", v: [104.5, 111.6, 117.8, 115.0, 106.4, 128.4, 110.5]},
+                    "Stabilizer reboiler inlet temperature": {u: "°C", v: [147.5, 154.2, 150.2, 151.0, 151.1, 161.6, 155.7]},
+                    "Stabilizer Reboiler outlet temperature": {u: "°C", v: [159.3, 215.3, 159.7, 158.6, 157.9, 166.4, 160.1]},
+                    "Stabilizer reflux flow": {u: "sm3/h", v: [29.5, 13.1, 36.5, 27.2, 23.0, 15.7, 22.1]},
+                    "BPA to reboiler inlet temperature": {u: "°C", v: [227.9, 263.8, 209.2, 206.5, 226.4, 199.8, 216.0]},
+                    "BPA to reboiler flow": {u: "sm3/h", v: [965.3, 568.6, 440.2, 368.6, 665.7, 462.3, 540.5]},
+                    "AR product temp. to ARDS": {u: "°C", v: [168.3, 170.0, 176.4, 157.0, 170.0, 169.3, 155.9]}
+                },
+                yields: {
+                    "LPG": [17.89, 2.02, 12.64, 11.61, 12.49, 0.81, 12.54],
+                    "Naphtha": [267.37, 224.87, 234.72, 186.99, 183.04, 137.92, 111.69],
+                    "Kerosene": [242.99, 228.09, 204.41, 166.53, 168.54, 103.65, 110.89],
+                    "Lt. Dsl": [207.76, 198.11, 195.03, 174.24, 157.89, 133.73, 110.30],
+                    "Hy. Dsl": [0, 0, 0, 0, 0, 0, 0],
+                    "AR": [651.60, 679.76, 577.65, 541.29, 479.13, 390.10, 376.71]
+                },
+                quality: {
+                    "Desalted Crude": { "Salt HEM": {u: "PTB", v: [0.65, 0.6, 0.6, 0.7, 1.0, 0.6, 0.6]}, "BS&W": {u: "%", v: [1.3, 0.6, 0.8, 0.7, 0.55, 0.5, 0.5]} },
+                    "Desalter Effluent": { "pH": {u: "pH", v: [5.0, 7.6, 6.0, 5.8, 7.0, 5.5]} },
+                    "SSW": { "pH": {u: "pH", v: [8.5, 8, 8.1, 9, 9.4, 8.5, 7.5]} },
+                    "Naphtha": { "RVP": {u: "psi", v: [9.16, 9.1, 8.9, 8.45, 8.51, 8, 8.65]}, "T95": {u: "°C", v: [143, 147, 144, 142, 140, 145, 143]} },
+                    "Kerosene": { "Freeze Point": {u: "°C", v: [-48, -49, -48, -52, -51, -56, -52]}, "T95": {u: "°C", v: [245, 252, 247, 240, 245, 231, 238]} },
+                    "Diesel": { "T95": {u: "°C", v: [331, 325, 334, 327, 336, 324, 311]}, "Cloud Point": {u: "°C", v: [-6, -9, -6, -9, -6, -11, -13]} },
+                    "AR": { "API": {u: "API", v: [12.6, 13.1, 12.9, 13, 12.9, 13, 14]}, "Sulfur": {u: "wt%", v: [4.6, 4.4, 4.66, 4.8, 4.4, 4.3, 4.38]} }
+                }
+            },
+             "Max Naphtha Mode": {
+                // Source: Unit parameters at various feeds.xlsx - KEC Max Naphtha Mode..csv
+                feeds: [205],
+                params: {
+                    "Crude Feed (Tank)": {u: "sm3/h", v: [1367.70]},
+                    "Slops": {u: "sm3/h", v: [10.61]},
+                    "Wild Naphtha": {u: "sm3/h", v: [20.39]},
+                    "Heater Feed Rate": {u: "sm3/h", v: [1200.02]},
+                    "Washwater flow to Desalter V02 (75%)": {u: "%", v: [53.50]},
+                    "Washwater flow to Desalter E01 (25%)": {u: "%", v: [17.80]},
+                    "V-0001 inlet temperature": {u: "°C", v: [150.0]},
+                    "V-0002 inlet temperature": {u: "°C", v: [149.1]},
+                    "E-10 Outlet Temp to Preflash Drum": {u: "°C", v: [200.6]},
+                    "Heater Outlet Temperature": {u: "°C", v: [371.0]},
+                    "Column Top Temperature": {u: "°C", v: [115.1]},
+                    "Top Column Pressure": {u: "barg", v: [1.00]},
+                    "Top Pump Around Flow": {u: "sm3/h", v: [1621.0]},
+                    "Top Pump Around Draw Temperature": {u: "°C", v: [128.5]},
+                    "Top Pump Around Return Temperature": {u: "°C", v: [106.3]},
+                    "Middle Pump Around Flow": {u: "sm3/h", v: [1261.0]},
+                    "Middle Pump Around Draw Temperature": {u: "°C", v: [219.2]},
+                    "Middle Pump Around Return Temperature": {u: "°C", v: [168.1]},
+                    "Bottom Pump Around Flow": {u: "sm3/h", v: [901.0]},
+                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [295.6]},
+                    "Bottom Pump Around Return Temperature": {u: "°C", v: [256.6]},
+                    "Column Bottom Temperature": {u: "°C", v: [343.5]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [177.2]},
+                    "Kerosene Reboiler Temperature": {u: "°C", v: [215.4]},
+                    "Light Diesel Draw Temperature": {u: "°C", v: [269.6]},
+                    "Heavy Diesel Draw Temperature": {u: "°C", v: [65.6]},
+                    "Overflash Flow": {u: "sm3/h", v: [99.17]},
+                    "Stripping Steam Temperature": {u: "°C", v: [288.2]},
+                    "Stripping steam to crude column": {u: "kg/hr", v: [24500]},
+                    "Stripping Steam to Light Diesel": {u: "kg/hr", v: [930]},
+                    "Stripping Steam to Heavy Diesel": {u: "kg/hr", v: [0]},
+                    "Stabilizer feed temperature": {u: "°C", v: [117.0]},
+                    "Stabilizer reboiler inlet temperature": {u: "°C", v: [149.8]},
+                    "Stabilizer Reboiler outlet temperature": {u: "°C", v: [160.7]},
+                    "Stabilizer reflux flow": {u: "sm3/h", v: [31.6]},
+                    "BPA to reboiler inlet temperature": {u: "°C", v: [219.5]},
+                    "BPA to reboiler flow": {u: "sm3/h", v: [400.2]},
+                    "AR product temp. to ARDS": {u: "°C", v: [171.0]}
+                },
+                yields: { "LPG": [10.29], "Naphtha": [248.52], "Kerosene": [226.91], "Lt. Dsl": [222.00], "Hy. Dsl": [0], "AR": [653.56] },
+                quality: { 
+                    "Desalted Crude": { "Salt HEM": {u:"PTB", v:[0.7]}, "BS&W": {u:"%", v:[1.0]} },
+                    "Desalter Effluent": { "pH": {u: "pH", v: [6.0]} },
+                    "SSW": { "pH": {u: "pH", v: [9.5]} },
+                    "Naphtha": { "RVP": {u:"psi", v:[8.5]}, "T95": {u:"°C", v:[147]} },
+                    "Kerosene": { "Freeze Point": {u:"°C", v:[-49]}, "T95": {u:"°C", v:[248]} },
+                    "Diesel": { "T95": {u:"°C", v:[335]}, "Cloud Point": {u:"°C", v:[-6]} },
+                    "AR": { "API": {u:"API", v:[12.8]}, "Sulfur": {u:"wt%", v:[4.44]} }
+                }
+            }
+        },
+        "KSRC": {
+            "Base Case": {
+                // Source: Unit parameters at various feeds.xlsx - KSRC Base Case..csv
+                feeds: [120],
+                params: {
+                    "Crude Feed (Tank)": {u: "sm3/h", v: [809.86]},
+                    "Slops": {u: "sm3/h", v: [7.52]},
+                    "Wild Naphtha": {u: "sm3/h", v: [3.58]},
+                    "Heater Feed Rate": {u: "sm3/h", v: [949.97]},
+                    "Washwater flow to Desalter V02 (75%)": {u: "%", v: [72.00]},
+                    "Washwater flow to Desalter E01 (25%)": {u: "%", v: [24.00]},
+                    "V-0001 inlet temperature": {u: "°C", v: [149.7]},
+                    "V-0002 inlet temperature": {u: "°C", v: [146.0]},
+                    "E-10 Outlet Temp to Preflash Drum": {u: "°C", v: [200.5]},
+                    "Heater Outlet Temperature": {u: "°C", v: [370.0]},
+                    "Column Top Temperature": {u: "°C", v: [113.0]},
+                    "Top Column Pressure": {u: "barg", v: [1.00]},
+                    "Top Pump Around Flow": {u: "sm3/h", v: [1270.0]},
+                    "Top Pump Around Draw Temperature": {u: "°C", v: [133.8]},
+                    "Top Pump Around Return Temperature": {u: "°C", v: [109.3]},
+                    "Middle Pump Around Flow": {u: "sm3/h", v: [861.8]},
+                    "Middle Pump Around Draw Temperature": {u: "°C", v: [221.9]},
+                    "Middle Pump Around Return Temperature": {u: "°C", v: [166.0]},
+                    "Bottom Pump Around Flow": {u: "sm3/h", v: [532.3]},
+                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [292.1]},
+                    "Bottom Pump Around Return Temperature": {u: "°C", v: [256.3]},
+                    "Column Bottom Temperature": {u: "°C", v: [348.1]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [188.5]},
+                    "Kerosene Reboiler Temperature": {u: "°C", v: [219.5]},
+                    "Light Diesel Draw Temperature": {u: "°C", v: [261.7]},
+                    "Heavy Diesel Draw Temperature": {u: "°C", v: [25.1]},
+                    "Overflash Flow": {u: "sm3/h", v: [61.65]},
+                    "Stripping Steam Temperature": {u: "°C", v: [302.6]},
+                    "Stripping steam to crude column": {u: "kg/hr", v: [9650]},
+                    "Stripping Steam to Light Diesel": {u: "kg/hr", v: [2500]},
+                    "Stripping Steam to Heavy Diesel": {u: "kg/hr", v: [109]},
+                    "Stabilizer feed temperature": {u: "°C", v: [110.8]},
+                    "Stabilizer reboiler inlet temperature": {u: "°C", v: [174.7]},
+                    "Stabilizer Reboiler outlet temperature": {u: "°C", v: [186.8]},
+                    "Stabilizer reflux flow": {u: "sm3/h", v: [0.003]},
+                    "BPA to reboiler inlet temperature": {u: "°C", v: [212.8]},
+                    "BPA to reboiler flow": {u: "sm3/h", v: [239.3]},
+                    "AR product temp. to ARDS": {u: "°C", v: [174.9]}
+                },
+                yields: { "LPG": [0], "Naphtha": [128.04], "Kerosene": [46.75], "Lt. Dsl": [142.98], "Hy. Dsl": [0], "AR": [532.78] },
+                quality: { 
+                    "Desalted Crude": { "Salt HEM": {u:"PTB", v:[0.4]}, "BS&W": {u:"%", v:[0.7]} },
+                    "Naphtha": { "RVP": {u:"psi", v:[7.25]}, "T95": {u:"°C", v:[146]} },
+                    "Kerosene": { "Freeze Point": {u:"°C", v:[-81]}, "T95": {u:"°C", v:[221]} },
+                    "Diesel": { "T95": {u:"°C", v:[320]}, "Cloud Point": {u:"°C", v:[-36]} },
+                    "AR": { "Sulfur": {u:"wt%", v:[5.78]} }
+                }
+            }
+        },
+        "KMHC": {
+            "Base Case": {
+                // Source: Unit parameters at various feeds.xlsx - KMHC Base Case.csv
+                feeds: [200, 120],
+                params: {
+                    "Crude Feed (Tank)": {u: "sm3/h", v: [1312.02, 810.73]},
+                    "Slops": {u: "sm3/h", v: [24.85, 0]},
+                    "Wild Naphtha": {u: "sm3/h", v: [1.73, 3.14]},
+                    "Heater Feed Rate": {u: "sm3/h", v: [1199.93, 734.77]},
+                    "Washwater flow to Desalter V02 (75%)": {u: "%", v: [51.99, 51.18]},
+                    "Washwater flow to Desalter E01 (25%)": {u: "%", v: [19.99, 17.06]},
+                    "V-0001 inlet temperature": {u: "°C", v: [150.9, 144.7]},
+                    "V-0002 inlet temperature": {u: "°C", v: [150.3, 143.7]},
+                    "E-10 Outlet Temp to Preflash Drum": {u: "°C", v: [188.8, 201.1]},
+                    "Heater Outlet Temperature": {u: "°C", v: [369.1, 370.3]},
+                    "Column Top Temperature": {u: "°C", v: [111.7, 112.4]},
+                    "Top Column Pressure": {u: "barg", v: [1.01, 1.00]},
+                    "Top Pump Around Flow": {u: "sm3/h", v: [1339.4, 1269.6]},
+                    "Top Pump Around Draw Temperature": {u: "°C", v: [127.6, 128.9]},
+                    "Top Pump Around Return Temperature": {u: "°C", v: [107.3, 109.4]},
+                    "Middle Pump Around Flow": {u: "sm3/h", v: [1242.7, 623.3]},
+                    "Middle Pump Around Draw Temperature": {u: "°C", v: [227.2, 216.4]},
+                    "Middle Pump Around Return Temperature": {u: "°C", v: [156.5, 170.1]},
+                    "Bottom Pump Around Flow": {u: "sm3/h", v: [1037.7, 547.6]},
+                    "Bottom Pump Around Draw Temperature": {u: "°C", v: [290.8, 292.6]},
+                    "Bottom Pump Around Return Temperature": {u: "°C", v: [263.6, 250.8]},
+                    "Column Bottom Temperature": {u: "°C", v: [342.0, 347.7]},
+                    "Kerosene Draw Temperature": {u: "°C", v: [177.0, 178.7]},
+                    "Kerosene Reboiler Temperature": {u: "°C", v: [217.6, 219.6]},
+                    "Light Diesel Draw Temperature": {u: "°C", v: [269.2, 259.2]},
+                    "Heavy Diesel Draw Temperature": {u: "°C", v: [42.9, 22.6]},
+                    "Overflash Flow": {u: "sm3/h", v: [0.16, 97.31]},
+                    "Stripping Steam Temperature": {u: "°C", v: [268.1, 265.4]},
+                    "Stripping steam to crude column": {u: "kg/hr", v: [23972, 15123]},
+                    "Stripping Steam to Light Diesel": {u: "kg/hr", v: [2340, 1776]},
+                    "Stripping Steam to Heavy Diesel": {u: "kg/hr", v: [108, 108]},
+                    "Stabilizer feed temperature": {u: "°C", v: [111.9, 116.0]},
+                    "Stabilizer reboiler inlet temperature": {u: "°C", v: [154.4, 168.9]},
+                    "Stabilizer Reboiler outlet temperature": {u: "°C", v: [214.5, 200.7]},
+                    "Stabilizer reflux flow": {u: "sm3/h", v: [17.47, 2.01]},
+                    "BPA to reboiler inlet temperature": {u: "°C", v: [263.9, 245.6]},
+                    "BPA to reboiler flow": {u: "sm3/h", v: [561.7, 402.6]},
+                    "AR product temp. to ARDS": {u: "°C", v: [168.7, 161.2]}
+                },
+                yields: { "LPG": [3.11, 3.56], "Naphtha": [222.70, 130.04], "Kerosene": [224.61, 105.78], "Lt. Dsl": [197.63, 128.29], "Hy. Dsl": [0, 0], "AR": [680.01, 424.50] },
+                quality: { 
+                    "Desalted Crude": { "Salt HEM": {u:"PTB", v:[0.6, 1.1]}, "BS&W": {u:"%", v:[0.6, 1.0]} },
+                    "Desalter Effluent": { "pH": {u: "pH", v: [5.1, 5.0]} },
+                    "SSW": { "pH": {u: "pH", v: [7.9, 8.5]} },
+                    "Naphtha": { "RVP": {u:"psi", v:[9.0, 8.1]}, "T95": {u:"°C", v:[146, 148]} },
+                    "Kerosene": { "Freeze Point": {u:"°C", v:[-49, -48]}, "T95": {u:"°C", v:[250, 245]} },
+                    "Diesel": { "T95": {u:"°C", v:[323, 330]}, "Cloud Point": {u:"°C", v:[-9, -7]} },
+                    "AR": { "API": {u:"API", v:[12.9, 12.0]}, "Sulfur": {u:"wt%", v:[4.46, 4.92]} }
+                }
+            }
+        }
+    };
+
+    const MODE_LABELS = {
+        "Max Kero (with Heavy Diesel)": { en: "with Heavy Diesel", ar: "مع ديزل ثقيل" },
+        "Max Kero (No Heavy Diesel)": { en: "no Heavy Diesel", ar: "بدون ديزل ثقيل" },
+        "Max Naphtha Mode": { en: "Naphtha Mode", ar: "وضع النافثا" },
+        "Base Case": { en: "Base Case", ar: "الحالة الأساسية" }
+    };
+
+    const STRINGS = {
+        en: {
+            mainTitle: "Crude Distillation Unit", subTitle: "Operational Parameters",
+            oilType: "Oil Type", opMode: "Operating Mode", inputUnit: "Input Unit", feedRate: "Feed Rate",
+            calcBtn: "Calculate", opParams: "Operational Parameters", paramName: "Parameter Name", value: "Value",
+            prodYields: "Production Yields", product: "Product", prodQuality: "Quality Specifications", 
+            stream: "Category", property: "Parameter", limit: "Value",
+            notesTitle: "General Notes & Guidelines", range: "Range: ", fixed: "Fixed: ",
+            
+            qNote1: "If SSW pH goes below 8, switchover to LP Condensate processing.",
+            qNote2: "If Desalter Effluent pH goes below 4.5, Contact U35 to optimize Caustic Injection.",
+
+            note1: "The above parameters based on previous performance with maximum yields + stable operations.. However, a variation is acceptable if the column profile is being maintained. Further fine tuning may be required in order to optimize the yields further. Minor adjustments can be done as needed. However, for any major deviation from the above, prior discussion with process engineer is recommended.",
+            note2: "Above are general guidelines, however desalter process parameters & chemical dosage shared through NALCO group to be followed.",
+            note3: "To be optimized depending on Diesel Cloud Point, On Spec -7 ° C winter and 4 °C summer."
+        },
+        ar: {
+            mainTitle: "وحدة تكرير النفط الخام", subTitle: "معايير التشغيل",
+            oilType: "نوع النفط", opMode: "وضع التشغيل", inputUnit: "وحدة الإدخال", feedRate: "كمية التكرير",
+            calcBtn: "احسب", opParams: "معايير التشغيل", paramName: "المعيار", value: "القيمة",
+            prodYields: "كميات الإنتاج", product: "المنتج", prodQuality: "مواصفات الجودة", 
+            stream: "الفئة", property: "المعيار", limit: "القيمة",
+            notesTitle: "ملاحظات وإرشادات عامة", range: "النطاق: ", fixed: "قيمة ثابتة: ",
+            
+            qNote1: "ذا انخفضت درجة حموضة الماء منزوع الحمضية عن 8، يجب التحويل إلى ماء الضغط المنخفض المكثف.",
+            qNote2: "إذا انخفضت درجة حمضية مياه صرف نزع الأملاح عن 4.5، تواصل مع U35 لتحسين حقن رماد الصودا.",
+
+            note1: "تستند المعايير أعلاه إلى قيم أداء فعلي سابق مع أقصى إنتاجية + عمليات مستقرة، التباين في القيم مقبول إذا تم الحفاظ على السلم الحراري لعمود تكرير النفط الخام، قد يلزم إجراء مزيد من الضبط الدقيق لتحسين الإنتاجية بشكل أكبر، كما يمكن إجراء تعديلات طفيفة حسب الحاجة، مع ذلك يُنصح بمناقشة أي انحراف كبير عن القيم أعلاه مع مهندس العمليات مسبقًا.",
+            note2: "ما ورد أعلاه إرشادات عامة، ومع ذلك يجب اتباع معايير عملية إزالة الأملاح والجرعات الكيميائية المشاركة من قبل مجموعة NALCO.",
+            note3: "يجب تعديل معايير التشغيل بناءً على نقطة التغييم للديزل (Cloud Point): المواصفات -7 °C شتاءً و 4 °C صيفاً."
+        }
+    };
+
+    let curLang = 'en';
+
+    // --- LOGIC ---
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        // System Theme Listener
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+             const newTheme = event.matches ? 'dark' : 'light';
+             document.documentElement.setAttribute('data-theme', newTheme);
+        });
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+
+        // Restore Language
+        const savedLang = localStorage.getItem('refinery-lang');
+        if (savedLang) {
+            curLang = savedLang;
+        }
+
+        const oilSelect = document.getElementById('oilTypeSelect');
+        if (oilSelect) {
+            for (let type in DB) {
+                let opt = document.createElement('option');
+                opt.value = type; opt.text = type;
+                oilSelect.add(opt);
+            }
+            
+            // Init UI with saved language
+            applyLanguageUI();
+            // Logic to fill modes now considers language
+            // IMPORTANT: Do NOT calculate results here, only setup UI
+            updateModes(false); 
+        }
+        
+        // Enter Key Listener
+        const feedInput = document.getElementById("feedInput");
+        if (feedInput) {
+            feedInput.addEventListener("keypress", function(event) {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                calculateResults();
+              }
+            });
+        }
+    });
+
+    function handleModeChange() {
+        updatePlaceholder();
+    }
+
+    function updateModes(preserveSelection = true) {
+        const oilType = document.getElementById('oilTypeSelect').value;
+        const modeSelect = document.getElementById('modeSelect');
+        
+        // Save selection to restore if possible
+        const currentVal = modeSelect.value;
+        
+        modeSelect.innerHTML = "";
+        
+        if (DB[oilType]) {
+            for (let mode in DB[oilType]) {
+                let opt = document.createElement('option');
+                opt.value = mode; // The internal key
+                
+                // Display Text Mapping
+                if (MODE_LABELS[mode]) {
+                    opt.text = MODE_LABELS[mode][curLang];
+                } else {
+                    opt.text = mode;
+                }
+                
+                modeSelect.add(opt);
+            }
+            
+            // Restore selection if it exists in new list
+            if (preserveSelection && currentVal && Array.from(modeSelect.options).some(o => o.value === currentVal)) {
+                modeSelect.value = currentVal;
+            }
+            
+            handleModeChange();
+        }
+    }
+
+    function updatePlaceholder() {
+        const oilType = document.getElementById('oilTypeSelect').value;
+        const mode = document.getElementById('modeSelect').value;
+        const unit = document.getElementById('unitSelect').value;
+        const feedInput = document.getElementById('feedInput');
+        
+        if (DB[oilType] && DB[oilType][mode]) {
+            const feeds = DB[oilType][mode].feeds;
+            let min = Math.min(...feeds);
+            let max = Math.max(...feeds);
+            
+            if (min === max) {
+                // --- FIXED VALUE LOGIC ---
+                let val = (unit === 'sm3hr') ? (min * CONVERSION_FACTOR).toFixed(0) : min;
+                let text = (curLang === 'en' ? STRINGS.en.fixed : STRINGS.ar.fixed) + val;
+                
+                feedInput.placeholder = text;
+                feedInput.value = val;          // Auto-fill Value
+                feedInput.disabled = true;      // Disable Input
+                
+                calculateResults();             // Auto-trigger Calculation
+            } else {
+                // --- RANGE LOGIC ---
+                if (unit === 'sm3hr') {
+                    min = (min * CONVERSION_FACTOR).toFixed(0);
+                    max = (max * CONVERSION_FACTOR).toFixed(0);
+                }
+                let text = (curLang === 'en' ? STRINGS.en.range : STRINGS.ar.range) + `${min} - ${max}`;
+                
+                feedInput.placeholder = text;
+                feedInput.disabled = false;     // Enable Input
+                feedInput.value = "";           // Clear Input for new typing
+            }
+        }
+    }
+
+    function lerp(x, x0, x1, y0, y1) {
+        return y0 + (x - x0) * (y1 - y0) / (x1 - x0);
+    }
+
+    function getInterpolatedValue(targetFeed, feeds, values) {
+        if (feeds.length === 1) return values[0];
+        if (feeds.includes(targetFeed)) return values[feeds.indexOf(targetFeed)];
+        
+        let points = feeds.map((f, i) => ({f: f, v: values[i]})).sort((a, b) => a.f - b.f);
+        if (targetFeed <= points[0].f) return points[0].v;
+        if (targetFeed >= points[points.length-1].f) return points[points.length-1].v;
+
+        for (let i = 0; i < points.length - 1; i++) {
+            if (targetFeed >= points[i].f && targetFeed <= points[i+1].f) {
+                return lerp(targetFeed, points[i].f, points[i+1].f, points[i].v, points[i+1].v);
+            }
+        }
+        return 0;
+    }
+
+    function calculateResults() {
+        // Show results container
+        document.getElementById('results-row').style.display = 'flex';
+
+        const oilType = document.getElementById('oilTypeSelect').value;
+        const mode = document.getElementById('modeSelect').value;
+        const unit = document.getElementById('unitSelect').value;
+        
+        let rawVal = document.getElementById('feedInput').value;
+        let rawInput = parseLocaleNumber(rawVal);
+        
+        if (isNaN(rawInput)) {
+            document.getElementById('feed-display-badge').innerText = "--";
+            return;
+        }
+
+        const data = DB[oilType][mode];
+        let targetKBPD = (unit === 'sm3hr') ? rawInput / CONVERSION_FACTOR : rawInput;
+        
+        let displayFeed = "";
+        if (unit === 'KBPD') {
+             let sm3Val = (rawInput * CONVERSION_FACTOR).toFixed(1);
+             displayFeed = `${rawInput} KBPD (${sm3Val} sm3/h)`;
+        } else {
+             let kbpdVal = (rawInput / CONVERSION_FACTOR).toFixed(1);
+             displayFeed = `${rawInput} sm3/h (${kbpdVal} KBPD)`;
+        }
+        document.getElementById('feed-display-badge').innerText = displayFeed;
+
+        // Params
+        let paramHTML = "";
+        for (let key in data.params) {
+            let item = data.params[key];
+            let val = getInterpolatedValue(targetKBPD, data.feeds, item.v);
+            let display = val.toLocaleString(undefined, {maximumFractionDigits: 1});
+            paramHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}<span class="unit-small">${item.u}</span></td></tr>`;
+        }
+        document.getElementById('params-body').innerHTML = paramHTML;
+
+        // Yields
+        let yieldHTML = "";
+        for (let key in data.yields) {
+            let val = getInterpolatedValue(targetKBPD, data.feeds, data.yields[key]);
+            let display = val.toLocaleString(undefined, {maximumFractionDigits: 1});
+            yieldHTML += `<tr><td>${key}</td><td class="text-end val-display">${display}</td></tr>`;
+        }
+        document.getElementById('yields-body').innerHTML = yieldHTML;
+
+        // Quality
+        let qualHTML = "";
+        for (let groupName in data.quality) {
+            let groupData = data.quality[groupName];
+            let subKeys = Object.keys(groupData);
+            subKeys.forEach((subKey, index) => {
+                let item = groupData[subKey];
+                let val = getInterpolatedValue(targetKBPD, data.feeds, item.v);
+                let display = (subKey.includes("Point") || subKey.includes("T95")) ? val.toFixed(0) : val.toFixed(2);
+                qualHTML += "<tr>";
+                if (index === 0) qualHTML += `<td class="group-cell" rowspan="${subKeys.length}">${groupName}</td>`;
+                qualHTML += `<td>${subKey}</td>`;
+                qualHTML += `<td class="text-end val-display">${display}<span class="unit-small">${item.u}</span></td>`;
+                qualHTML += "</tr>";
+            });
+        }
+        document.getElementById('quality-body').innerHTML = qualHTML;
+
+        renderQualityNotes();
+    }
+
+    function renderQualityNotes() {
+        const langObj = STRINGS[curLang];
+        const list = document.getElementById('quality-notes-list');
+        const area = document.getElementById('quality-notes-area');
+        
+        list.innerHTML = `
+            <li><i class='bi bi-exclamation-triangle-fill text-warning'></i> ${langObj.qNote1}</li>
+            <li><i class='bi bi-exclamation-triangle-fill text-warning'></i> ${langObj.qNote2}</li>
+        `;
+        area.style.display = 'block';
+    }
+
+    function updateStaticNotes() {
+        const footerList = document.getElementById('footer-static-notes');
+        footerList.innerHTML = `
+            <li>${STRINGS[curLang].note1}</li>
+            <li>${STRINGS[curLang].note2}</li>
+            <li>${STRINGS[curLang].note3}</li>
+        `;
+    }
+
+    // Mobile Manual Toggle
+    function toggleThemeManual() {
+        const html = document.documentElement;
+        const icon = document.getElementById('theme-icon');
+        const isDark = html.getAttribute('data-theme') === 'dark';
+        html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+        icon.className = isDark ? "bi bi-sun-fill" : "bi bi-moon-stars-fill";
+    }
+
+    function toggleLanguage() {
+        curLang = curLang === 'en' ? 'ar' : 'en';
+        localStorage.setItem('refinery-lang', curLang);
+        applyLanguageUI();
+    }
+
+    function applyLanguageUI() {
+        document.body.dir = curLang === 'ar' ? 'rtl' : 'ltr';
+        
+        // Animate Slider
+        const container = document.getElementById('lang-switch');
+        const optEn = document.getElementById('opt-en');
+        const optAr = document.getElementById('opt-ar');
+        
+        if (curLang === 'ar') {
+            container.classList.add('ar-active');
+            optAr.classList.add('active');
+            optEn.classList.remove('active');
+        } else {
+            container.classList.remove('ar-active');
+            optEn.classList.add('active');
+            optAr.classList.remove('active');
+        }
+        
+        // Translate UI
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            let key = el.getAttribute('data-i18n');
+            if (STRINGS[curLang][key]) el.innerText = STRINGS[curLang][key];
+        });
+        
+        // Update Mode Dropdown text without resetting selection
+        updateModes(true);
+        
+        updatePlaceholder();
+        renderQualityNotes(); 
+        updateStaticNotes();
+    }
+
+    window.onload = function() {
+        // Ensure updateStaticNotes runs on load
+        updateStaticNotes();
+    };
+</script>
